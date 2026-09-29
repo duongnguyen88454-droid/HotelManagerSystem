@@ -4,6 +4,7 @@ com\mycompany\hotelmanagersystem\controller\receptionist\ReceptionistPortalServl
 com\mycompany\hotelmanagersystem\service\auth\AuthService.class
 com\mycompany\hotelmanagersystem\controller\auth\LogoutServlet.class
 com\mycompany\hotelmanagersystem\controller\manager\ManagerPortalServlet.class
+com\mycompany\hotelmanagersystem\util\KeyGenerator.class
 com\mycompany\hotelmanagersystem\controller\housekeeper\HousekeeperPortalServlet.class
 com\mycompany\hotelmanagersystem\JakartaRestConfiguration.class
 com\mycompany\hotelmanagersystem\dao\auth\AccountDAO.class

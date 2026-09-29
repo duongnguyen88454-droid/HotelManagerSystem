@@ -24,6 +24,10 @@ public class Customer implements Serializable {
         this.cccd = cccd;
     }
 
+    public Customer(String maKH, String maTaiKhoan, String hoTen, String email, String soDT) {
+        this(maKH, maTaiKhoan, hoTen, email, soDT, null);
+    }
+
     public String getMaKH() {
         return maKH;
     }

@@ -51,19 +51,11 @@
                        style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px;"/>
             </div>
 
-            <div class="form-group" style="margin-bottom: 14px;">
+            <div class="form-group" style="margin-bottom: 20px;">
                 <label for="confirmPassword" style="display: block; font-weight: 600; margin-bottom: 4px; color: #2d3748;">
                     Xác nhận lại Mật khẩu: <span style="color: red;">*</span>
                 </label>
                 <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Nhập lại mật khẩu"
-                       style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px;"/>
-            </div>
-
-            <div class="form-group" style="margin-bottom: 20px;">
-                <label for="cccd" style="display: block; font-weight: 600; margin-bottom: 4px; color: #2d3748;">
-                    Số CCCD / CMND (để làm thủ tục lưu trú):
-                </label>
-                <input type="text" id="cccd" name="cccd" value="${oldCccd}" placeholder="VD: 079200001234"
                        style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px;"/>
             </div>
 

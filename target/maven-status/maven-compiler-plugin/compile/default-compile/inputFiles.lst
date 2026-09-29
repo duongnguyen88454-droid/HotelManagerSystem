@@ -15,6 +15,7 @@ D:\Learn\College\Lap trinh web\HotelManagerSystem\src\main\java\com\mycompany\ho
 D:\Learn\College\Lap trinh web\HotelManagerSystem\src\main\java\com\mycompany\hotelmanagersystem\dao\auth\AccountDAO.java
 D:\Learn\College\Lap trinh web\HotelManagerSystem\src\main\java\com\mycompany\hotelmanagersystem\util\DBContext.java
 D:\Learn\College\Lap trinh web\HotelManagerSystem\src\main\java\com\mycompany\hotelmanagersystem\dto\auth\UserSessionDTO.java
+D:\Learn\College\Lap trinh web\HotelManagerSystem\src\main\java\com\mycompany\hotelmanagersystem\util\KeyGenerator.java
 D:\Learn\College\Lap trinh web\HotelManagerSystem\src\main\java\com\mycompany\hotelmanagersystem\service\auth\AuthService.java
 D:\Learn\College\Lap trinh web\HotelManagerSystem\src\main\java\com\mycompany\hotelmanagersystem\model\Account.java
 D:\Learn\College\Lap trinh web\HotelManagerSystem\src\main\java\com\mycompany\hotelmanagersystem\model\Employee.java

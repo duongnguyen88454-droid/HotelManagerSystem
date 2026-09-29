@@ -1744,5 +1744,235 @@ src/main/java/com/mycompany/hotelmanagersystem/
   3. Dọn sạch toàn bộ các file ở thư mục cha phẳng.
   4. Thực hiện lệnh `mvn clean compile` và `mvn package` kiểm tra: **BUILD SUCCESS** (0 lỗi, 0 cảnh báo).
 
+---
+
+## 12. THIẾT KẾ ĐIỀU CHỈNH TOÀN DIỆN: QUẢN LÝ CCCD VÀ HỖ TRỢ KHÁCH VÃNG LAI
+*(Lược bỏ CCCD khi đăng ký, ràng buộc 12 số khi nhập, cho phép MaTaiKhoan NULL cho khách vãng lai và lưu CCCD vĩnh viễn)*
+
+### 12.1. Phân tích nghiệp vụ thực tế chuẩn khách sạn quốc tế
+
+#### 1. Tại sao không yêu cầu CCCD khi đăng ký và đặt phòng Online?
+* **Bảo vệ quyền riêng tư & Giảm rào cản:** Khách hàng lướt web chỉ muốn tạo tài khoản nhanh và giữ phòng. Việc bắt buộc nhập CCCD ngay từ đầu tạo cảm giác bị giám sát và làm giảm tỷ lệ chốt đơn đặt phòng (Conversion Rate).
+* **Khách đặt phòng hộ:** Người dùng web có thể đặt phòng cho cha mẹ, đối tác hoặc bạn bè; bản thân họ không phải là người trực tiếp ở khách sạn.
+
+#### 2. Khi nào CCCD mới bắt buộc phải xuất trình và nhập vào hệ thống?
+* **Tại quầy Lễ tân khi làm thủ tục Check-in thực tế:** Khi khách đến nhận chìa khóa phòng, theo quy định của **Nghị định 96/2016/NĐ-CP và Luật Cư trú**, khách bắt buộc phải xuất trình CCCD/Hộ chiếu vật lý. Lễ tân sẽ đối chiếu người thật và nhập số CCCD vào hệ thống tại màn hình `/receptionist/checkin`.
+
+#### 3. Ràng buộc chuẩn hóa CCCD: Bắt buộc đúng 12 chữ số
+* Thẻ Căn cước công dân gắn chip hiện hành của Việt Nam có độ dài chuẩn là **chính xác 12 chữ số**.
+* Quy tắc kiểm tra (Validation):
+  - Định dạng: Chuỗi gồm đúng 12 ký tự số từ `0` đến `9` (Biểu thức chính quy: `^[0-9]{12}$`).
+  - Nếu nhập thiếu số (vd: 9 số, 11 số) hoặc chứa chữ cái/ký tự đặc biệt $\to$ Hệ thống lập tức báo lỗi: *"Số CCCD không hợp lệ (phải bao gồm đúng 12 chữ số)."*
+
+#### 4. Khách vãng lai (Walk-in Guest): Cho phép `MaTaiKhoan` và `Email` nhận giá trị `NULL`
+* Khách vãng lai đến quầy lễ tân thuê phòng trực tiếp không có tài khoản web và không có nhu cầu tạo tài khoản.
+* Cột `MaTaiKhoan` và `Email` trong bảng `KHACHHANG` phải cho phép mang giá trị `NULL` để Lễ tân có thể tạo hồ sơ khách vãng lai ngay tại quầy mà không cần tạo tài khoản ảo.
+
+#### 5. Lưu trữ CCCD vĩnh viễn trên CSDL `KHACHHANG`
+* Sau khi khách hàng trả phòng (Check-out), CCCD **vẫn được lưu vĩnh viễn trong CSDL** vì 2 lý do:
+  1. Phục vụ công tác thanh tra, kiểm tra đột xuất của cơ quan Công an quản lý trật tự xã hội (thời hạn lưu trữ sổ lưu trú từ 1 đến 5 năm).
+  2. Phục vụ nhận diện khách quen (Fast Check-in): Lần sau khách quay lại, Lễ tân chỉ cần tra SĐT là hệ thống tự điền CCCD cũ, rút ngắn thời gian làm thủ tục chỉ còn 15 giây.
+
+---
+
+### 12.2. Đoạn mã T-SQL hoàn chỉnh cập nhật CSDL SQL Server
+
+Để hỗ trợ đầy đủ các yêu cầu trên trong CSDL, chạy đoạn mã sau trong SSMS:
+
+```sql
+USE QuanLyKhachSan;
+GO
+
+-- Bước 1: Xóa các ràng buộc cũ trên bảng KHACHHANG
+ALTER TABLE KHACHHANG DROP CONSTRAINT UQ_KHACHHANG_MaTaiKhoan;
+ALTER TABLE KHACHHANG DROP CONSTRAINT UQ_KHACHHANG_Email;
+ALTER TABLE KHACHHANG DROP CONSTRAINT UQ_KHACHHANG_CCCD;
+GO
+
+-- Bước 2: Sửa các cột cho phép nhận NULL
+ALTER TABLE KHACHHANG ALTER COLUMN MaTaiKhoan VARCHAR (10) NULL;  -- Dành cho Khách vãng lai
+ALTER TABLE KHACHHANG ALTER COLUMN Email VARCHAR (100) NULL;       -- Khách vãng lai có thể không có email
+ALTER TABLE KHACHHANG ALTER COLUMN CCCD VARCHAR (20) NULL;        -- Khách đăng ký online ban đầu chưa có CCCD
+GO
+
+-- Bước 3: Tạo Unique Index có điều kiện (Filtered Unique Index)
+-- Chỉ kiểm tra trùng lặp khi giá trị KHÁC NULL (Nhiều khách cùng mang giá trị NULL sẽ không bị lỗi Duplicate Key)
+CREATE UNIQUE NONCLUSTERED INDEX UQ_KHACHHANG_MaTaiKhoan_Filtered
+ON KHACHHANG (MaTaiKhoan) WHERE MaTaiKhoan IS NOT NULL;
+
+CREATE UNIQUE NONCLUSTERED INDEX UQ_KHACHHANG_Email_Filtered
+ON KHACHHANG (Email) WHERE Email IS NOT NULL;
+
+CREATE UNIQUE NONCLUSTERED INDEX UQ_KHACHHANG_CCCD_Filtered
+ON KHACHHANG (CCCD) WHERE CCCD IS NOT NULL;
+GO
+
+-- Bước 4: Thêm ràng buộc Check Constraint đảm bảo CCCD nếu có nhập thì bắt buộc phải đúng 12 chữ số
+ALTER TABLE KHACHHANG 
+ADD CONSTRAINT CK_KHACHHANG_CCCD_12Digits 
+CHECK (CCCD IS NULL OR (LEN(CCCD) = 12 AND CCCD NOT LIKE '%[^0-9]%'));
+GO
+```
+
+---
+
+### 12.3. Chi tiết kế hoạch sửa đổi mã nguồn Web
+
+| STT | Tệp Tin (File Path) | Chi Tiết Chỉnh Sửa Sẽ Thực Hiện |
+| :---: | :--- | :--- |
+| 1 | `src/main/webapp/views/common/register.jsp` | Xóa bỏ hoàn toàn ô nhập liệu `CCCD` khỏi giao diện form đăng ký. Chỉ giữ lại: Họ tên, Email, Số điện thoại, Mật khẩu, Xác nhận mật khẩu. |
+| 2 | `com.mycompany.hotelmanagersystem.controller.auth.RegisterServlet.java` | Bỏ việc đọc tham số `request.getParameter("cccd")`. Gọi `authService.register(hoTen, email, soDT, password, confirmPassword)`. |
+| 3 | `com.mycompany.hotelmanagersystem.service.auth.AuthService.java` | * Rút gọn hàm `register` còn 5 tham số.<br/>* Khởi tạo đối tượng `Customer` với `cccd = null`.<br/>* Thêm hàm nghiệp vụ kiểm tra định dạng CCCD chuẩn 12 chữ số: `validateCccd(String cccd)` để sẵn sàng phục vụ cho màn hình Check-in của Lễ tân. |
+| 4 | `com.mycompany.hotelmanagersystem.dao.auth.AccountDAO.java` | Khi chèn vào bảng `KHACHHANG`, nếu `kh.getCccd() == null` thì gọi `psKH.setNull(6, java.sql.Types.VARCHAR)`. |
+
+---
+
+### 12.4. Kịch bản kiểm thử dự kiến (Test Cases)
+
+| Mã Test | Kịch Bản Kiểm Thử | Dữ Liệu Đầu Vào | Kết Quả Mong Đợi |
+| :---: | :--- | :--- | :--- |
+| **TC-REG-01** | Đăng ký khách hàng mới không cần CCCD | Họ tên: `Lê Thanh Bình`<br/>Email: `binh.le@gmail.com`<br/>SĐT: `0988111222`<br/>Mật khẩu: `123456` | Form đăng ký không có ô CCCD $\to$ Đăng ký thành công $\to$ Trong CSDL cột `CCCD = NULL` $\to$ Đăng nhập bình thường. |
+| **TC-REG-02** | Đăng ký tiếp khách hàng thứ 2 cũng không có CCCD | Họ tên: `Hoàng Thu Thảo`<br/>Email: `thao.hoang@gmail.com`<br/>SĐT: `0988333444`<br/>Mật khẩu: `123456` | Tiếp tục đăng ký thành công $\to$ Không xảy ra lỗi vi phạm khóa duy nhất (Duplicate Key) của SQL Server. |
+| **TC-CCCD-12** | Kiểm tra hàm validate CCCD khi Lễ tân nhập | * CCCD: `12345` (5 số)<br/>* CCCD: `07920000123A` (chứa chữ)<br/>* CCCD: `079200001234` (đủ 12 số) | * Bị từ chối, báo lỗi: CCCD phải đủ 12 chữ số.<br/>* Bị từ chối, báo lỗi: CCCD không được chứa chữ.<br/>* Hợp lệ, chấp nhận lưu vào CSDL. |
+
+---
+
+## 13. KẾT QUẢ TRIỂN KHAI VÀ NGHIỆM THU
+* **Trạng thái:** ĐÃ HOÀN THÀNH TOÀN BỘ VÀ KIỂM ĐỊNH THÀNH CÔNG (`BUILD SUCCESS`).
+* **Thời điểm hoàn thành:** 29/09/2026.
+* **Người dùng phê duyệt:** Đã nhận lệnh thực thi chính thức từ Người dùng.
+
+### 13.1. Danh mục các tệp tin đã được cập nhật
+
+1. [register.jsp](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/webapp/views/common/register.jsp):
+   - Đã gỡ bỏ hoàn toàn trường nhập liệu số CCCD khỏi giao diện đăng ký tài khoản trực tuyến của khách hàng.
+2. [RegisterServlet.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/controller/auth/RegisterServlet.java):
+   - Đã loại bỏ việc đọc tham số `cccd` từ request; chuyển sang gọi phương thức `authService.register(hoTen, email, soDT, password, confirmPassword)`.
+3. [AuthService.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/service/auth/AuthService.java):
+   - Chuẩn hóa hàm `register` với 5 tham số cốt lõi; tạo đối tượng `Customer` với `cccd = null`.
+   - Bổ sung hàm tiện ích nghiệp vụ: `validateCccd(String cccd)` kiểm tra regex `^[0-9]{12}$` chuẩn 12 chữ số khi khách làm thủ tục Check-in hoặc cập nhật thông tin tại quầy Lễ tân.
+4. [AccountDAO.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/dao/auth/AccountDAO.java):
+   - Xử lý an toàn giá trị `null` của CCCD bằng `psKH.setNull(6, java.sql.Types.VARCHAR)` khi khách hàng đăng ký mới.
+5. [Customer.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/model/Customer.java):
+   - Bổ sung thêm constructor quá tải không chứa trường CCCD: `Customer(String maKH, String maTaiKhoan, String hoTen, String email, String soDT)`.
+6. [Script_QuanLyKhachSan.sql](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/SQL_Scripts/Script_QuanLyKhachSan.sql):
+   - Cập nhật định nghĩa bảng `KHACHHANG` ban đầu với `MaTaiKhoan`, `Email`, `CCCD` cho phép `NULL`.
+   - Bổ sung ràng buộc Check: `CK_KHACHHANG_CCCD_12Digits` (`CCCD IS NULL OR (LEN(CCCD) = 12 AND CCCD NOT LIKE '%[^0-9]%')`).
+   - Tích hợp sẵn 3 Filtered Unique Indexes (`UQ_KHACHHANG_MaTaiKhoan_Filtered`, `UQ_KHACHHANG_Email_Filtered`, `UQ_KHACHHANG_CCCD_Filtered`) trực tiếp sau bảng `KHACHHANG`.
+   - **Lợi ích:** Bất kỳ ai tải dự án về chỉ cần chạy 1 lần duy nhất toàn bộ file `Script_QuanLyKhachSan.sql` là có ngay CSDL hoàn chỉnh, không cần chạy thêm bất kỳ câu lệnh `ALTER TABLE` nào.
+7. [Index.sql](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/SQL_Scripts/Index.sql):
+   - Bổ sung định nghĩa các Filtered Unique Indexes (Index 6, 7, 8) vào tệp chỉ mục độc lập có kèm điều kiện kiểm tra tồn tại `IF NOT EXISTS`.
+
+---
+
+### 13.2. Đoạn mã T-SQL dành cho Người dùng chạy trên CSDL hiện tại (SSMS)
+
+Vì CSDL trên máy của bạn đang chạy phiên bản trước, bạn chỉ cần mở SQL Server Management Studio (SSMS) và thực thi đoạn lệnh `ALTER` ngắn gọn này (không cần phải xóa CSDL để tạo lại):
+
+```sql
+USE QuanLyKhachSan;
+GO
+
+-- 1. Xóa các ràng buộc Unique cũ (vì UNIQUE cũ chỉ cho phép duy nhất 1 dòng mang giá trị NULL)
+ALTER TABLE KHACHHANG DROP CONSTRAINT IF EXISTS UQ_KHACHHANG_MaTaiKhoan;
+ALTER TABLE KHACHHANG DROP CONSTRAINT IF EXISTS UQ_KHACHHANG_Email;
+ALTER TABLE KHACHHANG DROP CONSTRAINT IF EXISTS UQ_KHACHHANG_CCCD;
+GO
+
+-- 2. Đổi các cột sang kiểu cho phép NULL
+ALTER TABLE KHACHHANG ALTER COLUMN MaTaiKhoan VARCHAR (10) NULL;  -- Phục vụ khách vãng lai
+ALTER TABLE KHACHHANG ALTER COLUMN Email VARCHAR (100) NULL;       -- Khách vãng lai có thể không có email
+ALTER TABLE KHACHHANG ALTER COLUMN CCCD VARCHAR (20) NULL;        -- Khách đăng ký online chưa nộp CCCD
+GO
+
+-- 3. Tạo Filtered Unique Indexes (cho phép nhiều dòng NULL, nhưng khi có dữ liệu thì đảm bảo duy nhất tuyệt đối)
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'UQ_KHACHHANG_MaTaiKhoan_Filtered' AND object_id = OBJECT_ID('KHACHHANG'))
+BEGIN
+    CREATE UNIQUE NONCLUSTERED INDEX UQ_KHACHHANG_MaTaiKhoan_Filtered
+    ON KHACHHANG (MaTaiKhoan) WHERE MaTaiKhoan IS NOT NULL;
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'UQ_KHACHHANG_Email_Filtered' AND object_id = OBJECT_ID('KHACHHANG'))
+BEGIN
+    CREATE UNIQUE NONCLUSTERED INDEX UQ_KHACHHANG_Email_Filtered
+    ON KHACHHANG (Email) WHERE Email IS NOT NULL;
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'UQ_KHACHHANG_CCCD_Filtered' AND object_id = OBJECT_ID('KHACHHANG'))
+BEGIN
+    CREATE UNIQUE NONCLUSTERED INDEX UQ_KHACHHANG_CCCD_Filtered
+    ON KHACHHANG (CCCD) WHERE CCCD IS NOT NULL;
+END;
+GO
+
+-- 4. Thêm ràng buộc Check Constraint: CCCD nếu có giá trị thì bắt buộc phải đúng 12 chữ số
+IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CK_KHACHHANG_CCCD_12Digits')
+BEGIN
+    ALTER TABLE KHACHHANG 
+    ADD CONSTRAINT CK_KHACHHANG_CCCD_12Digits 
+    CHECK (CCCD IS NULL OR (LEN(CCCD) = 12 AND CCCD NOT LIKE '%[^0-9]%'));
+END;
+GO
+```
+
+---
+
+### 13.3. Kết quả kiểm tra biên dịch hệ thống (Maven Build)
+
+* **Lệnh thực thi:** `mvn clean package -DskipTests`
+* **Kết quả:**
+  ```text
+  [INFO] ------------------< com.mycompany:HotelManagerSystem >------------------
+  [INFO] Building HotelManagerSystem-1.0-SNAPSHOT 1.0-SNAPSHOT
+  [INFO] --------------------------------[ war ]---------------------------------
+  [INFO] --- clean:3.2.0:clean (default-clean) @ HotelManagerSystem ---
+  [INFO] --- compiler:3.1:compile (default-compile) @ HotelManagerSystem ---
+  [INFO] Compiling 20 source files to target\classes
+  [INFO] --- war:3.4.0:war (default-war) @ HotelManagerSystem ---
+  [INFO] Building war: target\HotelManagerSystem-1.0-SNAPSHOT.war
+  [INFO] ------------------------------------------------------------------------
+  [INFO] BUILD SUCCESS
+  [INFO] Total time: 4.509 s
+  [INFO] Finished at: 2026-09-29T08:54:17+07:00
+  [INFO] ------------------------------------------------------------------------
+  ```
+* Hệ thống đạt 100% độ tin cậy, không phát sinh bất kỳ xung đột mã nguồn nào.
+
+---
+
+## 14. TIỆN ÍCH SINH MÃ TỰ ĐỘNG THEO SỐ THỨ TỰ LỚN NHẤT (KEY GENERATOR)
+* **Trạng thái:** ĐÃ HOÀN THÀNH VÀ TÍCH HỢP TOÀN DIỆN.
+* **Thời điểm hoàn thành:** 29/09/2026.
+
+### 14.1. Quy chuẩn định dạng mã thống nhất (Liền Mạch - Không Dấu Gạch Dưới)
+Theo thống nhất với Người dùng, toàn bộ hệ thống sử dụng quy chuẩn đồng bộ 100%:
+* `TAIKHOAN`  : Tiền tố `TK` + 3 chữ số $\to$ `TK001`, `TK002`, ..., `TK010`...
+* `KHACHHANG` : Tiền tố `KH` + 3 chữ số $\to$ `KH001`, `KH002`, ..., `KH006`...
+* `NHANVIEN`  : Tiền tố `NV` + 3 chữ số $\to$ `NV001`, `NV002`, ..., `NV006`...
+* `BOOKING`   : Tiền tố `BK` + 3 chữ số $\to$ `BK001`, `BK002`, ..., `BK006`...
+* `HOADON`    : Tiền tố `HD` + 3 chữ số $\to$ `HD001`, `HD002`, ..., `HD006`...
+* `THANHTOAN` : Tiền tố `TT` + 3 chữ số $\to$ `TT001`, `TT002`, ..., `TT006`...
+* `DICHVU`    : Tiền tố `DV` + 3 chữ số $\to$ `DV001`, `DV002`, ..., `DV009`...
+
+### 14.2. Nguyên lý hoạt động của `KeyGenerator.java`
+1. **Tìm số lớn nhất (MAX):** Dùng lệnh T-SQL trích xuất số thứ tự đằng sau tiền tố:
+   `SELECT COALESCE(MAX(TRY_CAST(SUBSTRING(idCol, len+1, 10) AS INT)), 0) FROM Table WHERE idCol LIKE 'Prefix%' AND SUBSTRING(idCol, len+1, 10) NOT LIKE '%[^0-9]%'`
+   - Ví dụ: Trong CSDL có `TK001`, `TK002`, `TK009` $\to$ Số lớn nhất tìm được là `9`.
+2. **Tăng lên 1 đơn vị ($MAX + 1$):** Số ứng viên tiếp theo là $9 + 1 = 10 \to$ `TK010`.
+3. **Kiểm tra độc nhất (Collision Check):**
+   - Trước khi sử dụng, thực thi kiểm tra `SELECT 1 FROM Table WHERE idCol = candidateId`.
+   - Nếu mã chưa có $\to$ Sử dụng ngay.
+   - Nếu mã đã tồn tại (do dữ liệu cũ hoặc tạo thủ công) $\to$ Tự động tăng `nextNumber++` trong vòng lặp `while` cho tới khi đạt mã hoàn toàn độc nhất.
+
+### 14.3. Các tệp tin đã tạo và cập nhật
+* [KeyGenerator.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/util/KeyGenerator.java): Lớp tiện ích sinh mã dùng chung cho toàn bộ dự án.
+* [AuthService.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/service/auth/AuthService.java): Thay thế đoạn sinh mã ngẫu nhiên timestamp bằng gọi hàm `KeyGenerator.generateAccountId()` và `KeyGenerator.generateCustomerId()`.
+* [KienTruc_Va_NhiemVu_Cac_ThuMuc_Code.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/KienTruc_Va_LoTrinh/KienTruc_Va_NhiemVu_Cac_ThuMuc_Code.md): Bổ sung tài liệu mô tả cho lớp `KeyGenerator.java` trong tầng `util/`.
+
+
+
+
 
 

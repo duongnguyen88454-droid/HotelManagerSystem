@@ -32,10 +32,9 @@ public class RegisterServlet extends HttpServlet {
         String soDT = request.getParameter("soDT");
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
-        String cccd = request.getParameter("cccd");
 
         try {
-            boolean success = authService.register(hoTen, email, soDT, password, confirmPassword, cccd);
+            boolean success = authService.register(hoTen, email, soDT, password, confirmPassword);
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/login?msg=register_success");
             } else {
@@ -47,7 +46,6 @@ public class RegisterServlet extends HttpServlet {
             request.setAttribute("oldHoTen", hoTen);
             request.setAttribute("oldEmail", email);
             request.setAttribute("oldSoDT", soDT);
-            request.setAttribute("oldCccd", cccd);
             request.getRequestDispatcher("/views/common/register.jsp").forward(request, response);
         }
     }

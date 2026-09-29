@@ -4,6 +4,7 @@ import com.mycompany.hotelmanagersystem.dao.auth.AccountDAO;
 import com.mycompany.hotelmanagersystem.dto.auth.UserSessionDTO;
 import com.mycompany.hotelmanagersystem.model.Customer;
 import com.mycompany.hotelmanagersystem.model.Account;
+import com.mycompany.hotelmanagersystem.util.KeyGenerator;
 import com.mycompany.hotelmanagersystem.util.PasswordUtil;
 
 public class AuthService {
@@ -58,9 +59,9 @@ public class AuthService {
     }
 
     /**
-     * Đăng ký tài khoản Khách hàng mới (Email và SĐT là 2 trường bắt buộc duy nhất)
+     * Đăng ký tài khoản Khách hàng mới online (Email và SĐT là 2 trường bắt buộc duy nhất; CCCD không yêu cầu khi đăng ký).
      */
-    public boolean register(String hoTen, String email, String soDT, String password, String confirmPassword, String cccd) throws Exception {
+    public boolean register(String hoTen, String email, String soDT, String password, String confirmPassword) throws Exception {
         if (hoTen == null || hoTen.trim().isEmpty() ||
             email == null || email.trim().isEmpty() ||
             soDT == null || soDT.trim().isEmpty() ||
@@ -89,19 +90,29 @@ public class AuthService {
             throw new Exception("Số điện thoại này đã được đăng ký cho tài khoản khác.");
         }
 
-        // Tự sinh mã định danh duy nhất
-        String uniqueSuffix = String.valueOf(System.currentTimeMillis() % 100000);
-        String maTaiKhoan = "TK_" + uniqueSuffix;
-        String maKH = "KH_" + uniqueSuffix;
+        // Tự sinh mã tự tăng theo chuẩn liền mạch (TK001, KH001...) dựa trên số lớn nhất hiện có
+        String maTaiKhoan = KeyGenerator.generateAccountId();
+        String maKH = KeyGenerator.generateCustomerId();
 
         // Băm mật khẩu bằng thuật toán SHA-256 trước khi lưu vào CSDL
         String hashedPassword = PasswordUtil.hashPassword(password);
 
-        // Lưu tài khoản với TenDangNhap = Email và mật khẩu đã băm
+        // Lưu tài khoản với TenDangNhap = Email và mật khẩu đã băm; CCCD để null khi đăng ký online
         Account tk = new Account(maTaiKhoan, email.trim(), hashedPassword, "VT01", "Active");
-        Customer kh = new Customer(maKH, maTaiKhoan, hoTen.trim(), email.trim(), soDT.trim(), 
-                                     cccd != null ? cccd.trim() : "");
+        Customer kh = new Customer(maKH, maTaiKhoan, hoTen.trim(), email.trim(), soDT.trim(), null);
 
         return accountDAO.registerCustomer(tk, kh);
+    }
+
+    /**
+     * Kiểm tra tính hợp lệ của số CCCD theo quy chuẩn Nhà nước Việt Nam:
+     * - Bắt buộc đúng 12 ký tự chữ số [0-9]
+     * - Được sử dụng khi khách hàng check-in tại quầy hoặc cập nhật hồ sơ cá nhân
+     */
+    public boolean validateCccd(String cccd) {
+        if (cccd == null || cccd.trim().isEmpty()) {
+            return false;
+        }
+        return cccd.trim().matches("^[0-9]{12}$");
     }
 }

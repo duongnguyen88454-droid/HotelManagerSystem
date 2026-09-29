@@ -201,6 +201,7 @@ flowchart TD
 * **Các Class hiện có:**
   - [DBContext.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/util/DBContext.java): Cung cấp hàm `getConnection()` kết nối Microsoft SQL Server qua JDBC Driver, cùng các hàm đóng kết nối an toàn.
   - [PasswordUtil.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/util/PasswordUtil.java): Cung cấp thuật toán băm mật khẩu `hashPassword` bằng SHA-256 một chiều 64 ký tự và hàm `verifyPassword` so khớp mật khẩu kèm cơ chế tương thích ngược (fallback).
+  - [KeyGenerator.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/util/KeyGenerator.java): Cung cấp cơ chế tự động sinh mã khóa chính tăng dần chuẩn liền mạch (`TK001`, `KH001`, `NV001`, `BK001`, `HD001`...) dựa trên số lớn nhất hiện có trong CSDL kèm vòng lặp kiểm tra tính độc nhất (collision-proof).
 
 ---
 

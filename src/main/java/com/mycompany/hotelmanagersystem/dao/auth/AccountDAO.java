@@ -133,7 +133,11 @@ public class AccountDAO {
                 psKH.setString(3, kh.getHoTen());
                 psKH.setString(4, kh.getEmail());
                 psKH.setString(5, kh.getSoDT());
-                psKH.setString(6, kh.getCccd());
+                if (kh.getCccd() != null && !kh.getCccd().trim().isEmpty()) {
+                    psKH.setString(6, kh.getCccd().trim());
+                } else {
+                    psKH.setNull(6, java.sql.Types.VARCHAR);
+                }
                 psKH.executeUpdate();
             }
 
