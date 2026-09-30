@@ -133,6 +133,13 @@ public class KeyGenerator {
      * Sinh mã Dịch vụ: DV001, DV002... -> DV009
      */
     public static String generateServiceId() {
-        return generateNextId("DICHVU", "MaDV", "DV", 3);
+        return generateNextId("DICHVU", "MaDichVu", "DV", 3);
+    }
+
+    /**
+     * Sinh mã Chi tiết dịch vụ đặt phòng: BD001, BD002... -> BD010
+     */
+    public static String generateBookingDichVuId() {
+        return generateNextId("BOOKING_DICHVU", "MaBookingDichVu", "BD", 3);
     }
 }

@@ -63,7 +63,7 @@ BEGIN
         IF NOT EXISTS (SELECT 1 FROM HOADON WHERE MaBooking = @MaBookingMoi)
         BEGIN
             INSERT INTO HOADON (MaHoaDon, MaBooking, NgayLap, TongTienCuoiCung, MaNV, TrangThai)
-            VALUES ('HD_' + SUBSTRING(@MaBookingMoi, 4, 7), @MaBookingMoi, GETDATE(), NULL, 'NV001', 'ChuaThanhToan');
+            VALUES ('HD' + SUBSTRING(@MaBookingMoi, 3, 8), @MaBookingMoi, GETDATE(), NULL, 'NV001', 'ChuaThanhToan');
         END
 
         -- MỌI THAO TÁC THÀNH CÔNG -> XÁC NHẬN LƯU VĨNH VIỄN

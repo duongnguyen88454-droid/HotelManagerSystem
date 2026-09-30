@@ -15,19 +15,19 @@ public class AuthService {
     }
 
     /**
-     * Xác thực đăng nhập bằng Email hoặc Số điện thoại
+     * Xác thực đăng nhập bằng đúng Email và Mật khẩu trong bảng TAIKHOAN
      */
-    public UserSessionDTO login(String loginIdentifier, String password) throws Exception {
-        if (loginIdentifier == null || loginIdentifier.trim().isEmpty()) {
-            throw new Exception("Vui lòng nhập Email hoặc Số điện thoại.");
+    public UserSessionDTO login(String email, String password) throws Exception {
+        if (email == null || email.trim().isEmpty()) {
+            throw new Exception("Vui lòng nhập Email.");
         }
         if (password == null || password.trim().isEmpty()) {
             throw new Exception("Vui lòng nhập mật khẩu.");
         }
 
-        UserSessionDTO user = accountDAO.checkLogin(loginIdentifier.trim(), password);
+        UserSessionDTO user = accountDAO.checkLogin(email.trim(), password);
         if (user == null) {
-            throw new Exception("Email/Số điện thoại hoặc mật khẩu không chính xác.");
+            throw new Exception("Email hoặc mật khẩu không chính xác.");
         }
 
         if ("Locked".equalsIgnoreCase(user.getTrangThai())) {
@@ -59,14 +59,15 @@ public class AuthService {
     }
 
     /**
-     * Đăng ký tài khoản Khách hàng mới online (Email và SĐT là 2 trường bắt buộc duy nhất; CCCD không yêu cầu khi đăng ký).
+     * Đăng ký tài khoản Web Khách hàng mới online (Chỉ ghi vào bảng TAIKHOAN với đúng 6 thuộc tính chuẩn;
+     * Hoàn toàn không ghi vào bảng KHACHHANG, không bắt buộc SĐT lúc tạo tài khoản).
      */
-    public boolean register(String hoTen, String email, String soDT, String password, String confirmPassword) throws Exception {
+    public boolean register(String hoTen, String email, String password, String confirmPassword)
+            throws Exception {
         if (hoTen == null || hoTen.trim().isEmpty() ||
-            email == null || email.trim().isEmpty() ||
-            soDT == null || soDT.trim().isEmpty() ||
-            password == null || password.trim().isEmpty()) {
-            throw new Exception("Vui lòng điền đầy đủ: Họ tên, Email, Số điện thoại và Mật khẩu.");
+                email == null || email.trim().isEmpty() ||
+                password == null || password.trim().isEmpty()) {
+            throw new Exception("Vui lòng điền đầy đủ: Họ tên, Email và Mật khẩu.");
         }
 
         if (!password.equals(confirmPassword)) {
@@ -77,31 +78,29 @@ public class AuthService {
             throw new Exception("Địa chỉ email không đúng định dạng.");
         }
 
-        // Kiểm tra định dạng số điện thoại (chứa chữ số, từ 9-11 ký tự)
-        if (!soDT.trim().matches("^[0-9]{9,11}$")) {
-            throw new Exception("Số điện thoại không hợp lệ (phải từ 9 đến 11 chữ số).");
-        }
-
         if (accountDAO.checkEmailExists(email.trim())) {
-            throw new Exception("Email này đã được sử dụng. Vui lòng chọn email khác.");
+            throw new Exception("Email này đã được sử dụng để đăng ký tài khoản. Vui lòng đăng nhập hoặc chọn email khác.");
         }
 
-        if (accountDAO.checkPhoneExists(soDT.trim())) {
-            throw new Exception("Số điện thoại này đã được đăng ký cho tài khoản khác.");
-        }
-
-        // Tự sinh mã tự tăng theo chuẩn liền mạch (TK001, KH001...) dựa trên số lớn nhất hiện có
+        // Tự sinh mã tài khoản theo chuẩn liền mạch (TK001, TK002...)
         String maTaiKhoan = KeyGenerator.generateAccountId();
-        String maKH = KeyGenerator.generateCustomerId();
 
         // Băm mật khẩu bằng thuật toán SHA-256 trước khi lưu vào CSDL
         String hashedPassword = PasswordUtil.hashPassword(password);
 
-        // Lưu tài khoản với TenDangNhap = Email và mật khẩu đã băm; CCCD để null khi đăng ký online
-        Account tk = new Account(maTaiKhoan, email.trim(), hashedPassword, "VT01", "Active");
-        Customer kh = new Customer(maKH, maTaiKhoan, hoTen.trim(), email.trim(), soDT.trim(), null);
+        // Lưu tài khoản chuẩn đúng 6 thuộc tính vào bảng TAIKHOAN:
+        // MaTaiKhoan, MatKhau, MaVaiTro, TrangThai, HoTenTaiKhoan, Email
+        Account tk = new Account(maTaiKhoan, hashedPassword, "VT01", "Active", hoTen.trim(), email.trim());
 
-        return accountDAO.registerCustomer(tk, kh);
+        return accountDAO.registerAccount(tk);
+    }
+
+    /**
+     * Tương thích ngược: Đăng ký tài khoản (bỏ qua soDT vì TAIKHOAN chỉ lưu 6 thuộc tính chuẩn)
+     */
+    public boolean register(String hoTen, String email, String soDT, String password, String confirmPassword)
+            throws Exception {
+        return register(hoTen, email, password, confirmPassword);
     }
 
     /**

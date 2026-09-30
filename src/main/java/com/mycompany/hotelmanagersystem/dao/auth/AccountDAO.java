@@ -17,36 +17,36 @@ import java.sql.SQLException;
 public class AccountDAO {
 
     /**
-     * Xác thực thông tin đăng nhập bằng EMAIL hoặc SỐ ĐIỆN THOẠI đã đăng ký
-     * Hỗ trợ xác thực mật khẩu băm SHA-256 (kèm Fallback cho mật khẩu seed '1234')
+     * Xác thực thông tin đăng nhập:
+     * - Đăng nhập bằng đúng EMAIL và MẬT KHẨU tồn tại trong bảng TAIKHOAN.
+     * - Đồng bộ với CSDL chuẩn 3NF: TAIKHOAN có 6 thuộc tính (HoTenTaiKhoan, Email trực tiếp).
+     * - Xác thực mật khẩu mã hóa SHA-256 (kèm Fallback cho mật khẩu seed '1234').
      */
-    public UserSessionDTO checkLogin(String loginIdentifier, String password) {
+    public UserSessionDTO checkLogin(String email, String password) {
+        if (email == null || email.trim().isEmpty() || password == null) {
+            return null;
+        }
+
         String sql = "SELECT tk.MaTaiKhoan, tk.MatKhau, tk.MaVaiTro, vt.TenVaiTro, tk.TrangThai, "
-                + "COALESCE(kh.HoTen, nv.HoTen, N'Người Dùng') AS HoTen, "
-                + "COALESCE(kh.MaKH, nv.MaNV, '') AS MaDinhDanh, "
-                + "COALESCE(kh.Email, nv.Email, tk.TenDangNhap) AS Email, "
-                + "COALESCE(kh.SoDT, nv.SoDienThoai, '') AS SoDT "
+                + "COALESCE(tk.HoTenTaiKhoan, N'Người Dùng') AS HoTen, "
+                + "tk.Email, "
+                + "COALESCE(kh.SoDT, nv.SoDienThoai, '') AS SoDT, "
+                + "COALESCE(kh.MaKH, nv.MaNV, '') AS MaDinhDanh "
                 + "FROM TAIKHOAN tk "
                 + "JOIN VAITRO vt ON tk.MaVaiTro = vt.MaVaiTro "
                 + "LEFT JOIN KHACHHANG kh ON tk.MaTaiKhoan = kh.MaTaiKhoan "
                 + "LEFT JOIN NHANVIEN nv ON tk.MaTaiKhoan = nv.MaTaiKhoan "
-                + "WHERE (kh.Email = ? OR kh.SoDT = ? OR nv.Email = ? OR nv.SoDienThoai = ? OR tk.TenDangNhap = ?)";
+                + "WHERE tk.Email = ?";
 
         try (Connection conn = DBContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            // Truyền định danh đăng nhập vào cả 5 vị trí: Email khách, SĐT khách, Email NV,
-            // SĐT NV, Tên đăng nhập gốc
-            ps.setString(1, loginIdentifier);
-            ps.setString(2, loginIdentifier);
-            ps.setString(3, loginIdentifier);
-            ps.setString(4, loginIdentifier);
-            ps.setString(5, loginIdentifier);
+            ps.setString(1, email.trim());
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     String storedPassword = rs.getString("MatKhau");
-                    // Xác thực mật khẩu qua PasswordUtil (hỗ trợ hash SHA-256 và fallback)
+                    // Xác thực mật khẩu qua PasswordUtil (hỗ trợ hash SHA-256 và fallback seed)
                     if (PasswordUtil.verifyPassword(password, storedPassword)) {
                         return new UserSessionDTO(
                                 rs.getString("MaTaiKhoan"),
@@ -67,14 +67,13 @@ public class AccountDAO {
     }
 
     /**
-     * Kiểm tra Email đã tồn tại trong CSDL chưa (bảng KHACHHANG hoặc TAIKHOAN)
+     * Kiểm tra Email đã tồn tại trong bảng TAIKHOAN chưa
      */
     public boolean checkEmailExists(String email) {
-        String sql = "SELECT 1 FROM KHACHHANG WHERE Email = ? UNION SELECT 1 FROM TAIKHOAN WHERE TenDangNhap = ?";
+        String sql = "SELECT 1 FROM TAIKHOAN WHERE Email = ?";
         try (Connection conn = DBContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
-            ps.setString(2, email);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
@@ -103,65 +102,38 @@ public class AccountDAO {
     }
 
     /**
-     * Đăng ký tài khoản Khách hàng mới bằng Transaction ACID
+     * Đăng ký tài khoản Web mới (CHỈ ghi vào TAIKHOAN với đúng 6 thuộc tính chuẩn, 
+     * không can thiệp vào bảng KHACHHANG)
      */
-    public boolean registerCustomer(Account tk, Customer kh) {
-        String sqlTaiKhoan = "INSERT INTO TAIKHOAN (MaTaiKhoan, TenDangNhap, MatKhau, MaVaiTro, TrangThai) "
-                + "VALUES (?, ?, ?, ?, ?)";
-        String sqlKhachHang = "INSERT INTO KHACHHANG (MaKH, MaTaiKhoan, HoTen, Email, SoDT, CCCD) "
+    public boolean registerAccount(Account tk) {
+        String sqlTaiKhoan = "INSERT INTO TAIKHOAN (MaTaiKhoan, MatKhau, MaVaiTro, TrangThai, HoTenTaiKhoan, Email) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
 
-        Connection conn = null;
-        try {
-            conn = DBContext.getConnection();
-            conn.setAutoCommit(false); // Bắt đầu Transaction
-
-            // 1. Chèn vào TAIKHOAN (TenDangNhap = Email)
-            try (PreparedStatement psTK = conn.prepareStatement(sqlTaiKhoan)) {
-                psTK.setString(1, tk.getMaTaiKhoan());
-                psTK.setString(2, tk.getTenDangNhap());
-                psTK.setString(3, tk.getMatKhau());
-                psTK.setString(4, tk.getMaVaiTro());
-                psTK.setString(5, tk.getTrangThai());
-                psTK.executeUpdate();
-            }
-
-            // 2. Chèn vào KHACHHANG
-            try (PreparedStatement psKH = conn.prepareStatement(sqlKhachHang)) {
-                psKH.setString(1, kh.getMaKH());
-                psKH.setString(2, kh.getMaTaiKhoan());
-                psKH.setString(3, kh.getHoTen());
-                psKH.setString(4, kh.getEmail());
-                psKH.setString(5, kh.getSoDT());
-                if (kh.getCccd() != null && !kh.getCccd().trim().isEmpty()) {
-                    psKH.setString(6, kh.getCccd().trim());
-                } else {
-                    psKH.setNull(6, java.sql.Types.VARCHAR);
-                }
-                psKH.executeUpdate();
-            }
-
-            conn.commit(); // Thành công cả 2 bảng
-            return true;
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement psTK = conn.prepareStatement(sqlTaiKhoan)) {
+            psTK.setString(1, tk.getMaTaiKhoan());
+            psTK.setString(2, tk.getMatKhau());
+            psTK.setString(3, tk.getMaVaiTro() != null ? tk.getMaVaiTro() : "VT01");
+            psTK.setString(4, tk.getTrangThai() != null ? tk.getTrangThai() : "Active");
+            psTK.setString(5, tk.getHoTenTaiKhoan());
+            psTK.setString(6, tk.getEmail());
+            return psTK.executeUpdate() > 0;
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
             return false;
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
+    }
+
+    /**
+     * Tương thích ngược: Đăng ký tài khoản (chuyển tiếp sang registerAccount)
+     */
+    public boolean registerCustomer(Account tk, Customer kh) {
+        if (tk.getHoTenTaiKhoan() == null && kh != null) {
+            tk.setHoTenTaiKhoan(kh.getHoTen());
+        }
+        if (tk.getEmail() == null && kh != null) {
+            tk.setEmail(kh.getEmail());
+        }
+        return registerAccount(tk);
     }
 }

@@ -24,15 +24,15 @@ BEGIN
        OR UPDATE(NgayNhanDuKien) 
        OR UPDATE(NgayTraDuKien)
     BEGIN
-        -- 1. Chặn đặt các phòng đang bẩn (Dirty), đang dọn (Cleaning) hoặc đang hư hại (Damaged)
+        -- 1. Chặn đặt các phòng đang bị hư hại (Damaged)
         IF EXISTS (
             SELECT 1
             FROM inserted i
             INNER JOIN PHONG p ON i.MaPhong = p.MaPhong
-            WHERE p.TrangThai IN ('Dirty', 'Cleaning', 'Damaged')
+            WHERE p.TrangThai = 'Damaged'
         )
         BEGIN
-            RAISERROR(N'Lỗi nghiệp vụ: Phòng đang trong quá trình dọn dẹp (Dirty/Cleaning) hoặc bị hư hỏng (Damaged), không thể nhận đặt phòng!', 16, 1);
+            RAISERROR(N'Lỗi nghiệp vụ: Phòng đang bị hư hỏng (Damaged), không thể nhận đặt phòng!', 16, 1);
             ROLLBACK TRANSACTION;
             RETURN;
         END
@@ -44,8 +44,8 @@ BEGIN
             INNER JOIN BOOKING b_new ON i.MaBooking = b_new.MaBooking
             INNER JOIN BOOKING_PHONG bp_old ON i.MaPhong = bp_old.MaPhong AND i.MaBooking <> bp_old.MaBooking
             INNER JOIN BOOKING b_old ON bp_old.MaBooking = b_old.MaBooking
-            WHERE b_new.TrangThai IN ('DaXacNhan', 'DaCheckIn')
-              AND b_old.TrangThai IN ('DaXacNhan', 'DaCheckIn')
+            WHERE b_new.TrangThai IN ('ChoXacNhan', 'DaXacNhan', 'DaCheckIn')
+              AND b_old.TrangThai IN ('ChoXacNhan', 'DaXacNhan', 'DaCheckIn')
               AND NOT (i.NgayTraDuKien <= bp_old.NgayNhanDuKien OR i.NgayNhanDuKien >= bp_old.NgayTraDuKien)
         )
         BEGIN
@@ -163,7 +163,7 @@ BEGIN
 
     INSERT INTO HOADON (MaHoaDon, MaBooking, NgayLap, TongTienCuoiCung, MaNV, TrangThai)
     SELECT 
-        'HD_' + SUBSTRING(i.MaBooking, 4, 7),
+        'HD' + SUBSTRING(i.MaBooking, 3, 8),
         i.MaBooking,
         GETDATE(),
         NULL,

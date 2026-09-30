@@ -8,17 +8,17 @@ public class UserSessionDTO implements Serializable {
     private String maTaiKhoan;
     private String email;
     private String soDT;
-    private String maVaiTro;     // 'VT01', 'VT02', 'VT03', 'VT04'
-    private String tenVaiTro;    // 'Customer', 'Receptionist', 'HouseKeeper', 'Manager'
-    private String hoTen;        // Họ tên lấy từ KHACHHANG hoặc NHANVIEN
-    private String maDinhDanh;   // Mã KH (nếu là khách) hoặc Mã NV (nếu là nhân viên)
-    private String trangThai;    // 'Active', 'Locked'
+    private String maVaiTro; // 'VT01', 'VT02', 'VT03', 'VT04'
+    private String tenVaiTro; // 'Customer', 'Receptionist', 'HouseKeeper', 'Manager'
+    private String hoTen; // Họ tên lấy từ KHACHHANG hoặc NHANVIEN
+    private String maDinhDanh; // Mã KH (nếu là khách) hoặc Mã NV (nếu là nhân viên)
+    private String trangThai; // 'Active', 'Locked'
 
     public UserSessionDTO() {
     }
 
-    public UserSessionDTO(String maTaiKhoan, String email, String soDT, String maVaiTro, 
-                          String tenVaiTro, String hoTen, String maDinhDanh, String trangThai) {
+    public UserSessionDTO(String maTaiKhoan, String email, String soDT, String maVaiTro,
+            String tenVaiTro, String hoTen, String maDinhDanh, String trangThai) {
         this.maTaiKhoan = maTaiKhoan;
         this.email = email;
         this.soDT = soDT;
@@ -71,6 +71,14 @@ public class UserSessionDTO implements Serializable {
         this.soDT = soDT;
     }
 
+    public String getSoDienThoai() {
+        return soDT;
+    }
+
+    public void setSoDienThoai(String soDienThoai) {
+        this.soDT = soDienThoai;
+    }
+
     public String getMaVaiTro() {
         return maVaiTro;
     }
@@ -109,5 +117,13 @@ public class UserSessionDTO implements Serializable {
 
     public void setTrangThai(String trangThai) {
         this.trangThai = trangThai;
+    }
+
+    public String getHoTenTaiKhoan() {
+        return hoTen;
+    }
+
+    public void setHoTenTaiKhoan(String hoTenTaiKhoan) {
+        this.hoTen = hoTenTaiKhoan;
     }
 }

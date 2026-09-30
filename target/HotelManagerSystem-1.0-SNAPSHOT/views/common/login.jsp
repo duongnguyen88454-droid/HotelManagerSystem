@@ -22,7 +22,7 @@
         <%-- Thông báo thành công --%>
         <c:if test="${param.msg == 'register_success'}">
             <div class="alert alert-success" style="margin-bottom: 20px;">
-                <strong>✓ Thành công:</strong> Tài khoản đã được tạo! Mời bạn đăng nhập bằng Email hoặc SĐT.
+                <strong>✓ Thành công:</strong> Tài khoản đã được tạo! Mời bạn đăng nhập bằng Email và Mật khẩu.
             </div>
         </c:if>
         <c:if test="${param.msg == 'logged_out'}">
@@ -38,10 +38,10 @@
 
             <div class="form-group" style="margin-bottom: 16px;">
                 <label for="loginIdentifier" style="display: block; font-weight: 600; margin-bottom: 6px; color: #2d3748;">
-                    Email hoặc Số điện thoại:
+                    Email đăng nhập:
                 </label>
-                <input type="text" id="loginIdentifier" name="loginIdentifier" class="form-control" 
-                       value="${oldIdentifier}" placeholder="VD: an.nguyen@gmail.com hoặc 0901111111" required 
+                <input type="email" id="loginIdentifier" name="loginIdentifier" class="form-control" 
+                       value="${oldIdentifier}" placeholder="VD: an.nguyen@gmail.com" required 
                        style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px;"/>
             </div>
 

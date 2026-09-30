@@ -9,7 +9,7 @@
     <div class="card shadow-sm" style="background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 30px;">
         <div style="text-align: center; margin-bottom: 25px;">
             <h2 style="color: #1a365d; margin-bottom: 8px;">ĐĂNG KÝ KHÁCH HÀNG</h2>
-            <p style="color: #718096; font-size: 14px;">Email và Số điện thoại sẽ dùng để đăng nhập hệ thống</p>
+            <p style="color: #718096; font-size: 14px;">Email sẽ dùng để đăng nhập hệ thống</p>
         </div>
 
         <c:if test="${not empty errorMessage}">
@@ -32,14 +32,6 @@
                     Địa chỉ Email (Dùng để đăng nhập): <span style="color: red;">*</span>
                 </label>
                 <input type="email" id="email" name="email" value="${oldEmail}" required placeholder="VD: nam.tran@gmail.com"
-                       style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px;"/>
-            </div>
-
-            <div class="form-group" style="margin-bottom: 14px;">
-                <label for="soDT" style="display: block; font-weight: 600; margin-bottom: 4px; color: #2d3748;">
-                    Số điện thoại (Dùng để đăng nhập): <span style="color: red;">*</span>
-                </label>
-                <input type="tel" id="soDT" name="soDT" value="${oldSoDT}" required placeholder="VD: 0912345678"
                        style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px;"/>
             </div>
 
