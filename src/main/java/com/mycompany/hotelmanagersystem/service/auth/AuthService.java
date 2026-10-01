@@ -2,7 +2,7 @@ package com.mycompany.hotelmanagersystem.service.auth;
 
 import com.mycompany.hotelmanagersystem.dao.auth.AccountDAO;
 import com.mycompany.hotelmanagersystem.dto.auth.UserSessionDTO;
-import com.mycompany.hotelmanagersystem.model.Customer;
+import com.mycompany.hotelmanagersystem.customer.model.Customer;
 import com.mycompany.hotelmanagersystem.model.Account;
 import com.mycompany.hotelmanagersystem.util.PasswordUtil;
 

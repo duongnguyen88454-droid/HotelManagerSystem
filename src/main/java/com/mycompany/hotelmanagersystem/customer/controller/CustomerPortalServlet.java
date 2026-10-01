@@ -1,4 +1,4 @@
-package com.mycompany.hotelmanagersystem.controller.customer;
+package com.mycompany.hotelmanagersystem.customer.controller;
 
 import com.mycompany.hotelmanagersystem.room.model.RoomType;
 import com.mycompany.hotelmanagersystem.room.service.RoomService;
