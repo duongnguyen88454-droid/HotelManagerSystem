@@ -7,7 +7,7 @@ import com.mycompany.hotelmanagersystem.dto.booking.BookingDetailDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.BookingDichVuItemDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.CustomerBookingHistoryDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.RoomBookingDetailDTO;
-import com.mycompany.hotelmanagersystem.util.DBContext;
+import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.sql.Connection;
 import java.sql.Date;

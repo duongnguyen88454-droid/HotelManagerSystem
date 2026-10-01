@@ -1,7 +1,7 @@
 package com.mycompany.hotelmanagersystem.dao.customer;
 
 import com.mycompany.hotelmanagersystem.model.Customer;
-import com.mycompany.hotelmanagersystem.util.DBContext;
+import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

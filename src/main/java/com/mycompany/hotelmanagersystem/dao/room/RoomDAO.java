@@ -4,7 +4,7 @@ import com.mycompany.hotelmanagersystem.dto.receptionist.RoomMapKpiDTO;
 import com.mycompany.hotelmanagersystem.dto.receptionist.RoomTimelineDTO;
 import com.mycompany.hotelmanagersystem.dto.room.AvailableRoomDTO;
 import com.mycompany.hotelmanagersystem.model.RoomType;
-import com.mycompany.hotelmanagersystem.util.DBContext;
+import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.sql.Connection;
 import java.sql.Date;
