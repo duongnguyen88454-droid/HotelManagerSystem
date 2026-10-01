@@ -1,12 +1,12 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="/views/common/header.jsp">
     <jsp:param name="title" value="Bàn Làm Việc Lễ Tân - Sơ Đồ Phòng Timeline"/>
 </jsp:include>
 <jsp:include page="/views/common/navbar.jsp"/>
 
-<style>
-    /* RESET & THEME ENTERPRISE PMS */
+<style type="text/css">
+    /* RESET VA THEME ENTERPRISE PMS */
     .pms-container { max-width: 1440px; margin: 25px auto 60px auto; padding: 0 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     .pms-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 20px; }
     
@@ -22,7 +22,7 @@
     .badge-occupied { background: #b91c1c; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
     .badge-booked { background: #4338ca; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
     
-    /* CONTROLS & FILTER */
+    /* CONTROLS VA FILTER */
     .filter-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px; padding: 16px 20px; border-bottom: 1px solid #e2e8f0; }
     .filter-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .pms-input, .pms-select { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 13px; background: #ffffff; color: #1e293b; }
@@ -66,7 +66,7 @@
     .bar-occupied { background: #dc2626; border-left: 4px solid #7f1d1d; }
     .bar-checkout-today { background: #ea580c; border-left: 4px solid #7c2d12; }
     
-    /* CENTERED POPUP MODAL & BACKDROP OVERLAY */
+    /* CENTERED POPUP MODAL VA BACKDROP OVERLAY */
     .pms-modal-backdrop {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(15, 23, 42, 0.65); z-index: 1000;
@@ -93,7 +93,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <div>
             <h2 style="color: #0f172a; margin: 0; font-size: 22px; font-weight: 800;">BÀN LÀM VIỆC LỄ TÂN - SƠ ĐỒ PHÒNG TIMELINE</h2>
-            <p style="color: #64748b; margin: 4px 0 0 0; font-size: 13px;">Hệ thống Quản lý Đặt phòng & Tiếp đón Khách hàng thời gian thực</p>
+            <p style="color: #64748b; margin: 4px 0 0 0; font-size: 13px;">Hệ thống Quản lý Đặt phòng &amp; Tiếp đón Khách hàng thời gian thực</p>
         </div>
         <div style="display: flex; gap: 10px;">
             <button class="pms-btn pms-btn-primary" onclick="alert('Chức năng đặt phòng nhanh tại quầy sẽ được kích hoạt ở các bước tiếp theo.')">[ Đặt phòng mới ]</button>
@@ -112,14 +112,14 @@
             <span class="kpi-item"><span class="badge-dirty">[Bẩn chờ dọn]</span> : <strong>${kpi != null ? kpi.soPhongDirty : 0}</strong></span>
             <span class="kpi-item"><span class="badge-cleaning">[Đang dọn]</span> : <strong>${kpi != null ? kpi.soPhongCleaning : 0}</strong></span>
             <span class="kpi-item"><span class="badge-damaged">[Bảo trì]</span> : <strong>${kpi != null ? kpi.soPhongDamaged : 0}</strong></span>
-            <c:if test="${kpi != null && kpi.soPhongBooked > 0}">
+            <c:if test="${kpi != null and kpi.soPhongBooked gt 0}">
                 <span class="kpi-item"><span class="badge-booked" style="background:#e0e7ff;color:#3730a3;font-weight:700;padding:3px 8px;border-radius:4px;font-size:11px;">[Đã giữ chỗ]</span> : <strong>${kpi.soPhongBooked}</strong></span>
             </c:if>
             <span style="color: #cbd5e1;">|</span>
             <span class="kpi-item">Tỷ lệ lấp đầy: <strong style="color: #1e3a8a;">${kpi != null ? kpi.formattedOccupancyRate : '0.0%'}</strong></span>
         </div>
 
-        <!-- 2. BỘ LỌC TÌM KIẾM & ĐIỀU HƯỚNG -->
+        <!-- 2. BỘ LỌC TÌM KIẾM VA ĐIỀU HƯỚNG -->
         <div class="filter-toolbar">
             <div class="filter-group">
                 <input type="text" id="filterKeyword" class="pms-input" placeholder="Tìm tên khách, SĐT, số phòng, mã BK..." style="width: 260px;" oninput="applyFilter()">
@@ -142,9 +142,9 @@
                 <button type="button" class="pms-btn pms-btn-secondary" onclick="resetFilter()">[ Đặt lại ]</button>
             </div>
             <div class="filter-group">
-                <button class="pms-btn pms-btn-secondary" onclick="alert('Đang xem tuần hiện tại 29/09/2026 - 05/10/2026')">[ < Tuần trước ]</button>
+                <button class="pms-btn pms-btn-secondary" onclick="alert('Đang xem tuần hiện tại 29/09/2026 - 05/10/2026')">[ &lt; Tuần trước ]</button>
                 <strong style="font-size: 13px; color: #1e293b;">Tuần: 29/09/2026 - 05/10/2026</strong>
-                <button class="pms-btn pms-btn-secondary" onclick="alert('Đang xem tuần hiện tại 29/09/2026 - 05/10/2026')">[ Tuần sau > ]</button>
+                <button class="pms-btn pms-btn-secondary" onclick="alert('Đang xem tuần hiện tại 29/09/2026 - 05/10/2026')">[ Tuần sau &gt; ]</button>
             </div>
         </div>
 
@@ -162,7 +162,7 @@
             <table class="timeline-table">
                 <thead>
                     <tr>
-                        <th class="room-col-header">PHÒNG & LOẠI PHÒNG</th>
+                        <th class="room-col-header">PHÒNG &amp; LOẠI PHÒNG</th>
                         <th class="day-col-header">Thứ 2 (29/09)</th>
                         <th class="day-col-header">Thứ 3 (30/09)</th>
                         <th class="day-col-header">Thứ 4 (01/10)</th>
@@ -357,7 +357,7 @@
                     <option value="DV01" data-price="150000" data-unit="Suất">Ăn sáng Buffet (DV01) - 150.000 đ/Suất</option>
                     <option value="DV02" data-price="60000" data-unit="Bộ">Giặt ủi quần áo (DV02) - 60.000 đ/Bộ</option>
                     <option value="DV03" data-price="350000" data-unit="Chuyến">Đưa đón sân bay (DV03) - 350.000 đ/Chuyến</option>
-                    <option value="DV04" data-price="450000" data-unit="Lượt">Massage & Spa Body (DV04) - 450.000 đ/Lượt</option>
+                    <option value="DV04" data-price="450000" data-unit="Lượt">Massage &amp; Spa Body (DV04) - 450.000 đ/Lượt</option>
                     <option value="DV06" data-price="180000" data-unit="Ngày">Thuê xe máy tự lái (DV06) - 180.000 đ/Ngày</option>
                 </select>
             </div>
@@ -396,7 +396,7 @@
 </div>
 
 <script>
-    // 1. TÌM KIẾM & BỘ LỌC TIMELINE
+    // 1. TÌM KIẾM VA BỘ LỌC TIMELINE
     function applyFilter() {
         const kw = document.getElementById('filterKeyword').value.trim().toLowerCase();
         const floor = document.getElementById('filterFloor').value;
@@ -549,7 +549,7 @@
         openModal('roomDetailModal');
     }
 
-    // 3. TÍNH TOÁN & GỌI DỊCH VỤ
+    // 3. TÍNH TOÁN VA GỌI DỊCH VỤ
     function adjustQty(delta) {
         const qtyInput = document.getElementById('orderQty');
         let current = parseInt(qtyInput.value) || 1;
