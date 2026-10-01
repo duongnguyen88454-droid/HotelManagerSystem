@@ -7,7 +7,7 @@ import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
 import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
 import com.mycompany.hotelmanagersystem.customer.model.Customer;
 import com.mycompany.hotelmanagersystem.hotelservice.model.ServiceItem;
-import com.mycompany.hotelmanagersystem.customer.dao.CustomerDAO;
+import com.mycompany.hotelmanagersystem.customer.service.CustomerService;
 import com.mycompany.hotelmanagersystem.booking.service.BookingService;
 import com.mycompany.hotelmanagersystem.room.service.RoomService;
 
@@ -29,7 +29,7 @@ public class CustomerBookingServlet extends HttpServlet {
 
     private final RoomService roomService = new RoomService();
     private final BookingService bookingService = new BookingService();
-    private final CustomerDAO customerDAO = new CustomerDAO();
+    private final CustomerService customerService = new CustomerService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -71,12 +71,12 @@ public class CustomerBookingServlet extends HttpServlet {
         Customer savedGuest = null;
         UserSessionDTO currentUser = (session != null) ? (UserSessionDTO) session.getAttribute("CURRENT_USER") : null;
         if (currentUser != null) {
-            savedGuest = customerDAO.getGuestProfileByAccount(currentUser.getMaTaiKhoan(), currentUser.getEmail());
+            savedGuest = customerService.getGuestProfileByAccount(currentUser.getMaTaiKhoan(), currentUser.getEmail());
             // Nếu chưa tìm thấy qua DB nhưng trong session có lưu CCCD
             if (savedGuest == null) {
                 String savedCccd = (String) session.getAttribute("SAVED_CCCD");
                 if (savedCccd != null && !savedCccd.trim().isEmpty()) {
-                    savedGuest = customerDAO.findCustomerByCCCD(savedCccd.trim());
+                    savedGuest = customerService.findCustomerByCCCD(savedCccd.trim());
                 }
             }
         }
@@ -187,7 +187,7 @@ public class CustomerBookingServlet extends HttpServlet {
             // Tra cứu hoặc tạo/cập nhật hồ sơ KHACHHANG dựa theo CCCD và liên kết với tài
             // khoản
             String maTaiKhoan = currentUser.getMaTaiKhoan();
-            String maKH = customerDAO.findOrUpsertGuestByCCCD(customerName, customerEmail, customerPhone,
+            String maKH = customerService.findOrUpsertGuestByCCCD(customerName, customerEmail, customerPhone,
                     customerCccd.trim(), maTaiKhoan);
 
             String createdBookingId = bookingService.createMultiRoomBooking(maKH, maTaiKhoan, cart, note);

@@ -30,9 +30,9 @@ graph TD
 
     Common[common<br/>DBContext, EncodingFilter]:::commonStyle
     Room[room<br/>RoomDAO, RoomService, DTOs, Room/RoomType]:::feature
-    HotelService[hotelservice<br/>ServiceDAO, ServiceItem]:::independent
+    HotelService[hotelservice<br/>ServiceDAO, HotelServiceService, ServiceItem]:::independent
     Employee[employee<br/>Employee]:::independent
-    Customer[customer<br/>CustomerDAO, Customer]:::feature
+    Customer[customer<br/>CustomerDAO, CustomerService, Customer]:::feature
     Auth[auth<br/>AccountDAO, AuthService, AuthFilter, DTO/Models]:::feature
     Booking[booking<br/>BookingDAO, BookingService, DTOs, Models]:::feature
     Receptionist[receptionist<br/>ReceptionistPortalServlet]:::portal
@@ -77,6 +77,7 @@ graph TD
 | `auth/filter` | Auth / Bảo mật | Chặn và kiểm soát quyền truy cập URL theo vai trò. | WebFilter kiểm tra quyền theo vai trò. | Filter UTF-8 chung. | `AuthFilter.java` |
 | `auth/util` | Auth / Tiện ích | Tiện ích băm mật khẩu SHA-256 nội bộ phân hệ Auth. | Utility class thuần hàm static băm mã. | Controller, DAO, Servlet. | `PasswordUtil.java` |
 | `customer/controller`| Customer / Cổng | Điều hướng trang chủ phân hệ khách hàng. | HttpServlet quản lý trang chủ khách. | Logic kiểm tra buồng phòng. | `CustomerPortalServlet.java`|
+| `customer/service`   | Customer / Nghiệp vụ | Xử lý logic hồ sơ khách hàng, tra cứu CCCD, đối soát tài khoản. | Service quản lý hồ sơ khách lưu trú. | HttpServlet, SQL thô. | `CustomerService.java` |
 | `customer/dao` | Customer / Dữ liệu | Tương tác dữ liệu hồ sơ khách hàng `KHACHHANG`. | DAO thêm/sửa/tìm hồ sơ khách hàng. | Quản lý giỏ hàng, thông tin phòng. | `CustomerDAO.java` |
 | `customer/model` | Customer / Thực thể | Ánh xạ cấu trúc bảng `KHACHHANG`. | Entity khách hàng đại diện lưu trú. | Câu lệnh SQL, HTTP response. | `Customer.java` |
 | `room/controller` | Room / Điều hướng | Xử lý tra cứu phòng trống và xem chi tiết phòng. | HttpServlet tìm kiếm và chi tiết phòng. | Thuật toán kiểm tra xung đột lịch. | `CustomerSearchRoomServlet.java` |
@@ -89,6 +90,7 @@ graph TD
 | `booking/dao` | Booking / Dữ liệu | Quản lý Transaction ghi nhận đơn đặt phòng và dịch vụ.| DAO thực thi ACID cho booking, hóa đơn.| Dữ liệu session, redirect URL. | `BookingDAO.java` |
 | `booking/dto` | Booking / Vận chuyển | Chứa giỏ hàng, chi tiết đơn đặt và lịch sử đơn. | DTO đóng gói giỏ phòng, đơn booking. | Entity gắn liền CSDL. | `BookingCartDTO.java`, `BookingDetailDTO.java` |
 | `booking/model` | Booking / Thực thể | Ánh xạ thực thể đơn đặt, phòng đặt, dịch vụ và hóa đơn.| Entity `BOOKING`, `HOADON`... | Logic tính tiền hoặc validate form.| `Booking.java`, `Invoice.java`|
+| `hotelservice/service`| HotelService / Nghiệp vụ| Cung cấp danh mục dịch vụ tiện ích bổ trợ cho các domain.| Service dịch vụ tiện ích khách sạn. | Servlet, câu lệnh SQL thô. | `HotelServiceService.java` |
 | `hotelservice/dao` | HotelService / Dữ liệu| Truy vấn danh mục dịch vụ tiện ích bổ sung. | DAO làm việc với bảng `DICHVU`. | Xử lý giỏ hàng, session. | `ServiceDAO.java` |
 | `hotelservice/model`| HotelService / Thực thể| Biểu diễn thực thể dịch vụ khách sạn. | Entity ánh xạ bảng `DICHVU`. | HttpServlet, JDBC connection. | `ServiceItem.java` |
 | `employee/model` | Employee / Thực thể | Biểu diễn thực thể nhân viên khách sạn. | Entity ánh xạ bảng `NHANVIEN`. | Phân quyền hay servlet logic. | `Employee.java` |

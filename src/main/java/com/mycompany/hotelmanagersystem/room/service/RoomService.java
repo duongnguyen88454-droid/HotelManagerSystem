@@ -2,6 +2,8 @@ package com.mycompany.hotelmanagersystem.room.service;
 
 import com.mycompany.hotelmanagersystem.room.dao.RoomDAO;
 import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
+import com.mycompany.hotelmanagersystem.room.dto.RoomMapKpiDTO;
+import com.mycompany.hotelmanagersystem.room.dto.RoomTimelineDTO;
 import com.mycompany.hotelmanagersystem.room.model.RoomType;
 
 import java.sql.Date;
@@ -141,5 +143,29 @@ public class RoomService {
         room.setTongTienDuKien(room.getGiaPhong() * soDem);
 
         return room;
+    }
+
+    /**
+     * FN-3.1: Lấy toàn bộ danh sách phòng thực tế theo tầng phục vụ sơ đồ buồng phòng
+     */
+    public List<RoomTimelineDTO> getAllRoomsForTimeline() {
+        return roomDAO.getAllRoomsForTimeline();
+    }
+
+    /**
+     * FN-3.1: Lấy các chỉ số thống kê buồng phòng thời gian thực (KPI)
+     */
+    public RoomMapKpiDTO getRoomMapKpi() {
+        return roomDAO.getRoomMapKpi();
+    }
+
+    /**
+     * Lấy thông tin phòng theo mã phòng
+     */
+    public AvailableRoomDTO getRoomDetailById(String maPhong) {
+        if (maPhong == null || maPhong.trim().isEmpty()) {
+            return null;
+        }
+        return roomDAO.getRoomDetailById(maPhong.trim());
     }
 }

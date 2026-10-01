@@ -1,8 +1,8 @@
 package com.mycompany.hotelmanagersystem.booking.service;
 
 import com.mycompany.hotelmanagersystem.booking.dao.BookingDAO;
-import com.mycompany.hotelmanagersystem.room.dao.RoomDAO;
-import com.mycompany.hotelmanagersystem.hotelservice.dao.ServiceDAO;
+import com.mycompany.hotelmanagersystem.room.service.RoomService;
+import com.mycompany.hotelmanagersystem.hotelservice.service.HotelServiceService;
 import com.mycompany.hotelmanagersystem.booking.dto.BookingCartDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartRoomItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
@@ -20,26 +20,26 @@ import java.util.Map;
 public class BookingService {
 
     private final BookingDAO bookingDAO;
-    private final RoomDAO roomDAO;
-    private final ServiceDAO serviceDAO;
+    private final RoomService roomService;
+    private final HotelServiceService hotelServiceService;
 
     public BookingService() {
         this.bookingDAO = new BookingDAO();
-        this.roomDAO = new RoomDAO();
-        this.serviceDAO = new ServiceDAO();
+        this.roomService = new RoomService();
+        this.hotelServiceService = new HotelServiceService();
     }
 
-    public BookingService(BookingDAO bookingDAO, RoomDAO roomDAO, ServiceDAO serviceDAO) {
+    public BookingService(BookingDAO bookingDAO, RoomService roomService, HotelServiceService hotelServiceService) {
         this.bookingDAO = bookingDAO;
-        this.roomDAO = roomDAO;
-        this.serviceDAO = serviceDAO;
+        this.roomService = roomService;
+        this.hotelServiceService = hotelServiceService;
     }
 
     /**
      * Lấy toàn bộ dịch vụ đang kinh doanh
      */
     public List<ServiceItem> getActiveServices() {
-        return serviceDAO.getAllActiveServices();
+        return hotelServiceService.getAllActiveServices();
     }
 
     /**
@@ -66,7 +66,7 @@ public class BookingService {
             throw new IllegalArgumentException("Ngày trả phòng phải sau ngày nhận phòng!");
         }
 
-        AvailableRoomDTO room = roomDAO.getRoomDetailById(maPhong.trim());
+        AvailableRoomDTO room = roomService.getRoomDetailById(maPhong.trim());
         if (room == null) {
             throw new IllegalArgumentException("Phòng " + maPhong + " không tồn tại!");
         }
@@ -83,7 +83,7 @@ public class BookingService {
                 String maDv = entry.getKey();
                 int soLuong = entry.getValue() != null ? entry.getValue() : 0;
                 if (soLuong > 0) {
-                    ServiceItem item = serviceDAO.getServiceById(maDv);
+                    ServiceItem item = hotelServiceService.getServiceById(maDv);
                     if (item != null) {
                         tongTienDichVu += item.getDonGia() * soLuong;
                     }
@@ -149,7 +149,7 @@ public class BookingService {
             if (roomItem.getSelectedServices() != null) {
                 for (CartServiceItemDTO svc : roomItem.getSelectedServices()) {
                     if (svc.getDonGia() <= 0) {
-                        ServiceItem dbSvc = serviceDAO.getServiceById(svc.getMaDichVu());
+                        ServiceItem dbSvc = hotelServiceService.getServiceById(svc.getMaDichVu());
                         if (dbSvc != null) {
                             svc.setDonGia(dbSvc.getDonGia());
                             svc.setTenDichVu(dbSvc.getTenDichVu());
