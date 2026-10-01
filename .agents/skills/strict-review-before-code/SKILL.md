@@ -20,7 +20,7 @@ Kỹ năng này quy định quy trình làm việc bắt buộc giữa AI Assist
 3. **BẮT BUỘC CÓ BẢNG SO SÁNH TRƯỚC VÀ SAU (BEFORE & AFTER):** 
    * Luôn trình bày chi tiết đoạn mã hiện tại và đoạn mã đề xuất thay thế.
 4. **LƯU VÀO TÀI LIỆU RIÊNG (`.md`):** 
-   * Ghi nhận đầy đủ vào file báo cáo markdown độc lập trong `TaiLieu_DuAn/` để User dễ dàng đọc, kiểm tra và lưu vết.
+   * Ghi nhận đầy đủ vào file báo cáo markdown độc lập trong `docs/` để User dễ dàng đọc, kiểm tra và lưu vết.
 5. **CHỈ HÀNH ĐỘNG KHI CÓ HIỆU LỆNH DUYỆT:** 
    * Chỉ tiến hành sửa code sau khi User đọc xong và phản hồi đồng ý (ví dụ: *"Ok đúng ý tôi rồi tiến hành code đi"*).
 
