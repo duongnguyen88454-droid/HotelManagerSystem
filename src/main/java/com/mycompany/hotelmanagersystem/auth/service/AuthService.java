@@ -1,10 +1,10 @@
-package com.mycompany.hotelmanagersystem.service.auth;
+package com.mycompany.hotelmanagersystem.auth.service;
 
-import com.mycompany.hotelmanagersystem.dao.auth.AccountDAO;
-import com.mycompany.hotelmanagersystem.dto.auth.UserSessionDTO;
+import com.mycompany.hotelmanagersystem.auth.dao.AccountDAO;
+import com.mycompany.hotelmanagersystem.auth.dto.UserSessionDTO;
 import com.mycompany.hotelmanagersystem.customer.model.Customer;
-import com.mycompany.hotelmanagersystem.model.Account;
-import com.mycompany.hotelmanagersystem.util.PasswordUtil;
+import com.mycompany.hotelmanagersystem.auth.model.Account;
+import com.mycompany.hotelmanagersystem.auth.util.PasswordUtil;
 
 public class AuthService {
     private final AccountDAO accountDAO;

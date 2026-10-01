@@ -1,6 +1,6 @@
 package com.mycompany.hotelmanagersystem.controller.customer;
 
-import com.mycompany.hotelmanagersystem.dto.auth.UserSessionDTO;
+import com.mycompany.hotelmanagersystem.auth.dto.UserSessionDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.BookingCartDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.CartRoomItemDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.CartServiceItemDTO;
