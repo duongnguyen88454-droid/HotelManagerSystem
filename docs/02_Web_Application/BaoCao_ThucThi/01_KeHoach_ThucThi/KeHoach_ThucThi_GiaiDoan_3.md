@@ -45,7 +45,7 @@ graph TD
     subgraph "PHÂN HỆ LỄ TÂN - GIAI ĐOẠN 3"
         F1["1. SƠ ĐỒ PHÒNG TIMELINE (PMS Gantt Chart)<br/>- Lưới phòng theo Tầng & Loại phòng<br/>- 4 Trạng thái buồng phòng thuần text<br/>- Thanh thống kê nhanh (KPI Bar)<br/>- Thanh dải đặt phòng kéo dài theo ngày"]
         F2["2. POPUP MODAL NỔI TRUNG TÂM<br/>- Backdrop tối làm nổi bật Popup<br/>- Không reload hay chuyển trang<br/>- Xử lý Check-in, Check-out trực tiếp<br/>- Cập nhật màu sắc Timeline tức thời"]
-        F3["3. QUẢN LÝ TIẾP ĐÓN & CHECK-IN<br/>- Tra cứu đơn theo Mã BK / SĐT / CCCD<br/>- Xem trước thông tin phòng & tiền cọc<br/>- Check-in toàn bộ đơn hoặc từng phòng<br/>- Tự động đổi trạng thái phòng sang Occupied"]
+        F3["3. QUẢN LÝ TIẾP ĐÓN & CHECK-IN<br/>- Tra cứu đơn theo Mã BK / SĐT / CCCD<br/>- Xem trước thông tin phòng & chi phí dự kiến<br/>- Check-in toàn bộ đơn hoặc từng phòng<br/>- Tự động đổi trạng thái phòng sang Occupied"]
         F4["4. GỌI DỊCH VỤ PHÁT SINH (In-Stay Services)<br/>- Menu danh mục dịch vụ đang kinh doanh<br/>- Gọi món/dịch vụ gắn vào phòng đang ở<br/>- Tự động áp giá niêm yết chuẩn<br/>- Xem lịch sử dịch vụ đã gọi của phòng"]
         F5["5. PHÂN QUYỀN & BẢO MẬT LỄ TÂN<br/>- AuthFilter bảo vệ vùng /receptionist/*<br/>- Chỉ tài khoản Lễ tân (VT02) được thao tác<br/>- Ghi nhận định danh MaNV thực hiện"]
     end

@@ -268,13 +268,18 @@
             </div>
 
             <div style="margin-top: 15px; padding: 12px; background: #eff6ff; border-radius: 6px; border: 1px solid #bfdbfe;">
-                <div style="display: flex; justify-content: space-between;">
-                    <span>Tiền phòng (4 đêm): <strong>1.800.000 đ</strong></span>
-                    <span>Đã cọc trước: <strong style="color: #15803d;">900.000 đ</strong></span>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span>Tiền phòng lưu trú:</span>
+                    <strong id="dtlRoomCost">Tính theo biểu phí phòng</strong>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 14px;">
-                    <strong>Còn phải quyết toán khi Check-out:</strong>
-                    <strong style="color: #1e3a8a;" id="finalBalance">1.110.000 đ</strong>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span>Tiền dịch vụ phát sinh:</span>
+                    <strong style="color: #b91c1c;" id="dtlServiceCostSummary">0 đ</strong>
+                </div>
+                <div style="border-top: 1px dashed #bfdbfe; margin: 8px 0;"></div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px;">
+                    <strong>Tổng thanh toán dự kiến khi Check-out:</strong>
+                    <strong style="color: #1e3a8a;" id="finalBalance">Quyết toán khi trả phòng</strong>
                 </div>
             </div>
         </div>
@@ -476,14 +481,21 @@
                                      + '<td style="text-align: right; font-weight: 600;">' + s.thanhTien.toLocaleString('vi-VN') + ' đ</td>';
                         tbody.appendChild(tr);
                     });
-                    document.getElementById('totalServiceCost').innerText = data.totalCost.toLocaleString('vi-VN') + ' đ';
+                    const formattedCost = data.totalCost.toLocaleString('vi-VN') + ' đ';
+                    document.getElementById('totalServiceCost').innerText = formattedCost;
+                    const dtlSummary = document.getElementById('dtlServiceCostSummary');
+                    if (dtlSummary) dtlSummary.innerText = formattedCost;
                 } else {
                     tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic;">Chưa có dịch vụ phát sinh nào cho phòng này.</td></tr>';
                     document.getElementById('totalServiceCost').innerText = '0 đ';
+                    const dtlSummary = document.getElementById('dtlServiceCostSummary');
+                    if (dtlSummary) dtlSummary.innerText = '0 đ';
                 }
             })
             .catch(err => {
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ef4444;">Lỗi khi tải dịch vụ: ' + err.message + '</td></tr>';
+                const dtlSummary = document.getElementById('dtlServiceCostSummary');
+                if (dtlSummary) dtlSummary.innerText = '0 đ';
             });
     }
 

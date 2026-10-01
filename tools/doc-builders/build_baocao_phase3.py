@@ -174,7 +174,7 @@ Theo chỉ thị thiết kế của dự án, giao diện Phân hệ Lễ tân t
 
 #### 6. Chức năng con FN-3.6: API Chi tiết phòng đang ở & Tạm tính tiền
 * **Đặc tả nghiệp vụ:**
-  * Khi lễ tân nhấp vào thanh phòng đang ở trên Timeline, API truy vấn chi tiết: Khách đại diện, SĐT, CCCD, ngày nhận thực tế, danh sách toàn bộ các món dịch vụ đã dùng trong suốt kỳ nghỉ, tiền phòng, tiền cọc và số tiền còn lại phải quyết toán.
+  * Khi lễ tân nhấp vào thanh phòng đang ở trên Timeline, API truy vấn chi tiết: Khách đại diện, SĐT, CCCD, ngày nhận thực tế, danh sách toàn bộ các món dịch vụ đã dùng trong suốt kỳ nghỉ, tiền phòng, tiền dịch vụ phát sinh và tổng số tiền thanh toán khi Check-out (hệ thống không áp dụng cơ chế cọc trước).
 * **Input / Output:**
   * Input: `maPhong` hoặc `maBooking`.
   * Output: JSON chi tiết phòng đầy đủ để đổ vào Popup Modal.

@@ -171,7 +171,7 @@ Theo chỉ thị thiết kế của dự án, giao diện Phân hệ Lễ tân t
 
 #### 6. Chức năng con FN-3.6: API Chi tiết phòng đang ở & Tạm tính tiền
 * **Đặc tả nghiệp vụ:**
-  * Khi lễ tân nhấp vào thanh phòng đang ở trên Timeline, API truy vấn chi tiết: Khách đại diện, SĐT, CCCD, ngày nhận thực tế, danh sách toàn bộ các món dịch vụ đã dùng trong suốt kỳ nghỉ, tiền phòng, tiền cọc và số tiền còn lại phải quyết toán.
+  * Khi lễ tân nhấp vào thanh phòng đang ở trên Timeline, API truy vấn chi tiết: Khách đại diện, SĐT, CCCD, ngày nhận thực tế, danh sách toàn bộ các món dịch vụ đã dùng trong suốt kỳ nghỉ, tiền phòng, tiền dịch vụ phát sinh và tổng số tiền thanh toán khi Check-out (hệ thống không áp dụng cơ chế cọc trước).
 * **Input / Output:**
   * Input: `maPhong` hoặc `maBooking`.
   * Output: JSON chi tiết phòng đầy đủ để đổ vào Popup Modal.
@@ -800,7 +800,7 @@ public RoomMapKpiDTO getRoomMapKpi() {
 
 #### BƯỚC 7: TRIỂN KHAI FN-3.6 (API CHI TIẾT PHÒNG ĐANG Ở & TẠM TÍNH TIỀN)
 * **Mục tiêu:** Tạo `ReceptionistRoomDetailApiServlet.java` (URL `/api/receptionist/room-detail`).
-* **Output:** JSON trả về thông tin khách đang ở (Họ tên, SĐT, CCCD), danh sách các món dịch vụ đã sử dụng trong suốt kỳ nghỉ, tiền phòng dự kiến, tiền cọc đã trả và tổng số tiền còn lại phải quyết toán.
+* **Output:** JSON trả về thông tin khách đang ở (Họ tên, SĐT, CCCD), danh sách các món dịch vụ đã sử dụng trong suốt kỳ nghỉ, tiền phòng dự kiến, tiền dịch vụ phát sinh và tổng số tiền thanh toán khi Check-out (hệ thống không áp dụng cơ chế cọc trước).
 * **Kịch bản kiểm thử độc lập (TC-3.7):** Nhấp vào thanh phòng đang ở P202 trên sơ đồ -> Centered Modal 1 mở ra hiển thị đầy đủ chi tiết khách và bảng kê dịch vụ khớp 100% CSDL.
 
 ---
