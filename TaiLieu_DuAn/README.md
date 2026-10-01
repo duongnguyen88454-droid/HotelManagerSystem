@@ -24,14 +24,28 @@
 
 ### PHÂN HỆ 2: TÀI LIỆU ỨNG DỤNG WEB & BÁO CÁO GIAI ĐOẠN (`02_Web_Application/`)
 
+#### 📂 1. Kiến Trúc & Lộ Trình Tổng Thể (`KienTruc_Va_LoTrinh/`)
 | STT | Tên Tài Liệu | Nội Dung Chính | Trạng Thái |
 | :---: | :--- | :--- | :---: |
-| 1 | 📄 [Lo_Trinh_Phat_Trien_UI_Va_Kiem_Thu.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/Lo_Trinh_Phat_Trien_UI_Va_Kiem_Thu.md) | Bản đồ lộ trình tổng thể 6 giai đoạn phát triển giao diện theo chu trình khép kín: Khách hàng $\to$ Lễ tân $\to$ Thu ngân $\to$ Buồng phòng $\to$ Quản lý. | ✅ Đã duyệt |
-| 2 | 📄 [KienTruc_Va_NhiemVu_Cac_ThuMuc_Code.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/KienTruc_Va_NhiemVu_Cac_ThuMuc_Code.md) | **Cẩm nang kiến trúc:** Tóm tắt chi tiết chức năng, nhiệm vụ cốt lõi, bảng ranh giới trách nhiệm và chu trình tương tác thực tế của từng thư mục (`controller`, `service`, `dao`, `model`, `dto`, `filter`, `util`, `views`). | ✅ Đã ban hành |
-| 3 | 📄 [BaoCao_ThucThi_GiaiDoan_0.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi_GiaiDoan_0.md) | Bản thuyết minh chi tiết luồng dữ liệu 3 lớp, tương tác giữa các class/tầng và toàn bộ code của Giai đoạn 0 (`pom.xml`, `DBContext`, `EncodingFilter`, Base UI, `index.jsp`). | ✅ Đã hoàn thành |
-| 4 | 📄 [BaoCao_ThucThi_GiaiDoan_1.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi_GiaiDoan_1.md) | Báo cáo chi tiết luồng tương tác, phân định trách nhiệm từng class, kiến trúc phân quyền 4 vai trò, bộ lọc `AuthFilter`, băm mật khẩu `SHA-256`, chuẩn hóa tên Tiếng Anh và chia sub-package. | ✅ Đã hoàn thành |
-| 5 | 📄 [BaoCao_ThucThi_GiaiDoan_2.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/BaoCao_ThucThi_GiaiDoan_2.md) | Báo cáo thiết kế kỹ thuật Giai đoạn 2: Phân hệ Khách hàng — Tra cứu phòng trống thời gian thực, đặt phòng trực tuyến (Online Booking), sinh mã `BK001`/`HD001` và kiểm tra chống trùng lịch. | ⏳ Đang trình duyệt |
+| 1 | 📄 [Lo_Trinh_Phat_Trien_UI_Va_Kiem_Thu.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/KienTruc_Va_LoTrinh/Lo_Trinh_Phat_Trien_UI_Va_Kiem_Thu.md) | Bản đồ lộ trình tổng thể 6 giai đoạn phát triển giao diện theo chu trình khép kín: Khách hàng $\to$ Lễ tân $\to$ Thu ngân $\to$ Buồng phòng $\to$ Quản lý. | ✅ Đã duyệt |
+| 2 | 📄 [KienTruc_Va_NhiemVu_Cac_ThuMuc_Code.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/KienTruc_Va_LoTrinh/KienTruc_Va_NhiemVu_Cac_ThuMuc_Code.md) | **Cẩm nang kiến trúc:** Tóm tắt chi tiết chức năng, nhiệm vụ cốt lõi, bảng ranh giới trách nhiệm và chu trình tương tác thực tế của từng thư mục (`controller`, `service`, `dao`, `model`, `dto`, `filter`, `util`, `views`). | ✅ Đã ban hành |
+
+#### 📂 2. Hồ Sơ Báo Cáo Thực Thi & Kiểm Thử (`BaoCao_ThucThi/`)
+> 👉 Xem danh mục chi tiết tại [Mục lục trung tâm BaoCao_ThucThi/README.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/README.md)
+
+* **Nhóm 1 - Kế hoạch thực thi (`01_KeHoach_ThucThi/`):**
+  - [KeHoach_ThucThi_GiaiDoan_3.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/01_KeHoach_ThucThi/KeHoach_ThucThi_GiaiDoan_3.md): Kế hoạch phân hệ Lễ tân, 4 Sprint, 20 Test Cases, Wireframe thuần Text, 5 REST APIs.
+* **Nhóm 2 - Báo cáo kiến trúc (`02_BaoCao_KienTruc/`):**
+  - [BaoCao_ThucThi_GiaiDoan_0.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/02_BaoCao_KienTruc/BaoCao_ThucThi_GiaiDoan_0.md): Khởi tạo dự án, Maven, UTF-8 EncodingFilter, Base UI.
+  - [BaoCao_ThucThi_GiaiDoan_1.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/02_BaoCao_KienTruc/BaoCao_ThucThi_GiaiDoan_1.md): Xác thực, AuthFilter, SHA-256, 4 vai trò.
+  - [BaoCao_ThucThi_GiaiDoan_2.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/02_BaoCao_KienTruc/BaoCao_ThucThi_GiaiDoan_2.md): Đặt phòng 5 bước, chống Overbooking, dịch vụ đi kèm.
+  - [BaoCao_ThucThi_GiaiDoan_3.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/02_BaoCao_KienTruc/BaoCao_ThucThi_GiaiDoan_3.md): Phân rã 4 nhóm & 12 bước triển khai TDD chi tiết cho Lễ tân.
+* **Nhóm 3 - Nghiệm thu & Kiểm thử (`03_TongKet_Va_KiemThu/`):**
+  - [BaoCao_TongKet_GiaiDoan_2.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/03_TongKet_Va_KiemThu/BaoCao_TongKet_GiaiDoan_2.md): Nghiệm thu Phase 2 (40/40 Test Cases PASS 100%).
+  - [BaoCao_Loi_TestCase_Phase0_2.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/03_TongKet_Va_KiemThu/BaoCao_Loi_TestCase_Phase0_2.md): Sổ tay phân tích và khắc phục lỗi kỹ thuật.
+  - [BaoCao_KiemThu_FN31.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/03_TongKet_Va_KiemThu/BaoCao_KiemThu_FN31.md): Báo cáo kiểm thử FN-3.1 (20/20 Test Cases PASS 100%).
+  - [BaoCao_KiemThu_Phase2_TacDong_FN31.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/03_TongKet_Va_KiemThu/BaoCao_KiemThu_Phase2_TacDong_FN31.md): Kiểm thử tác động chéo Phase 2 -> FN-3.1 (19/20 PASS, phát hiện lỗi Deadlock kiến trúc).
 
 ---
 
-*Lưu ý: Mọi giai đoạn tiếp theo (Giai đoạn 3: Phân hệ Lễ tân, Giai đoạn 4: Thu ngân & Quyết toán, Giai đoạn 5: Buồng phòng & Báo cáo...) đều sẽ được lập báo cáo chi tiết và lưu trữ tại thư mục `TaiLieu_DuAn/02_Web_Application/`.*
+*Lưu ý: Mọi giai đoạn tiếp theo (Giai đoạn 4: Thu ngân & Quyết toán, Giai đoạn 5: Buồng phòng & Báo cáo...) đều sẽ được lập tài liệu và lưu trữ khoa học theo các nhóm trên.*

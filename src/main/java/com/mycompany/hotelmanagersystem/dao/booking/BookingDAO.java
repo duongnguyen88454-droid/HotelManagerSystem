@@ -8,7 +8,6 @@ import com.mycompany.hotelmanagersystem.dto.booking.BookingDichVuItemDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.CustomerBookingHistoryDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.RoomBookingDetailDTO;
 import com.mycompany.hotelmanagersystem.util.DBContext;
-import com.mycompany.hotelmanagersystem.util.KeyGenerator;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -47,7 +46,7 @@ public class BookingDAO {
             conn.setAutoCommit(false);
 
             validateRoomAvailability(conn, maPhong, checkIn, checkOut);
-            String maBooking = KeyGenerator.generateBookingId();
+            String maBooking = getNextBookingIdFromDB(conn);
             insertBookingHeader(conn, maBooking, maKH, maTaiKhoan, tongChiPhi);
             insertBookingRoom(conn, maBooking, maPhong, donGiaPhong, checkIn, checkOut);
             insertBookingServices(conn, maBooking, maPhong, selectedServices);
@@ -84,7 +83,7 @@ public class BookingDAO {
                 validateRoomAvailability(conn, roomItem.getMaPhong(), dIn, dOut);
             }
 
-            String maBooking = KeyGenerator.generateBookingId();
+            String maBooking = getNextBookingIdFromDB(conn);
             insertBookingHeader(conn, maBooking, maKH, maTaiKhoan, cart.getGrandTotal());
 
             for (CartRoomItemDTO roomItem : cart.getItems().values()) {
@@ -375,19 +374,27 @@ public class BookingDAO {
      */
     private void insertSingleBookingService(Connection conn, String maBooking, String maPhong,
             String maDichVu, double donGia, int soLuong, String nguoiThem) throws SQLException {
-        String insertBdvSql = "INSERT INTO BOOKING_DICHVU (MaBookingDichVu, MaBooking, MaPhong, MaDichVu, DonGia, SoLuong, ThoiDiemThem, NguoiThem, MaNV) "
-                + "VALUES (?, ?, ?, ?, ?, ?, GETDATE(), ?, NULL)";
-        String maBdv = KeyGenerator.generateBookingDichVuId();
+        String insertBdvSql = "INSERT INTO BOOKING_DICHVU (MaBooking, MaPhong, MaDichVu, DonGia, SoLuong, ThoiDiemThem, NguoiThem, MaNV) "
+                + "VALUES (?, ?, ?, ?, ?, GETDATE(), ?, NULL)";
         try (PreparedStatement psBdv = conn.prepareStatement(insertBdvSql)) {
-            psBdv.setString(1, maBdv);
-            psBdv.setString(2, maBooking);
-            psBdv.setString(3, maPhong);
-            psBdv.setString(4, maDichVu);
-            psBdv.setDouble(5, donGia);
-            psBdv.setInt(6, soLuong);
-            psBdv.setString(7, nguoiThem);
+            psBdv.setString(1, maBooking);
+            psBdv.setString(2, maPhong);
+            psBdv.setString(3, maDichVu);
+            psBdv.setDouble(4, donGia);
+            psBdv.setInt(5, soLuong);
+            psBdv.setString(6, nguoiThem);
             psBdv.executeUpdate();
         }
+    }
+
+    private String getNextBookingIdFromDB(Connection conn) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("SELECT dbo.fn_SinhMaBooking()");
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getString(1);
+            }
+        }
+        return "BK001";
     }
 
     /**

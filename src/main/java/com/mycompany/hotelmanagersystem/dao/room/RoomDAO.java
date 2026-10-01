@@ -1,5 +1,7 @@
 package com.mycompany.hotelmanagersystem.dao.room;
 
+import com.mycompany.hotelmanagersystem.dto.receptionist.RoomMapKpiDTO;
+import com.mycompany.hotelmanagersystem.dto.receptionist.RoomTimelineDTO;
 import com.mycompany.hotelmanagersystem.dto.room.AvailableRoomDTO;
 import com.mycompany.hotelmanagersystem.model.RoomType;
 import com.mycompany.hotelmanagersystem.util.DBContext;
@@ -178,5 +180,82 @@ public class RoomDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * FN-3.1: Lấy toàn bộ danh sách phòng thực tế theo tầng để hiển thị trên PMS Gantt Timeline
+     */
+    public List<RoomTimelineDTO> getAllRoomsForTimeline() {
+        List<RoomTimelineDTO> list = new ArrayList<>();
+        String sql = "SELECT p.MaPhong, p.SoPhong, lp.MaLoaiPhong, lp.TenLoaiPhong, lp.GiaPhong, p.TrangThai, p.MoTa "
+                   + "FROM PHONG p "
+                   + "INNER JOIN LOAIPHONG lp ON p.MaLoaiPhong = lp.MaLoaiPhong "
+                   + "ORDER BY p.SoPhong ASC";
+
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                String soPhong = rs.getString("SoPhong");
+                int soTang = 1;
+                if (soPhong != null && !soPhong.isEmpty()) {
+                    char firstChar = soPhong.charAt(0);
+                    if (Character.isDigit(firstChar)) {
+                        soTang = Character.getNumericValue(firstChar);
+                    }
+                }
+
+                RoomTimelineDTO dto = new RoomTimelineDTO(
+                        rs.getString("MaPhong"),
+                        soPhong,
+                        soTang,
+                        rs.getString("MaLoaiPhong"),
+                        rs.getNString("TenLoaiPhong"),
+                        rs.getDouble("GiaPhong"),
+                        rs.getString("TrangThai"),
+                        rs.getNString("MoTa")
+                );
+                list.add(dto);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * FN-3.1: Tính toán các chỉ số thống kê buồng phòng thời gian thực (KPI)
+     */
+    public RoomMapKpiDTO getRoomMapKpi() {
+        String sql = "SELECT "
+                   + "    COUNT(*) AS TongSoPhong, "
+                   + "    SUM(CASE WHEN TrangThai = 'Available' THEN 1 ELSE 0 END) AS SoAvailable, "
+                   + "    SUM(CASE WHEN TrangThai = 'Occupied' THEN 1 ELSE 0 END) AS SoOccupied, "
+                   + "    SUM(CASE WHEN TrangThai = 'Dirty' THEN 1 ELSE 0 END) AS SoDirty, "
+                   + "    SUM(CASE WHEN TrangThai = 'Cleaning' THEN 1 ELSE 0 END) AS SoCleaning, "
+                   + "    SUM(CASE WHEN TrangThai = 'Damaged' THEN 1 ELSE 0 END) AS SoDamaged, "
+                   + "    SUM(CASE WHEN TrangThai = 'Booked' THEN 1 ELSE 0 END) AS SoBooked "
+                   + "FROM PHONG";
+
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                int total = rs.getInt("TongSoPhong");
+                int avail = rs.getInt("SoAvailable");
+                int occ = rs.getInt("SoOccupied");
+                int dirty = rs.getInt("SoDirty");
+                int clean = rs.getInt("SoCleaning");
+                int dmg = rs.getInt("SoDamaged");
+                int booked = rs.getInt("SoBooked");
+
+                return new RoomMapKpiDTO(total, avail, occ, dirty, clean, dmg, booked);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return new RoomMapKpiDTO(0, 0, 0, 0, 0, 0, 0);
     }
 }

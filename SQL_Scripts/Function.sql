@@ -179,3 +179,149 @@ BEGIN
     WHERE  ThoiDiemThanhToan BETWEEN @TuNgay AND @DenNgay;
     RETURN @TongThu;
 END
+GO
+
+-- ============================================================================
+-- PHẦN BỔ SUNG: CÁC FUNCTION TỰ ĐỘNG SINH MÃ KHÓA CHÍNH (AUTO-PK FUNCTIONS)
+-- Hỗ trợ Backend truy vấn trực tiếp từ CSDL, triệt tiêu hoàn toàn KeyGenerator
+-- ============================================================================
+
+-- ----------------------------------------------------------------------------
+-- Function 8: Sinh mã Đơn đặt phòng (BK001, BK002...)
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER FUNCTION dbo.fn_SinhMaBooking()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaBooking, PATINDEX('%[0-9]%', MaBooking), 10) AS INT)), 0)
+    FROM BOOKING WITH (NOLOCK);
+    RETURN 'BK' + RIGHT('000' + CAST(@MaxID + 1 AS VARCHAR(10)), 3);
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Function 9: Sinh mã Khách hàng (KH001, KH002...)
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER FUNCTION dbo.fn_SinhMaKhachHang()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaKH, PATINDEX('%[0-9]%', MaKH), 10) AS INT)), 0)
+    FROM KHACHHANG WITH (NOLOCK);
+    RETURN 'KH' + RIGHT('000' + CAST(@MaxID + 1 AS VARCHAR(10)), 3);
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Function 10: Sinh mã Tài khoản (TK001, TK002...)
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER FUNCTION dbo.fn_SinhMaTaiKhoan()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaTaiKhoan, PATINDEX('%[0-9]%', MaTaiKhoan), 10) AS INT)), 0)
+    FROM TAIKHOAN WITH (NOLOCK);
+    RETURN 'TK' + RIGHT('000' + CAST(@MaxID + 1 AS VARCHAR(10)), 3);
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Function 11: Sinh mã Hóa đơn (HD001, HD002...)
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER FUNCTION dbo.fn_SinhMaHoaDon()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaHoaDon, PATINDEX('%[0-9]%', MaHoaDon), 10) AS INT)), 0)
+    FROM HOADON WITH (NOLOCK);
+    RETURN 'HD' + RIGHT('000' + CAST(@MaxID + 1 AS VARCHAR(10)), 3);
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Function 12: Sinh mã Thanh toán (TT001, TT002...)
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER FUNCTION dbo.fn_SinhMaThanhToan()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaThanhToan, PATINDEX('%[0-9]%', MaThanhToan), 10) AS INT)), 0)
+    FROM THANHTOAN WITH (NOLOCK);
+    RETURN 'TT' + RIGHT('000' + CAST(@MaxID + 1 AS VARCHAR(10)), 3);
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Function 13: Sinh mã Chi tiết dịch vụ đặt phòng (BDV001, BDV002...)
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER FUNCTION dbo.fn_SinhMaBookingDichVu()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaBookingDichVu, PATINDEX('%[0-9]%', MaBookingDichVu), 10) AS INT)), 0)
+    FROM BOOKING_DICHVU WITH (NOLOCK);
+    RETURN 'BDV' + RIGHT('000' + CAST(@MaxID + 1 AS VARCHAR(10)), 3);
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Function 14: Sinh mã Dịch vụ danh mục (DV001, DV002...)
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER FUNCTION dbo.fn_SinhMaDichVu()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaDichVu, PATINDEX('%[0-9]%', MaDichVu), 10) AS INT)), 0)
+    FROM DICHVU WITH (NOLOCK);
+    RETURN 'DV' + RIGHT('000' + CAST(@MaxID + 1 AS VARCHAR(10)), 3);
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Function 15: Sinh mã Nhân viên (NV001, NV002...)
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER FUNCTION dbo.fn_SinhMaNhanVien()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaNV, PATINDEX('%[0-9]%', MaNV), 10) AS INT)), 0)
+    FROM NHANVIEN WITH (NOLOCK);
+    RETURN 'NV' + RIGHT('000' + CAST(@MaxID + 1 AS VARCHAR(10)), 3);
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Function 16: Sinh mã Nhiệm vụ dọn phòng (NM001, NM002...)
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER FUNCTION dbo.fn_SinhMaNhiemVuDoPhong()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaNhiemVu, PATINDEX('%[0-9]%', MaNhiemVu), 10) AS INT)), 0)
+    FROM NHIEMVUDOPHONG WITH (NOLOCK);
+    RETURN 'NM' + RIGHT('000' + CAST(@MaxID + 1 AS VARCHAR(10)), 3);
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Function 17: Sinh mã Hạng phòng / Loại phòng (LP01, LP02...)
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER FUNCTION dbo.fn_SinhMaLoaiPhong()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaLoaiPhong, PATINDEX('%[0-9]%', MaLoaiPhong), 10) AS INT)), 0)
+    FROM LOAIPHONG WITH (NOLOCK);
+    RETURN 'LP' + RIGHT('00' + CAST(@MaxID + 1 AS VARCHAR(10)), 2);
+END;
+GO

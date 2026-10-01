@@ -565,3 +565,247 @@ GO
 | `v_BaoCaoDoanhThuTheoThang` | **VIEW** | Quản lý & Giám đốc | Báo cáo doanh thu thực thu định kỳ theo tháng/năm. |
 | `v_ThongKeDichVuBanChay` | **VIEW** | Kinh doanh & Quản lý | Thống kê số lượng và doanh thu từng loại dịch vụ gia tăng. |
 | `v_TyLeLapDayPhong` | **VIEW** | Dashboard Quản lý | Báo cáo tỷ lệ công suất lấp đầy phòng (%) tại thời điểm hiện tại. |
+| `trg_AutoPK_BOOKING_DICHVU` | **TRIGGER** | `BOOKING_DICHVU` | Tự động cấp phát mã `BDV...` triệt tiêu Deadlock khi đặt dịch vụ đi kèm. |
+| `trg_AutoPK_BOOKING` | **TRIGGER** | `BOOKING` | Tự động cấp phát mã `BK...` khi tạo đơn đặt phòng mới. |
+| `trg_AutoPK_KHACHHANG` | **TRIGGER** | `KHACHHANG` | Tự động cấp phát mã `KH...` khi thêm mới khách hàng. |
+| `trg_AutoPK_TAIKHOAN` | **TRIGGER** | `TAIKHOAN` | Tự động cấp phát mã `TK...` khi đăng ký tài khoản. |
+| `trg_AutoPK_THANHTOAN` | **TRIGGER** | `THANHTOAN` | Tự động cấp phát mã `TT...` khi ghi nhận thanh toán. |
+| `trg_AutoPK_HOADON` | **TRIGGER** | `HOADON` | Tự động cấp phát mã `HD...` khi lập hóa đơn mới. |
+
+---
+
+## 5. HỆ THỐNG TRIGGER TỰ ĐỘNG SINH KHÓA CHÍNH (AUTO-PK) & GIẢI PHÁP CHỐNG SELF-DEADLOCK
+
+### 5.1. Bối cảnh & Phân tích hiện tượng Self-Deadlock thực tế
+
+Trong quá trình kiểm thử tích hợp chéo giữa phân hệ khách hàng (Phase 2 - Online Booking) và phân hệ Lễ tân (FN-3.1), một lỗi tắc nghẽn nghiêm trọng đã được phát hiện tại test case `TC-3.1-P2.04`:
+- **Hiện tượng:** Khi khách hàng đặt phòng trực tuyến có chọn thêm dịch vụ đi kèm (Ăn sáng, đồ uống...), hệ thống bị treo vĩnh viễn (Deadlock) ở tầng cơ sở dữ liệu và ném ra ngoại lệ `Connection reset by peer / The connection is closed`.
+- **Nguyên nhân cốt lõi (Self-Deadlock):**
+  1. Trong phương thức `BookingDAO.createOnlineBookingWithServices`, ứng dụng Java mở kết nối thứ nhất (`Connection 1`) và bật chế độ Transaction: `conn.setAutoCommit(false)`.
+  2. `Connection 1` thực hiện chèn dữ liệu vào bảng `BOOKING` và bảng `BOOKING_PHONG`, lúc này SQL Server cấp **Khóa độc quyền (Exclusive Lock - X-Lock)** trên các trang dữ liệu của `BOOKING`.
+  3. Để chèn tiếp vào bảng `BOOKING_DICHVU`, Java gọi hàm tiện ích `KeyGenerator.generateBookingDichVuId()` để lấy mã khóa chính tiếp theo.
+  4. Bên trong hàm `KeyGenerator.generateNextId()`, ứng dụng lại tự mở một **kết nối JDBC thứ 2 độc lập (`Connection 2`)** và gửi câu lệnh `SELECT MAX(...) FROM BOOKING_DICHVU`.
+  5. Bảng `BOOKING_DICHVU` có khóa ngoại tham chiếu đến `BOOKING`. Dưới mức cô lập mặc định `READ COMMITTED` của SQL Server, câu lệnh `SELECT` của `Connection 2` đòi hỏi **Khóa chia sẻ (Shared Lock - S-Lock)**. Khóa đọc này bị chặn lại bởi khóa ghi độc quyền `X-Lock` mà `Connection 1` đang nắm giữ (chờ `Connection 1` commit, wait type `LCK_M_S`).
+  6. Tuy nhiên, luồng Java của `Connection 1` lại đang tạm dừng đồng bộ để **chờ `Connection 2` trả về mã ID** thì mới chạy tiếp tới lệnh `commit()`!
+  7. **Hậu quả:** Hai kết nối của chính cùng một ứng dụng tự khóa lẫn nhau (Self-Deadlock), gây tê liệt toàn bộ luồng giao dịch.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Conn1 as Connection 1 (BookingDAO Transaction)
+    participant SQL as SQL Server (QuanLyKhachSan)
+    participant Conn2 as Connection 2 (KeyGenerator)
+
+    Conn1->>SQL: INSERT INTO BOOKING (Giữ Exclusive Lock X)
+    Conn1->>Conn2: Gọi KeyGenerator (Chờ lấy mã BDV...)
+    Conn2->>SQL: SELECT MAX(...) FROM BOOKING_DICHVU (Đòi Shared Lock S)
+    SQL-->>Conn2: BỊ CHẶN (LCK_M_S: Đợi Conn1 commit)
+    Note over Conn1,Conn2: Conn1 đợi Conn2 trả mã <--> Conn2 đợi Conn1 nhả khóa<br/>==> SELF-DEADLOCK VĨNH VIỄN!
+```
+
+---
+
+### 5.2. Nguyên lý giải pháp: Trigger `INSTEAD OF INSERT` kết hợp `DEFAULT ''`
+
+Thay vì để tầng ứng dụng Java phải tự truy vấn tìm số MAX rồi nối chuỗi mã thủ công (vừa tốn chi phí mở kết nối phụ, vừa sinh nguy cơ xung đột khóa), hệ thống chuyển giao hoàn toàn trách nhiệm sinh khóa chính tự tăng cho **Cơ sở dữ liệu SQL Server** thông qua cơ chế Trigger:
+
+1. **Ràng buộc `DEFAULT ''` trên cột Khóa Chính:**
+   - Đảm bảo câu lệnh `INSERT` từ client (Java) có thể bỏ qua cột khóa chính (hoặc truyền giá trị rỗng `''`) mà không bị lỗi vi phạm ràng buộc `NOT NULL` của SQL Server.
+2. **Trigger `INSTEAD OF INSERT`:**
+   - Chặn câu lệnh chèn trước khi ghi xuống bảng vật lý.
+   - Quét tìm số thứ tự lớn nhất hiện tại bằng hàm `PATINDEX` và `TRY_CAST` kết hợp gợi ý khóa `WITH (NOLOCK)` để không bao giờ bị giữ khóa đợi.
+   - Sử dụng hàm cửa sổ `ROW_NUMBER() OVER (...)` để hỗ trợ cấp phát hàng loạt khóa chính liên tiếp khi chèn nhiều dòng cùng lúc (Batch Insert).
+   - Kiểm tra điều kiện:
+     - Nếu bản ghi truyền vào có mã rỗng/null: Tự động ghép tiền tố và số thứ tự định dạng 3 chữ số (`001`, `002`...).
+     - Nếu bản ghi truyền vào đã có mã cụ thể (từ script nạp dữ liệu mẫu hoặc mã cố định): Giữ nguyên mã người dùng cung cấp.
+3. **Triệt tiêu hoàn toàn Deadlock (100%):**
+   - Trigger chạy **trực tiếp trong cùng một Session/Connection** của câu lệnh `INSERT`. Không có kết nối phụ nào được tạo ra, triệt tiêu tận gốc hiện tượng tự bế tắc.
+
+---
+
+### 5.3. Chi tiết 6 Trigger tự động sinh khóa chính (Triggers 8 - 13)
+
+#### 1. Trigger 8: Tự động sinh `MaBookingDichVu` (`BDV001`, `BDV002`...)
+- **Bảng tác động:** `BOOKING_DICHVU` | **Sự kiện:** `INSTEAD OF INSERT`
+- **Mã nguồn:**
+```sql
+CREATE OR ALTER TRIGGER trg_AutoPK_BOOKING_DICHVU
+ON BOOKING_DICHVU
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaBookingDichVu, PATINDEX('%[0-9]%', MaBookingDichVu), 10) AS INT)), 0)
+    FROM BOOKING_DICHVU WITH (NOLOCK);
+
+    INSERT INTO BOOKING_DICHVU (
+        MaBookingDichVu, MaBooking, MaPhong, MaDichVu, DonGia, SoLuong, ThoiDiemThem, NguoiThem, MaNV
+    )
+    SELECT
+        CASE 
+            WHEN ISNULL(i.MaBookingDichVu, '') = '' 
+                THEN 'BDV' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
+            ELSE i.MaBookingDichVu
+        END,
+        i.MaBooking, i.MaPhong, i.MaDichVu, i.DonGia, ISNULL(i.SoLuong, 1),
+        ISNULL(i.ThoiDiemThem, GETDATE()), i.NguoiThem, i.MaNV
+    FROM inserted i;
+END;
+GO
+```
+
+#### 2. Trigger 9: Tự động sinh `MaBooking` (`BK001`, `BK002`...)
+- **Bảng tác động:** `BOOKING` | **Sự kiện:** `INSTEAD OF INSERT`
+```sql
+CREATE OR ALTER TRIGGER trg_AutoPK_BOOKING
+ON BOOKING
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaBooking, PATINDEX('%[0-9]%', MaBooking), 10) AS INT)), 0)
+    FROM BOOKING WITH (NOLOCK);
+
+    INSERT INTO BOOKING (
+        MaBooking, MaKH, MaTaiKhoan, MaNV, NgayDat, TrangThai, ChiPhiDuKien, PhuongPhapBooking, ThoiDiemHuy, PhiHuy
+    )
+    SELECT
+        CASE 
+            WHEN ISNULL(i.MaBooking, '') = '' 
+                THEN 'BK' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
+            ELSE i.MaBooking
+        END,
+        i.MaKH, i.MaTaiKhoan, i.MaNV, ISNULL(i.NgayDat, GETDATE()),
+        ISNULL(i.TrangThai, 'ChoXacNhan'), i.ChiPhiDuKien,
+        ISNULL(i.PhuongPhapBooking, 'Online'), i.ThoiDiemHuy, i.PhiHuy
+    FROM inserted i;
+END;
+GO
+```
+
+#### 3. Trigger 10: Tự động sinh `MaKH` (`KH001`, `KH002`...)
+- **Bảng tác động:** `KHACHHANG` | **Sự kiện:** `INSTEAD OF INSERT`
+```sql
+CREATE OR ALTER TRIGGER trg_AutoPK_KHACHHANG
+ON KHACHHANG
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaKH, PATINDEX('%[0-9]%', MaKH), 10) AS INT)), 0)
+    FROM KHACHHANG WITH (NOLOCK);
+
+    INSERT INTO KHACHHANG (MaKH, MaTaiKhoan, HoTen, Email, SoDT, CCCD)
+    SELECT
+        CASE 
+            WHEN ISNULL(i.MaKH, '') = '' 
+                THEN 'KH' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
+            ELSE i.MaKH
+        END,
+        i.MaTaiKhoan, i.HoTen, i.Email, i.SoDT, i.CCCD
+    FROM inserted i;
+END;
+GO
+```
+
+#### 4. Trigger 11: Tự động sinh `MaTaiKhoan` (`TK001`, `TK002`...)
+- **Bảng tác động:** `TAIKHOAN` | **Sự kiện:** `INSTEAD OF INSERT`
+```sql
+CREATE OR ALTER TRIGGER trg_AutoPK_TAIKHOAN
+ON TAIKHOAN
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaTaiKhoan, PATINDEX('%[0-9]%', MaTaiKhoan), 10) AS INT)), 0)
+    FROM TAIKHOAN WITH (NOLOCK);
+
+    INSERT INTO TAIKHOAN (MaTaiKhoan, MatKhau, MaVaiTro, TrangThai, HoTenTaiKhoan, Email)
+    SELECT
+        CASE 
+            WHEN ISNULL(i.MaTaiKhoan, '') = '' 
+                THEN 'TK' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
+            ELSE i.MaTaiKhoan
+        END,
+        i.MatKhau, i.MaVaiTro, ISNULL(i.TrangThai, 'Active'), i.HoTenTaiKhoan, i.Email
+    FROM inserted i;
+END;
+GO
+```
+
+#### 5. Trigger 12: Tự động sinh `MaThanhToan` (`TT001`, `TT002`...)
+- **Bảng tác động:** `THANHTOAN` | **Sự kiện:** `INSTEAD OF INSERT`
+```sql
+CREATE OR ALTER TRIGGER trg_AutoPK_THANHTOAN
+ON THANHTOAN
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaThanhToan, PATINDEX('%[0-9]%', MaThanhToan), 10) AS INT)), 0)
+    FROM THANHTOAN WITH (NOLOCK);
+
+    INSERT INTO THANHTOAN (MaThanhToan, MaHoaDon, MaNV, SoTien, PhuongThucThanhToan, ThoiDiemThanhToan)
+    SELECT
+        CASE 
+            WHEN ISNULL(i.MaThanhToan, '') = '' 
+                THEN 'TT' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
+            ELSE i.MaThanhToan
+        END,
+        i.MaHoaDon, i.MaNV, i.SoTien,
+        ISNULL(i.PhuongThucThanhToan, 'TienMat'), ISNULL(i.ThoiDiemThanhToan, GETDATE())
+    FROM inserted i;
+END;
+GO
+```
+
+#### 6. Trigger 13: Tự động sinh `MaHoaDon` (`HD001`, `HD002`...)
+- **Bảng tác động:** `HOADON` | **Sự kiện:** `INSTEAD OF INSERT`
+```sql
+CREATE OR ALTER TRIGGER trg_AutoPK_HOADON
+ON HOADON
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaHoaDon, PATINDEX('%[0-9]%', MaHoaDon), 10) AS INT)), 0)
+    FROM HOADON WITH (NOLOCK);
+
+    INSERT INTO HOADON (MaHoaDon, MaBooking, NgayLap, TongTienCuoiCung, MaNV, TrangThai)
+    SELECT
+        CASE 
+            WHEN ISNULL(i.MaHoaDon, '') = '' 
+                THEN 'HD' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
+            ELSE i.MaHoaDon
+        END,
+        i.MaBooking, ISNULL(i.NgayLap, GETDATE()), i.TongTienCuoiCung,
+        ISNULL(i.MaNV, 'NV001'), ISNULL(i.TrangThai, 'ChuaThanhToan')
+    FROM inserted i;
+END;
+GO
+```
+
+---
+
+### 5.4. Lợi ích kiến trúc và kết quả nghiệm thu
+
+1. **Hiệu năng & Đồng thời (Concurrency):**
+   - Loại bỏ 100% độ trễ mạng do ứng dụng Java phải gửi các truy vấn phụ `SELECT MAX` trước khi `INSERT`.
+   - Kết hợp gợi ý khóa `WITH (NOLOCK)` giúp câu lệnh lấy số thứ tự không bao giờ bị nghẽn bởi các giao dịch ghi khác.
+2. **Tính toàn vẹn & Tương thích ngược:**
+   - Mã nguồn Java cũ vẫn có thể truyền mã tường minh nếu muốn; mã nguồn mới có thể bỏ trống để CSDL tự xử lý.
+3. **Kết quả kiểm thử thực tế:**
+   - Bộ 20 test case kiểm thử tác động chéo giữa Phase 2 và FN-3.1 ([BaoCao_KiemThu_Phase2_TacDong_FN31.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/03_TongKet_Va_KiemThu/BaoCao_KiemThu_Phase2_TacDong_FN31.md)) đạt tỷ lệ thành công tuyệt đối: **20/20 PASS (100%)**.
+

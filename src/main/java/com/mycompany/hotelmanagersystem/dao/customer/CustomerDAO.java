@@ -2,7 +2,6 @@ package com.mycompany.hotelmanagersystem.dao.customer;
 
 import com.mycompany.hotelmanagersystem.model.Customer;
 import com.mycompany.hotelmanagersystem.util.DBContext;
-import com.mycompany.hotelmanagersystem.util.KeyGenerator;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -184,23 +183,27 @@ public class CustomerDAO {
             return existing.getMaKH();
         }
 
-        // CCCD chưa có trong hệ thống -> Tạo hồ sơ khách hàng mới
-        String newMaKH = KeyGenerator.generateCustomerId();
         String insertSql = "INSERT INTO KHACHHANG (MaKH, HoTen, Email, SoDT, CCCD, MaTaiKhoan) VALUES (?, ?, ?, ?, ?, ?)";
+        String newMaKH = null;
 
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(insertSql)) {
-            ps.setString(1, newMaKH);
-            ps.setNString(2, hoTen.trim());
-            ps.setString(3, email.trim());
-            ps.setString(4, soDT.trim());
-            ps.setString(5, cleanCCCD);
-            ps.setString(6, cleanMaTaiKhoan);
-            ps.executeUpdate();
-            return newMaKH;
+        try (Connection conn = DBContext.getConnection()) {
+            newMaKH = getNextCustomerIdFromDB(conn);
+            try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
+                ps.setString(1, newMaKH);
+                ps.setNString(2, hoTen.trim());
+                ps.setString(3, email.trim());
+                ps.setString(4, soDT.trim());
+                ps.setString(5, cleanCCCD);
+                ps.setString(6, cleanMaTaiKhoan);
+                ps.executeUpdate();
+                return newMaKH;
+            }
         } catch (SQLException | ClassNotFoundException e) {
             // Trường hợp lỗi (ví dụ MaTaiKhoan đã liên kết hoặc trùng SĐT/Email cũ):
             try (Connection conn = DBContext.getConnection()) {
+                if (newMaKH == null) {
+                    newMaKH = getNextCustomerIdFromDB(conn);
+                }
                 // Fallback 1: Thử chèn với MaTaiKhoan = NULL
                 String insertNullSql = "INSERT INTO KHACHHANG (MaKH, HoTen, Email, SoDT, CCCD, MaTaiKhoan) VALUES (?, ?, ?, ?, ?, NULL)";
                 try (PreparedStatement psNull = conn.prepareStatement(insertNullSql)) {
@@ -239,5 +242,15 @@ public class CustomerDAO {
             }
             throw new Exception("Lỗi ghi nhận hồ sơ khách lưu trú: " + e.getMessage());
         }
+    }
+
+    public String getNextCustomerIdFromDB(Connection conn) {
+        try (PreparedStatement ps = conn.prepareStatement("SELECT dbo.fn_SinhMaKhachHang()");
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getString(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "KH001";
     }
 }

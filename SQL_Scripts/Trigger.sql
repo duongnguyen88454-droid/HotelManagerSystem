@@ -231,3 +231,233 @@ BEGIN
     END
 END;
 GO
+
+-- ============================================================================
+-- PHẦN BỔ SUNG: HỆ THỐNG TRIGGER TỰ ĐỘNG SINH KHÓA CHÍNH (PRIMARY KEY AUTO-PK)
+-- Triệt tiêu hoàn toàn lỗi Self-Deadlock giao dịch và tối ưu hóa xử lý đồng thời
+-- ============================================================================
+
+-- Đảm bảo các bảng có ràng buộc DEFAULT '' để client có thể INSERT mà không cần truyền mã
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID('BOOKING_DICHVU') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID('BOOKING_DICHVU'), 'MaBookingDichVu', 'ColumnId'))
+    ALTER TABLE BOOKING_DICHVU ADD CONSTRAINT DF_BDV_MaBookingDichVu DEFAULT '' FOR MaBookingDichVu;
+
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID('BOOKING') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID('BOOKING'), 'MaBooking', 'ColumnId'))
+    ALTER TABLE BOOKING ADD CONSTRAINT DF_BOOKING_MaBooking DEFAULT '' FOR MaBooking;
+
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID('KHACHHANG') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID('KHACHHANG'), 'MaKH', 'ColumnId'))
+    ALTER TABLE KHACHHANG ADD CONSTRAINT DF_KH_MaKH DEFAULT '' FOR MaKH;
+
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID('TAIKHOAN') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID('TAIKHOAN'), 'MaTaiKhoan', 'ColumnId'))
+    ALTER TABLE TAIKHOAN ADD CONSTRAINT DF_TK_MaTaiKhoan DEFAULT '' FOR MaTaiKhoan;
+
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID('THANHTOAN') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID('THANHTOAN'), 'MaThanhToan', 'ColumnId'))
+    ALTER TABLE THANHTOAN ADD CONSTRAINT DF_TT_MaThanhToan DEFAULT '' FOR MaThanhToan;
+
+IF NOT EXISTS (SELECT 1 FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID('HOADON') AND parent_column_id = COLUMNPROPERTY(OBJECT_ID('HOADON'), 'MaHoaDon', 'ColumnId'))
+    ALTER TABLE HOADON ADD CONSTRAINT DF_HD_MaHoaDon DEFAULT '' FOR MaHoaDon;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Trigger 8: Tự động sinh khóa chính MaBookingDichVu (BDV...)
+-- Bảng: BOOKING_DICHVU | Sự kiện: INSTEAD OF INSERT
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER TRIGGER trg_AutoPK_BOOKING_DICHVU
+ON BOOKING_DICHVU
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaBookingDichVu, PATINDEX('%[0-9]%', MaBookingDichVu), 10) AS INT)), 0)
+    FROM BOOKING_DICHVU WITH (NOLOCK);
+
+    INSERT INTO BOOKING_DICHVU (
+        MaBookingDichVu, MaBooking, MaPhong, MaDichVu, DonGia, SoLuong, ThoiDiemThem, NguoiThem, MaNV
+    )
+    SELECT
+        CASE 
+            WHEN ISNULL(i.MaBookingDichVu, '') = '' 
+                THEN 'BDV' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
+            ELSE i.MaBookingDichVu
+        END,
+        i.MaBooking,
+        i.MaPhong,
+        i.MaDichVu,
+        i.DonGia,
+        ISNULL(i.SoLuong, 1),
+        ISNULL(i.ThoiDiemThem, GETDATE()),
+        i.NguoiThem,
+        i.MaNV
+    FROM inserted i;
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Trigger 9: Tự động sinh khóa chính MaBooking (BK...)
+-- Bảng: BOOKING | Sự kiện: INSTEAD OF INSERT
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER TRIGGER trg_AutoPK_BOOKING
+ON BOOKING
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaBooking, PATINDEX('%[0-9]%', MaBooking), 10) AS INT)), 0)
+    FROM BOOKING WITH (NOLOCK);
+
+    INSERT INTO BOOKING (
+        MaBooking, MaKH, MaTaiKhoan, MaNV, NgayDat, TrangThai, ChiPhiDuKien, PhuongPhapBooking, ThoiDiemHuy, PhiHuy
+    )
+    SELECT
+        CASE 
+            WHEN ISNULL(i.MaBooking, '') = '' 
+                THEN 'BK' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
+            ELSE i.MaBooking
+        END,
+        i.MaKH,
+        i.MaTaiKhoan,
+        i.MaNV,
+        ISNULL(i.NgayDat, GETDATE()),
+        ISNULL(i.TrangThai, 'ChoXacNhan'),
+        i.ChiPhiDuKien,
+        ISNULL(i.PhuongPhapBooking, 'Online'),
+        i.ThoiDiemHuy,
+        i.PhiHuy
+    FROM inserted i;
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Trigger 10: Tự động sinh khóa chính MaKH (KH...)
+-- Bảng: KHACHHANG | Sự kiện: INSTEAD OF INSERT
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER TRIGGER trg_AutoPK_KHACHHANG
+ON KHACHHANG
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaKH, PATINDEX('%[0-9]%', MaKH), 10) AS INT)), 0)
+    FROM KHACHHANG WITH (NOLOCK);
+
+    INSERT INTO KHACHHANG (
+        MaKH, MaTaiKhoan, HoTen, Email, SoDT, CCCD
+    )
+    SELECT
+        CASE 
+            WHEN ISNULL(i.MaKH, '') = '' 
+                THEN 'KH' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
+            ELSE i.MaKH
+        END,
+        i.MaTaiKhoan,
+        i.HoTen,
+        i.Email,
+        i.SoDT,
+        i.CCCD
+    FROM inserted i;
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Trigger 11: Tự động sinh khóa chính MaTaiKhoan (TK...)
+-- Bảng: TAIKHOAN | Sự kiện: INSTEAD OF INSERT
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER TRIGGER trg_AutoPK_TAIKHOAN
+ON TAIKHOAN
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaTaiKhoan, PATINDEX('%[0-9]%', MaTaiKhoan), 10) AS INT)), 0)
+    FROM TAIKHOAN WITH (NOLOCK);
+
+    INSERT INTO TAIKHOAN (
+        MaTaiKhoan, MatKhau, MaVaiTro, TrangThai, HoTenTaiKhoan, Email
+    )
+    SELECT
+        CASE 
+            WHEN ISNULL(i.MaTaiKhoan, '') = '' 
+                THEN 'TK' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
+            ELSE i.MaTaiKhoan
+        END,
+        i.MatKhau,
+        i.MaVaiTro,
+        ISNULL(i.TrangThai, 'Active'),
+        i.HoTenTaiKhoan,
+        i.Email
+    FROM inserted i;
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Trigger 12: Tự động sinh khóa chính MaThanhToan (TT...)
+-- Bảng: THANHTOAN | Sự kiện: INSTEAD OF INSERT
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER TRIGGER trg_AutoPK_THANHTOAN
+ON THANHTOAN
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaThanhToan, PATINDEX('%[0-9]%', MaThanhToan), 10) AS INT)), 0)
+    FROM THANHTOAN WITH (NOLOCK);
+
+    INSERT INTO THANHTOAN (
+        MaThanhToan, MaHoaDon, MaNV, SoTien, PhuongThucThanhToan, ThoiDiemThanhToan
+    )
+    SELECT
+        CASE 
+            WHEN ISNULL(i.MaThanhToan, '') = '' 
+                THEN 'TT' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
+            ELSE i.MaThanhToan
+        END,
+        i.MaHoaDon,
+        i.MaNV,
+        i.SoTien,
+        ISNULL(i.PhuongThucThanhToan, 'TienMat'),
+        ISNULL(i.ThoiDiemThanhToan, GETDATE())
+    FROM inserted i;
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- Trigger 13: Tự động sinh khóa chính MaHoaDon (HD...)
+-- Bảng: HOADON | Sự kiện: INSTEAD OF INSERT
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER TRIGGER trg_AutoPK_HOADON
+ON HOADON
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(MaHoaDon, PATINDEX('%[0-9]%', MaHoaDon), 10) AS INT)), 0)
+    FROM HOADON WITH (NOLOCK);
+
+    INSERT INTO HOADON (
+        MaHoaDon, MaBooking, NgayLap, TongTienCuoiCung, MaNV, TrangThai
+    )
+    SELECT
+        CASE 
+            WHEN ISNULL(i.MaHoaDon, '') = '' 
+                THEN 'HD' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
+            ELSE i.MaHoaDon
+        END,
+        i.MaBooking,
+        ISNULL(i.NgayLap, GETDATE()),
+        i.TongTienCuoiCung,
+        ISNULL(i.MaNV, 'NV001'),
+        ISNULL(i.TrangThai, 'ChuaThanhToan')
+    FROM inserted i;
+END;
+GO

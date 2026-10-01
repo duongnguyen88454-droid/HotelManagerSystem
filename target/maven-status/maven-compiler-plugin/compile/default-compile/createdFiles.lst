@@ -1,6 +1,7 @@
 com\mycompany\hotelmanagersystem\controller\customer\CustomerBookingDetailServlet.class
 com\mycompany\hotelmanagersystem\filter\common\EncodingFilter.class
 com\mycompany\hotelmanagersystem\model\BookingRoom.class
+com\mycompany\hotelmanagersystem\dto\receptionist\RoomTimelineDTO.class
 com\mycompany\hotelmanagersystem\controller\customer\CustomerHistoryServlet.class
 com\mycompany\hotelmanagersystem\controller\housekeeper\HousekeeperPortalServlet.class
 com\mycompany\hotelmanagersystem\dto\booking\CustomerBookingHistoryDTO.class
@@ -29,12 +30,13 @@ com\mycompany\hotelmanagersystem\model\Customer.class
 com\mycompany\hotelmanagersystem\model\Role.class
 com\mycompany\hotelmanagersystem\service\booking\BookingService.class
 com\mycompany\hotelmanagersystem\model\Booking.class
-com\mycompany\hotelmanagersystem\util\KeyGenerator.class
+com\mycompany\hotelmanagersystem\dto\receptionist\BookingBarDTO.class
 com\mycompany\hotelmanagersystem\model\BookingDichVu.class
 com\mycompany\hotelmanagersystem\model\Invoice.class
 com\mycompany\hotelmanagersystem\resources\JakartaEE8Resource.class
 com\mycompany\hotelmanagersystem\controller\auth\LoginServlet.class
 com\mycompany\hotelmanagersystem\dto\booking\CartRoomItemDTO.class
+com\mycompany\hotelmanagersystem\dto\receptionist\RoomMapKpiDTO.class
 com\mycompany\hotelmanagersystem\controller\customer\CustomerRoomDetailServlet.class
 com\mycompany\hotelmanagersystem\dto\booking\BookingRequestDTO.class
 com\mycompany\hotelmanagersystem\controller\receptionist\ReceptionistPortalServlet.class

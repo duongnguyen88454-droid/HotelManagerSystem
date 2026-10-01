@@ -16,6 +16,17 @@
    - Function 5: Tra cứu danh sách phòng trống theo ngày và loại phòng (fn_TraCuuPhongTrongTheoYeuCau)
    - Function 6: Xem lịch sử đặt phòng của một khách hàng (fn_LichSuDatPhongKhachHang)
    - Function 7: Thống kê doanh thu trong một khoảng thời gian tùy chọn (fn_DoanhThuTheoKhoangThoiGian)
+   - Nhóm Function Tự Động Sinh Mã Khóa Chính (Auto-PK Functions):
+     - Function 8: Sinh mã Đơn đặt phòng tự động (fn_SinhMaBooking)
+     - Function 9: Sinh mã Khách hàng tự động (fn_SinhMaKhachHang)
+     - Function 10: Sinh mã Tài khoản tự động (fn_SinhMaTaiKhoan)
+     - Function 11: Sinh mã Hóa đơn tự động (fn_SinhMaHoaDon)
+     - Function 12: Sinh mã Giao dịch Thanh toán tự động (fn_SinhMaThanhToan)
+     - Function 13: Sinh mã Đặt dịch vụ tự động (fn_SinhMaBookingDichVu)
+     - Function 14: Sinh mã Dịch vụ tự động (fn_SinhMaDichVu)
+     - Function 15: Sinh mã Nhân viên tự động (fn_SinhMaNhanVien)
+     - Function 16: Sinh mã Nhiệm vụ dọn phòng tự động (fn_SinhMaNhiemVuDoPhong)
+     - Function 17: Sinh mã Loại phòng tự động (fn_SinhMaLoaiPhong)
 3. DANH SÁCH Ý TƯỞNG CÁC STORED PROCEDURE (THỦ TỤC NGHIỆP VỤ)
    - Procedure 1: Đặt phòng trực tuyến cho khách hàng (sp_TaoDonDatPhongOnline)
    - Procedure 2: Thủ tục Check-in nhận phòng tại quầy (sp_CheckInNhanPhong)
@@ -288,6 +299,256 @@ BEGIN
     WHERE ThoiDiemThanhToan BETWEEN @TuNgay AND @DenNgay;
 
     RETURN @TongThu;
+END;
+GO
+```
+
+---
+
+### 2.8. NHÓM FUNCTION TỰ ĐỘNG SINH MÃ KHÓA CHÍNH (AUTO-GENERATING PRIMARY KEY FUNCTIONS)
+
+Nhằm xóa bỏ hoàn toàn sự phụ thuộc vào tiện ích sinh mã tầng ứng dụng (Java `KeyGenerator`), loại bỏ nguy cơ lệch số (desync) và triệt tiêu triệt để hiện tượng Deadlock tự thân (Self-Deadlock) khi Java vừa giữ connection mở vừa tính toán khóa chính, toàn bộ logic sinh mã nhận dạng được quy hoạch tập trung 100% xuống tầng CSDL thông qua hệ thống Scalar UDFs độc lập.
+
+* **Quy chuẩn mã hóa:** `[Tiền tố chuẩn 2-3 ký tự] + [Số thứ tự 3-4 chữ số căn lề 0]`.
+* **Công thức tổng quát:** `PREFIX + RIGHT('000' + CAST(ISNULL(MAX(CAST(SUBSTRING(MaCol, LenPrefix + 1, 10) AS INT)), 0) + 1 AS VARCHAR), SoChuSo)`.
+* **Cơ chế chống nghẽn (Concurrency Optimization):** Sử dụng hint `WITH (NOLOCK)` trong câu lệnh đọc số cực đại giúp hàm đọc nhanh trạng thái mà không giữ Shared Locks trên bảng, tránh xung đột khóa với các giao tác `INSERT`/`UPDATE` đồng thời.
+
+---
+
+#### Function 8: Tự sinh mã Đơn đặt phòng (`fn_SinhMaBooking`)
+* **Loại hàm:** Scalar UDF (Trả về `VARCHAR(10)`).
+* **Định dạng:** `BK001`, `BK002`, `BK010`, `BK100`... (Tiền tố `BK` + 3 chữ số).
+* **Mã T-SQL:**
+```sql
+CREATE OR ALTER FUNCTION fn_SinhMaBooking()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @NextID VARCHAR(10);
+    DECLARE @MaxNum INT = 0;
+
+    SELECT @MaxNum = ISNULL(MAX(CAST(SUBSTRING(MaBooking, 3, 10) AS INT)), 0)
+    FROM BOOKING WITH (NOLOCK)
+    WHERE MaBooking LIKE 'BK[0-9]%';
+
+    SET @NextID = 'BK' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR(10)), 3);
+    RETURN @NextID;
+END;
+GO
+```
+
+---
+
+#### Function 9: Tự sinh mã Khách hàng (`fn_SinhMaKhachHang`)
+* **Loại hàm:** Scalar UDF (Trả về `VARCHAR(10)`).
+* **Định dạng:** `KH001`, `KH002`, `KH015`... (Tiền tố `KH` + 3 chữ số).
+* **Mã T-SQL:**
+```sql
+CREATE OR ALTER FUNCTION fn_SinhMaKhachHang()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @NextID VARCHAR(10);
+    DECLARE @MaxNum INT = 0;
+
+    SELECT @MaxNum = ISNULL(MAX(CAST(SUBSTRING(MaKH, 3, 10) AS INT)), 0)
+    FROM KHACHHANG WITH (NOLOCK)
+    WHERE MaKH LIKE 'KH[0-9]%';
+
+    SET @NextID = 'KH' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR(10)), 3);
+    RETURN @NextID;
+END;
+GO
+```
+
+---
+
+#### Function 10: Tự sinh mã Tài khoản hệ thống (`fn_SinhMaTaiKhoan`)
+* **Loại hàm:** Scalar UDF (Trả về `VARCHAR(10)`).
+* **Định dạng:** `TK001`, `TK002`, `TK010`... (Tiền tố `TK` + 3 chữ số).
+* **Mã T-SQL:**
+```sql
+CREATE OR ALTER FUNCTION fn_SinhMaTaiKhoan()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @NextID VARCHAR(10);
+    DECLARE @MaxNum INT = 0;
+
+    SELECT @MaxNum = ISNULL(MAX(CAST(SUBSTRING(MaTaiKhoan, 3, 10) AS INT)), 0)
+    FROM TAIKHOAN WITH (NOLOCK)
+    WHERE MaTaiKhoan LIKE 'TK[0-9]%';
+
+    SET @NextID = 'TK' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR(10)), 3);
+    RETURN @NextID;
+END;
+GO
+```
+
+---
+
+#### Function 11: Tự sinh mã Hóa đơn thanh toán (`fn_SinhMaHoaDon`)
+* **Loại hàm:** Scalar UDF (Trả về `VARCHAR(10)`).
+* **Định dạng:** `HD001`, `HD002`, `HD010`... (Tiền tố `HD` + 3 chữ số).
+* **Mã T-SQL:**
+```sql
+CREATE OR ALTER FUNCTION fn_SinhMaHoaDon()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @NextID VARCHAR(10);
+    DECLARE @MaxNum INT = 0;
+
+    SELECT @MaxNum = ISNULL(MAX(CAST(SUBSTRING(MaHoaDon, 3, 10) AS INT)), 0)
+    FROM HOADON WITH (NOLOCK)
+    WHERE MaHoaDon LIKE 'HD[0-9]%';
+
+    SET @NextID = 'HD' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR(10)), 3);
+    RETURN @NextID;
+END;
+GO
+```
+
+---
+
+#### Function 12: Tự sinh mã Giao dịch thanh toán (`fn_SinhMaThanhToan`)
+* **Loại hàm:** Scalar UDF (Trả về `VARCHAR(10)`).
+* **Định dạng:** `TT001`, `TT002`, `TT010`... (Tiền tố `TT` + 3 chữ số).
+* **Mã T-SQL:**
+```sql
+CREATE OR ALTER FUNCTION fn_SinhMaThanhToan()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @NextID VARCHAR(10);
+    DECLARE @MaxNum INT = 0;
+
+    SELECT @MaxNum = ISNULL(MAX(CAST(SUBSTRING(MaThanhToan, 3, 10) AS INT)), 0)
+    FROM THANHTOAN WITH (NOLOCK)
+    WHERE MaThanhToan LIKE 'TT[0-9]%';
+
+    SET @NextID = 'TT' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR(10)), 3);
+    RETURN @NextID;
+END;
+GO
+```
+
+---
+
+#### Function 13: Tự sinh mã Chi tiết sử dụng dịch vụ (`fn_SinhMaBookingDichVu`)
+* **Loại hàm:** Scalar UDF (Trả về `VARCHAR(10)`).
+* **Định dạng:** `BDV001`, `BDV002`, `BDV010`... (Tiền tố `BDV` + 3 chữ số).
+* **Mã T-SQL:**
+```sql
+CREATE OR ALTER FUNCTION fn_SinhMaBookingDichVu()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @NextID VARCHAR(10);
+    DECLARE @MaxNum INT = 0;
+
+    SELECT @MaxNum = ISNULL(MAX(CAST(SUBSTRING(MaBookingDichVu, 4, 10) AS INT)), 0)
+    FROM BOOKING_DICHVU WITH (NOLOCK)
+    WHERE MaBookingDichVu LIKE 'BDV[0-9]%';
+
+    SET @NextID = 'BDV' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR(10)), 3);
+    RETURN @NextID;
+END;
+GO
+```
+
+---
+
+#### Function 14: Tự sinh mã Dịch vụ danh mục (`fn_SinhMaDichVu`)
+* **Loại hàm:** Scalar UDF (Trả về `VARCHAR(10)`).
+* **Định dạng:** `DV001`, `DV002`, `DV010`... (Tiền tố `DV` + 3 chữ số).
+* **Mã T-SQL:**
+```sql
+CREATE OR ALTER FUNCTION fn_SinhMaDichVu()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @NextID VARCHAR(10);
+    DECLARE @MaxNum INT = 0;
+
+    SELECT @MaxNum = ISNULL(MAX(CAST(SUBSTRING(MaDichVu, 3, 10) AS INT)), 0)
+    FROM DICHVU WITH (NOLOCK)
+    WHERE MaDichVu LIKE 'DV[0-9]%';
+
+    SET @NextID = 'DV' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR(10)), 3);
+    RETURN @NextID;
+END;
+GO
+```
+
+---
+
+#### Function 15: Tự sinh mã Nhân viên (`fn_SinhMaNhanVien`)
+* **Loại hàm:** Scalar UDF (Trả về `VARCHAR(10)`).
+* **Định dạng:** `NV001`, `NV002`, `NV010`... (Tiền tố `NV` + 3 chữ số).
+* **Mã T-SQL:**
+```sql
+CREATE OR ALTER FUNCTION fn_SinhMaNhanVien()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @NextID VARCHAR(10);
+    DECLARE @MaxNum INT = 0;
+
+    SELECT @MaxNum = ISNULL(MAX(CAST(SUBSTRING(MaNV, 3, 10) AS INT)), 0)
+    FROM NHANVIEN WITH (NOLOCK)
+    WHERE MaNV LIKE 'NV[0-9]%';
+
+    SET @NextID = 'NV' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR(10)), 3);
+    RETURN @NextID;
+END;
+GO
+```
+
+---
+
+#### Function 16: Tự sinh mã Nhiệm vụ dọn phòng (`fn_SinhMaNhiemVuDoPhong`)
+* **Loại hàm:** Scalar UDF (Trả về `VARCHAR(10)`).
+* **Định dạng:** `DP001`, `DP002`, `DP010`... (Tiền tố `DP` + 3 chữ số).
+* **Mã T-SQL:**
+```sql
+CREATE OR ALTER FUNCTION fn_SinhMaNhiemVuDoPhong()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @NextID VARCHAR(10);
+    DECLARE @MaxNum INT = 0;
+
+    SELECT @MaxNum = ISNULL(MAX(CAST(SUBSTRING(MaNhiemVu, 3, 10) AS INT)), 0)
+    FROM NHIEMVU_DONPHONG WITH (NOLOCK)
+    WHERE MaNhiemVu LIKE 'DP[0-9]%';
+
+    SET @NextID = 'DP' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR(10)), 3);
+    RETURN @NextID;
+END;
+GO
+```
+
+---
+
+#### Function 17: Tự sinh mã Loại phòng (`fn_SinhMaLoaiPhong`)
+* **Loại hàm:** Scalar UDF (Trả về `VARCHAR(10)`).
+* **Định dạng:** `LP001`, `LP002`, `LP010`... (Tiền tố `LP` + 3 chữ số).
+* **Mã T-SQL:**
+```sql
+CREATE OR ALTER FUNCTION fn_SinhMaLoaiPhong()
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @NextID VARCHAR(10);
+    DECLARE @MaxNum INT = 0;
+
+    SELECT @MaxNum = ISNULL(MAX(CAST(SUBSTRING(MaLoaiPhong, 3, 10) AS INT)), 0)
+    FROM LOAIPHONG WITH (NOLOCK)
+    WHERE MaLoaiPhong LIKE 'LP[0-9]%';
+
+    SET @NextID = 'LP' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR(10)), 3);
+    RETURN @NextID;
 END;
 GO
 ```

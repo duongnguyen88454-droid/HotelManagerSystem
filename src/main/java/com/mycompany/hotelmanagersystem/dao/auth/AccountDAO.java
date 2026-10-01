@@ -136,4 +136,17 @@ public class AccountDAO {
         }
         return registerAccount(tk);
     }
+
+    public String getNextAccountIdFromDB() {
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT dbo.fn_SinhMaTaiKhoan()");
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getString(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "TK001";
+    }
 }

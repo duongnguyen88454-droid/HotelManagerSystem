@@ -4,7 +4,6 @@ import com.mycompany.hotelmanagersystem.dao.auth.AccountDAO;
 import com.mycompany.hotelmanagersystem.dto.auth.UserSessionDTO;
 import com.mycompany.hotelmanagersystem.model.Customer;
 import com.mycompany.hotelmanagersystem.model.Account;
-import com.mycompany.hotelmanagersystem.util.KeyGenerator;
 import com.mycompany.hotelmanagersystem.util.PasswordUtil;
 
 public class AuthService {
@@ -82,8 +81,8 @@ public class AuthService {
             throw new Exception("Email này đã được sử dụng để đăng ký tài khoản. Vui lòng đăng nhập hoặc chọn email khác.");
         }
 
-        // Tự sinh mã tài khoản theo chuẩn liền mạch (TK001, TK002...)
-        String maTaiKhoan = KeyGenerator.generateAccountId();
+        // Tự sinh mã tài khoản bằng SQL Server Function fn_SinhMaTaiKhoan
+        String maTaiKhoan = accountDAO.getNextAccountIdFromDB();
 
         // Băm mật khẩu bằng thuật toán SHA-256 trước khi lưu vào CSDL
         String hashedPassword = PasswordUtil.hashPassword(password);
