@@ -17,7 +17,7 @@
     /* TEXT BADGES */
     .badge-clean { background: #15803d; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
     .badge-dirty { background: #b45309; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
-    .badge-cleaning { background: #0284c7; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+    .badge-cleaning { background: #d97706; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
     .badge-damaged, .badge-maintenance { background: #475569; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
     .badge-occupied { background: #b91c1c; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
     .badge-booked { background: #4338ca; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
@@ -43,25 +43,25 @@
     .timeline-wrapper { overflow-x: auto; max-width: 100%; }
     .timeline-table { width: 100%; border-collapse: collapse; min-width: 1100px; font-size: 12px; }
     .timeline-table th, .timeline-table td { border: 1px solid #e2e8f0; padding: 0; text-align: center; }
-    .timeline-table th { background: #f8fafc; color: #334155; font-weight: 700; height: 42px; }
-    .room-col-header { width: 150px; min-width: 150px; text-align: left !important; padding: 8px 12px !important; }
-    .status-col-header { width: 95px; min-width: 95px; }
-    .day-col-header { width: 125px; min-width: 125px; }
+    .timeline-table th { background: #f8fafc; color: #334155; font-weight: 700; height: 44px; }
+    .room-col-header { width: 175px; min-width: 175px; text-align: left !important; padding: 8px 14px !important; }
+    .day-col-header { min-width: 140px; }
     
-    .floor-row td { background: #f1f5f9; font-weight: 700; text-align: left; padding: 8px 12px; color: #1e293b; font-size: 13px; }
-    .room-row { height: 50px; }
-    .room-cell-info { text-align: left !important; padding: 6px 12px !important; font-weight: 600; color: #0f172a; }
-    .timeline-grid-cell { position: relative; height: 50px; background: #ffffff; }
+    .floor-row td { background: #f1f5f9; font-weight: 700; text-align: left; padding: 8px 14px; color: #1e293b; font-size: 13px; }
+    .room-row { height: 58px; }
+    .room-cell-info { text-align: left !important; padding: 6px 12px !important; vertical-align: middle; }
+    .timeline-grid-cell { position: relative; height: 58px; background: #ffffff; }
     .timeline-grid-cell:hover { background: #f8fafc; }
     
     /* BOOKING BARS */
     .booking-bar {
-        position: absolute; top: 6px; bottom: 6px; border-radius: 4px;
+        position: absolute; top: 8px; bottom: 8px; border-radius: 6px;
         display: flex; align-items: center; padding: 0 10px; font-size: 11px; font-weight: 700;
-        color: #ffffff; cursor: pointer; z-index: 5; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: transform 0.15s ease;
+        color: #ffffff; cursor: pointer; z-index: 5; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: all 0.15s ease;
     }
-    .booking-bar:hover { transform: translateY(-1px); box-shadow: 0 3px 6px rgba(0,0,0,0.2); }
+    .booking-bar:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.25); }
     .bar-confirmed { background: #16a34a; border-left: 4px solid #14532d; }
     .bar-occupied { background: #dc2626; border-left: 4px solid #7f1d1d; }
     .bar-checkout-today { background: #ea580c; border-left: 4px solid #7c2d12; }
@@ -162,8 +162,7 @@
             <table class="timeline-table">
                 <thead>
                     <tr>
-                        <th class="room-col-header">PHÒNG</th>
-                        <th class="status-col-header">TRẠNG THÁI</th>
+                        <th class="room-col-header">PHÒNG & LOẠI PHÒNG</th>
                         <th class="day-col-header">Thứ 2 (29/09)</th>
                         <th class="day-col-header">Thứ 3 (30/09)</th>
                         <th class="day-col-header">Thứ 4 (01/10)</th>
@@ -178,25 +177,30 @@
                     <c:forEach items="${roomList}" var="r">
                         <c:if test="${r.soTang ne prevFloor}">
                             <c:set var="prevFloor" value="${r.soTang}" />
-                            <tr class="floor-row" data-floor="T${r.soTang}"><td colspan="9">-- TẦNG ${r.soTang} --</td></tr>
+                            <tr class="floor-row" data-floor="T${r.soTang}"><td colspan="8">-- TẦNG ${r.soTang} --</td></tr>
                         </c:if>
                         <tr class="room-row" data-floor="T${r.soTang}" data-status="${r.trangThaiPhong}" data-room="${r.maPhong}">
                             <td class="room-cell-info">
-                                ${r.soPhong} (${r.tenLoaiPhong})
-                                <c:if test="${r.trangThaiPhong eq 'Occupied'}">
-                                    <button type="button" class="pms-btn pms-btn-primary" style="padding: 2px 6px; font-size: 11px; margin-left: 6px;" onclick="openServiceOrderForRoom('${r.maPhong}', '${r.soPhong}')">[Gọi DV]</button>
-                                </c:if>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                                    <span style="font-size: 13px; font-weight: 800; color: #0f172a;">Phòng ${r.soPhong}</span>
+                                    <span class="${r.trangThaiCssClass}" style="font-size: 10px; padding: 2px 6px;">${r.trangThaiBadgeText}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 11px; color: #64748b;">${r.tenLoaiPhong}</span>
+                                    <c:if test="${r.trangThaiPhong eq 'Occupied'}">
+                                        <button type="button" class="pms-btn pms-btn-primary" style="padding: 1px 5px; font-size: 10px;" onclick="openServiceOrderForRoom('${r.maPhong}', '${r.soPhong}')">[Gọi DV]</button>
+                                    </c:if>
+                                </div>
                             </td>
-                            <td><span class="${r.trangThaiCssClass}">${r.trangThaiBadgeText}</span></td>
                             <c:choose>
                                 <c:when test="${r.trangThaiPhong eq 'Dirty'}">
-                                    <td class="timeline-grid-cell" colspan="7" style="background: #fafaf9; color: #a8a29e; font-style: italic; line-height: 50px;">Phòng vừa trả khách, đang chờ buồng phòng dọn dẹp</td>
+                                    <td class="timeline-grid-cell" colspan="7" style="background: #fafaf9; color: #a8a29e; font-style: italic; line-height: 58px;">Phòng vừa trả khách, đang chờ buồng phòng dọn dẹp</td>
                                 </c:when>
                                 <c:when test="${r.trangThaiPhong eq 'Damaged'}">
-                                    <td class="timeline-grid-cell" colspan="7" style="background: #f1f5f9; color: #64748b; font-weight: 600; line-height: 50px;">Phòng tạm khóa để bảo trì: ${not empty r.moTa ? r.moTa : 'Thiết bị hư hỏng'}</td>
+                                    <td class="timeline-grid-cell" colspan="7" style="background: #f1f5f9; color: #64748b; font-weight: 600; line-height: 58px;">Phòng tạm khóa để bảo trì: ${not empty r.moTa ? r.moTa : 'Thiết bị hư hỏng'}</td>
                                 </c:when>
                                 <c:when test="${r.trangThaiPhong eq 'Cleaning'}">
-                                    <td class="timeline-grid-cell" colspan="7" style="background: #f0fdf4; color: #166534; font-style: italic; line-height: 50px;">Nhân viên buồng phòng đang tiến hành vệ sinh</td>
+                                    <td class="timeline-grid-cell" colspan="7" style="background: #fffbeb; color: #92400e; font-style: italic; font-weight: 600; line-height: 58px;">Nhân viên buồng phòng đang tiến hành vệ sinh</td>
                                 </c:when>
                                 <c:otherwise>
                                     <c:forEach var="dayIdx" begin="1" end="7">
@@ -204,7 +208,7 @@
                                             <c:forEach items="${r.bookingBars}" var="bar">
                                                 <c:if test="${bar.startCol eq dayIdx}">
                                                     <div class="booking-bar ${bar.cssClass}" 
-                                                         style="left: 4px; width: calc(${bar.colSpan * 100}% - 8px); z-index: 10;"
+                                                         style="left: 6px; width: calc(${bar.colSpan * 100}% - 12px); z-index: 10;"
                                                          title="[${bar.maBooking}] ${bar.tenKhachHang} (${bar.trangThaiBooking eq 'DaCheckIn' ? 'Đang lưu trú' : 'Đã xác nhận'})"
                                                          onclick="handleBookingBarClick('${r.maPhong}', '${r.soPhong}', '${bar.maBooking}', '${bar.tenKhachHang}', '${bar.soDienThoai}', '${bar.soCccd}', '${bar.trangThaiBooking}', '${bar.ngayNhanDuKien}', '${bar.ngayTraDuKien}')">
                                                         [${bar.maBooking}] ${bar.tenKhachHang} (${bar.trangThaiBooking eq 'DaCheckIn' ? 'Đang ở' : 'Chờ nhận'})
@@ -219,7 +223,7 @@
                     </c:forEach>
                     <c:if test="${empty roomList}">
                         <tr>
-                            <td colspan="9" style="text-align: center; padding: 30px; color: #64748b;">Chưa có dữ liệu phòng nào trong hệ thống.</td>
+                            <td colspan="8" style="text-align: center; padding: 30px; color: #64748b;">Chưa có dữ liệu phòng nào trong hệ thống.</td>
                         </tr>
                     </c:if>
                 </tbody>
@@ -665,7 +669,7 @@
         const roomRow = document.querySelector('.room-row[data-room="' + roomId + '"]');
         if (roomRow) {
             roomRow.setAttribute('data-status', 'Occupied');
-            const badgeSpan = roomRow.querySelector('td:nth-child(2) span');
+            const badgeSpan = roomRow.querySelector('.room-cell-info span[class*="badge-"]');
             if (badgeSpan) {
                 badgeSpan.className = 'badge-occupied';
                 badgeSpan.innerText = '[Đang có khách]';

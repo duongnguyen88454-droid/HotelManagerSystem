@@ -504,7 +504,7 @@ VALUES             ('P101', '101', 'LP01', 'Available', N'Phòng tầng 1, hư�
                    ('P102', '102', 'LP01', 'Dirty', N'Khách vừa check-out lúc 11:30, cần dọn dẹp.'),
                    ('P103', '103', 'LP02', 'Available', N'Phòng tầng 1, gần sảnh lễ tân.'),
                    ('P201', '201', 'LP02', 'Occupied', N'Khách KH001 đang lưu trú.'),
-                   ('P202', '202', 'LP03', 'Booked', N'Đã nhận cọc, giữ phòng cho khách ngày mai.'),
+                   ('P202', '202', 'LP03', 'Booked', N'Phòng Deluxe King tầng 2, giữ phòng theo lịch đặt.'),
                    ('P203', '203', 'LP03', 'Available', N'Phòng tầng 2, ban công nhìn ra hồ bơi.'),
                    ('P301', '301', 'LP04', 'Cleaning', N'Nhân viên Nhung đang tiến hành vệ sinh.'),
                    ('P302', '302', 'LP04', 'Occupied', N'Khách gia đình KH002 đang ở.'),
