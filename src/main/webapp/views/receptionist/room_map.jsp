@@ -56,7 +56,8 @@
     /* BOOKING BARS */
     .booking-bar {
         position: absolute; top: 8px; bottom: 8px; border-radius: 6px;
-        display: flex; align-items: center; padding: 0 10px; font-size: 11px; font-weight: 700;
+        display: flex; align-items: center; justify-content: center; text-align: center;
+        padding: 0 10px; font-size: 12px; font-weight: 700;
         color: #ffffff; cursor: pointer; z-index: 5; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         border: 1px solid rgba(255, 255, 255, 0.4);
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: all 0.15s ease;
@@ -211,7 +212,7 @@
                                                          style="left: 6px; width: calc(${bar.colSpan * 100}% - 12px); z-index: 10;"
                                                          title="[${bar.maBooking}] ${bar.tenKhachHang} (${bar.trangThaiBooking eq 'DaCheckIn' ? 'Đang lưu trú' : 'Đã xác nhận'})"
                                                          onclick="handleBookingBarClick('${r.maPhong}', '${r.soPhong}', '${bar.maBooking}', '${bar.tenKhachHang}', '${bar.soDienThoai}', '${bar.soCccd}', '${bar.trangThaiBooking}', '${bar.ngayNhanDuKien}', '${bar.ngayTraDuKien}')">
-                                                        [${bar.maBooking}] ${bar.tenKhachHang} (${bar.trangThaiBooking eq 'DaCheckIn' ? 'Đang ở' : 'Chờ nhận'})
+                                                        ${bar.tenKhachHang}
                                                     </div>
                                                 </c:if>
                                             </c:forEach>
@@ -680,7 +681,8 @@
                 const guestName = document.getElementById('ciGuestName').innerText;
                 const phone = document.getElementById('ciPhone').innerText;
                 const cccd = document.getElementById('ciCccd').innerText;
-                bar.innerText = '[' + bookingId + '] ' + guestName + ' (Đang ở)';
+                bar.innerText = guestName;
+                bar.title = '[' + bookingId + '] ' + guestName + ' (Đang lưu trú)';
                 bar.setAttribute('onclick', "openRoomDetailModal('" + roomId + "', '" + bookingId + "', '" + guestName + "', '" + phone + "', '" + cccd + "', '', '')");
             }
         }
