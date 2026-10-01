@@ -2,7 +2,7 @@ package com.mycompany.hotelmanagersystem.controller.customer;
 
 import com.mycompany.hotelmanagersystem.dto.auth.UserSessionDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.BookingDetailDTO;
-import com.mycompany.hotelmanagersystem.model.ServiceItem;
+import com.mycompany.hotelmanagersystem.hotelservice.model.ServiceItem;
 import com.mycompany.hotelmanagersystem.service.booking.BookingService;
 
 import javax.servlet.ServletException;

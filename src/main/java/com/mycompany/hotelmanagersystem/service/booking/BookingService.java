@@ -2,14 +2,14 @@ package com.mycompany.hotelmanagersystem.service.booking;
 
 import com.mycompany.hotelmanagersystem.dao.booking.BookingDAO;
 import com.mycompany.hotelmanagersystem.room.dao.RoomDAO;
-import com.mycompany.hotelmanagersystem.dao.service.ServiceDAO;
+import com.mycompany.hotelmanagersystem.hotelservice.dao.ServiceDAO;
 import com.mycompany.hotelmanagersystem.dto.booking.BookingCartDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.CartRoomItemDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.CartServiceItemDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.BookingDetailDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.CustomerBookingHistoryDTO;
 import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
-import com.mycompany.hotelmanagersystem.model.ServiceItem;
+import com.mycompany.hotelmanagersystem.hotelservice.model.ServiceItem;
 
 import java.sql.Date;
 import java.time.LocalDate;

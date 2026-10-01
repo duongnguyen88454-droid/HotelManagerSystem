@@ -1,6 +1,6 @@
-package com.mycompany.hotelmanagersystem.dao.service;
+package com.mycompany.hotelmanagersystem.hotelservice.dao;
 
-import com.mycompany.hotelmanagersystem.model.ServiceItem;
+import com.mycompany.hotelmanagersystem.hotelservice.model.ServiceItem;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.sql.Connection;
