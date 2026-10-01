@@ -9,3 +9,4 @@
   4. Ghi nhận vào file báo cáo `.md` riêng nếu User yêu cầu.
   5. **DỪNG LẠI HOÀN TOÀN** để chờ User đọc, thẩm định và duyệt.
 - **CHỈ KHI NÀO USER NÓI ĐỒNG Ý / CHO PHÉP CODE:** Lúc đó mới được phép thực thi chỉnh sửa code, rebuild và chạy lại test case để kiểm chứng.
+- Trước khi sửa bất kỳ file .java nào, phải đọc .agents/rules/ARCHITECTURE_RULES.md và tuân thủ.

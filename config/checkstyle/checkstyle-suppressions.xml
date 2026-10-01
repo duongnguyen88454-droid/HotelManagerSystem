@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+          "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+<!--
+  ============================================================================
+  DANH SÁCH NỢ KỸ THUẬT ĐÃ BIẾT (baseline) - đo trên nhánh phase3, commit 62fb343.
+  ~
+  QUY TẮC (xem ARCHITECTURE_RULES.md, mục 5):
+   1. Danh sách này CHỈ ĐƯỢC NGẮN LẠI. Cấm thêm dòng mới nếu chưa được người duyệt kiến trúc đồng ý.
+   2. Khi sửa xong một mục, XÓA dòng suppress tương ứng trong cùng commit.
+   3. Cấm thêm code mới vào class/method đang nằm trong danh sách này; code mới đặt vào class mới.
+   4. Các suppress dùng "lines" gắn với số dòng khai báo; nếu bạn làm lệch số dòng thì build sẽ đỏ -
+      hãy REFACTOR cho hết vi phạm, đừng chỉ sửa lại số dòng.
+  ============================================================================
+-->
+<suppressions>
+
+  <!-- Hằng số miễn trừ vĩnh viễn: lớp dữ liệu thuần (getter/setter, constructor đầy đủ) -->
+  <suppress checks="MethodCount|ParameterNumber" files="[\\/](dto|model)[\\/]"/>
+
+  <!-- ===== NỢ 1: BookingDAO - "god class" (697 dòng, 30 method, 4 trách nhiệm). Kế hoạch tách: QT 2.3 ===== -->
+  <suppress checks="FileLength"       files="BookingDAO\.java"/>
+  <suppress checks="MethodCount"      files="BookingDAO\.java" lines="29"/>
+  <suppress checks="ParameterNumber"  files="BookingDAO\.java" lines="39"/>   <!-- createOnlineBookingWithServices: 9 tham số -->
+  <suppress checks="ParameterNumber"  files="BookingDAO\.java" lines="375"/>  <!-- insertSingleBookingService: 7 tham số -->
+
+  <!-- ===== NỢ 2: BookingService - quá lớn, quá nhiều overload, dùng java.sql.Date ===== -->
+  <suppress checks="FileLength"           files="BookingService\.java"/>
+  <suppress checks="MethodCount"          files="BookingService\.java" lines="20"/>
+  <suppress checks="ParameterNumber"      files="BookingService\.java" lines="48"/>
+  <suppress checks="MethodLength"         files="BookingService\.java" message="createBookingWithServices"/>
+  <suppress checks="CyclomaticComplexity" files="BookingService\.java" lines="172"/>  <!-- getBookingDetail: độ phức tạp 17 -->
+  <suppress checks="ImportControl"        files="BookingService\.java" message="java\.sql\.Date"/>
+  <suppress checks="ImportControl"        files="RoomService\.java"    message="java\.sql\.Date"/>
+
+  <!-- ===== NỢ 3: Controller chứa nghiệp vụ (method quá dài/phức tạp) ===== -->
+  <suppress checks="MethodLength"         files="CustomerBookingServlet\.java" message="doPost"/>
+  <suppress checks="CyclomaticComplexity" files="CustomerBookingServlet\.java" lines="34"/>   <!-- doGet: 17 -->
+  <suppress checks="CyclomaticComplexity" files="CustomerBookingServlet\.java" lines="95"/>   <!-- doPost: 31 -->
+  <suppress checks="MethodLength"         files="CustomerCartServlet\.java"    message="handleAddRoom"/>
+  <suppress checks="CyclomaticComplexity" files="CustomerCartServlet\.java"    lines="76"/>   <!-- handleAddRoom: 23 -->
+
+  <!-- ===== NỢ 4: Controller gọi thẳng DAO (bỏ qua service) ===== -->
+  <suppress checks="ImportControl" files="CustomerBookingServlet\.java"     message="CustomerDAO"/>
+  <suppress checks="ImportControl" files="ReceptionistPortalServlet\.java"  message="RoomDAO"/>
+
+  <!-- ===== NỢ 5: DAO có method quá dài/phức tạp ===== -->
+  <suppress checks="MethodLength"         files="CustomerDAO\.java" message="findOrUpsertGuestByCCCD"/>
+  <suppress checks="CyclomaticComplexity" files="CustomerDAO\.java" lines="122"/>  <!-- findOrUpsertGuestByCCCD: 26 -->
+  <suppress checks="MethodLength"         files="RoomDAO\.java"     message="searchAvailableRooms"/>
+
+</suppressions>
