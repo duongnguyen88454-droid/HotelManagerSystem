@@ -1,11 +1,11 @@
-package com.mycompany.hotelmanagersystem.controller.customer;
+package com.mycompany.hotelmanagersystem.booking.controller;
 
-import com.mycompany.hotelmanagersystem.dto.booking.BookingCartDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.CartRoomItemDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.CartServiceItemDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.BookingCartDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.CartRoomItemDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
 import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
 import com.mycompany.hotelmanagersystem.hotelservice.model.ServiceItem;
-import com.mycompany.hotelmanagersystem.service.booking.BookingService;
+import com.mycompany.hotelmanagersystem.booking.service.BookingService;
 import com.mycompany.hotelmanagersystem.room.service.RoomService;
 
 import javax.servlet.ServletException;

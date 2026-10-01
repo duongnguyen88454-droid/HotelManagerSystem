@@ -1,13 +1,13 @@
-package com.mycompany.hotelmanagersystem.service.booking;
+package com.mycompany.hotelmanagersystem.booking.service;
 
-import com.mycompany.hotelmanagersystem.dao.booking.BookingDAO;
+import com.mycompany.hotelmanagersystem.booking.dao.BookingDAO;
 import com.mycompany.hotelmanagersystem.room.dao.RoomDAO;
 import com.mycompany.hotelmanagersystem.hotelservice.dao.ServiceDAO;
-import com.mycompany.hotelmanagersystem.dto.booking.BookingCartDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.CartRoomItemDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.CartServiceItemDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.BookingDetailDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.CustomerBookingHistoryDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.BookingCartDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.CartRoomItemDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.BookingDetailDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.CustomerBookingHistoryDTO;
 import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
 import com.mycompany.hotelmanagersystem.hotelservice.model.ServiceItem;
 

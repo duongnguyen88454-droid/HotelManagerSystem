@@ -1,8 +1,8 @@
-package com.mycompany.hotelmanagersystem.controller.customer;
+package com.mycompany.hotelmanagersystem.booking.controller;
 
 import com.mycompany.hotelmanagersystem.auth.dto.UserSessionDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.CustomerBookingHistoryDTO;
-import com.mycompany.hotelmanagersystem.service.booking.BookingService;
+import com.mycompany.hotelmanagersystem.booking.dto.CustomerBookingHistoryDTO;
+import com.mycompany.hotelmanagersystem.booking.service.BookingService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

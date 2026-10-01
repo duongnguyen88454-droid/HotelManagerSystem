@@ -1,12 +1,12 @@
-package com.mycompany.hotelmanagersystem.dao.booking;
+package com.mycompany.hotelmanagersystem.booking.dao;
 
-import com.mycompany.hotelmanagersystem.dto.booking.BookingCartDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.CartRoomItemDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.CartServiceItemDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.BookingDetailDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.BookingDichVuItemDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.CustomerBookingHistoryDTO;
-import com.mycompany.hotelmanagersystem.dto.booking.RoomBookingDetailDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.BookingCartDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.CartRoomItemDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.BookingDetailDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.BookingDichVuItemDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.CustomerBookingHistoryDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.RoomBookingDetailDTO;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.sql.Connection;
