@@ -1,7 +1,7 @@
 package com.mycompany.hotelmanagersystem.controller.customer;
 
-import com.mycompany.hotelmanagersystem.model.RoomType;
-import com.mycompany.hotelmanagersystem.service.room.RoomService;
+import com.mycompany.hotelmanagersystem.room.model.RoomType;
+import com.mycompany.hotelmanagersystem.room.service.RoomService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

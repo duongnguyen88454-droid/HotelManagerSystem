@@ -1,9 +1,9 @@
-package com.mycompany.hotelmanagersystem.dao.room;
+package com.mycompany.hotelmanagersystem.room.dao;
 
-import com.mycompany.hotelmanagersystem.dto.receptionist.RoomMapKpiDTO;
-import com.mycompany.hotelmanagersystem.dto.receptionist.RoomTimelineDTO;
-import com.mycompany.hotelmanagersystem.dto.room.AvailableRoomDTO;
-import com.mycompany.hotelmanagersystem.model.RoomType;
+import com.mycompany.hotelmanagersystem.room.dto.RoomMapKpiDTO;
+import com.mycompany.hotelmanagersystem.room.dto.RoomTimelineDTO;
+import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
+import com.mycompany.hotelmanagersystem.room.model.RoomType;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.sql.Connection;

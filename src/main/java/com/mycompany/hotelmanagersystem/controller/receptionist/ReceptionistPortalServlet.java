@@ -1,8 +1,8 @@
 package com.mycompany.hotelmanagersystem.controller.receptionist;
 
-import com.mycompany.hotelmanagersystem.dao.room.RoomDAO;
-import com.mycompany.hotelmanagersystem.dto.receptionist.RoomMapKpiDTO;
-import com.mycompany.hotelmanagersystem.dto.receptionist.RoomTimelineDTO;
+import com.mycompany.hotelmanagersystem.room.dao.RoomDAO;
+import com.mycompany.hotelmanagersystem.room.dto.RoomMapKpiDTO;
+import com.mycompany.hotelmanagersystem.room.dto.RoomTimelineDTO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

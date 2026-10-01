@@ -3,10 +3,10 @@ package com.mycompany.hotelmanagersystem.controller.customer;
 import com.mycompany.hotelmanagersystem.dto.booking.BookingCartDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.CartRoomItemDTO;
 import com.mycompany.hotelmanagersystem.dto.booking.CartServiceItemDTO;
-import com.mycompany.hotelmanagersystem.dto.room.AvailableRoomDTO;
+import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
 import com.mycompany.hotelmanagersystem.model.ServiceItem;
 import com.mycompany.hotelmanagersystem.service.booking.BookingService;
-import com.mycompany.hotelmanagersystem.service.room.RoomService;
+import com.mycompany.hotelmanagersystem.room.service.RoomService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
