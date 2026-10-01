@@ -1,8 +1,8 @@
 package com.mycompany.hotelmanagersystem.receptionist.controller;
 
+import com.mycompany.hotelmanagersystem.receptionist.service.RoomMapService;
 import com.mycompany.hotelmanagersystem.room.dto.RoomMapKpiDTO;
 import com.mycompany.hotelmanagersystem.room.dto.RoomTimelineDTO;
-import com.mycompany.hotelmanagersystem.room.service.RoomService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,30 +10,34 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
-@WebServlet(name = "ReceptionistPortalServlet", urlPatterns = {"/receptionist/room-map", "/receptionist/checkin"})
+@WebServlet(name = "ReceptionistPortalServlet", urlPatterns = {"/receptionist/room-map"})
 public class ReceptionistPortalServlet extends HttpServlet {
 
-    private RoomService roomService;
+    private RoomMapService roomMapService;
 
     @Override
     public void init() throws ServletException {
-        this.roomService = new RoomService();
+        this.roomMapService = new RoomMapService();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // 1. Tải danh sách phòng thực tế từ CSDL SQL Server theo tầng qua RoomService
-        List<RoomTimelineDTO> roomList = roomService.getAllRoomsForTimeline();
+        LocalDate startDate = LocalDate.of(2026, 9, 29);
+        LocalDate endDate = LocalDate.of(2026, 10, 5);
 
-        // 2. Tính toán chỉ số thống kê buồng phòng thời gian thực (KPI) qua RoomService
-        RoomMapKpiDTO kpi = roomService.getRoomMapKpi();
+        List<RoomTimelineDTO> roomList = roomMapService.getTimelineWithBookingBars(startDate, endDate);
+        RoomMapKpiDTO kpi = roomMapService.getRoomMapKpi();
 
         request.setAttribute("roomList", roomList);
         request.setAttribute("kpi", kpi);
+        request.setAttribute("startDate", startDate);
+        request.setAttribute("endDate", endDate);
 
         request.getRequestDispatcher("/views/receptionist/room_map.jsp").forward(request, response);
     }
 }
+

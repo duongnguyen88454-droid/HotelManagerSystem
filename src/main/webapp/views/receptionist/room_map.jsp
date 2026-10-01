@@ -194,13 +194,20 @@
                                     <td class="timeline-grid-cell" colspan="7" style="background: #f0fdf4; color: #166534; font-style: italic; line-height: 50px;">Nhân viên buồng phòng đang tiến hành vệ sinh</td>
                                 </c:when>
                                 <c:otherwise>
-                                    <td class="timeline-grid-cell"></td>
-                                    <td class="timeline-grid-cell"></td>
-                                    <td class="timeline-grid-cell"></td>
-                                    <td class="timeline-grid-cell"></td>
-                                    <td class="timeline-grid-cell"></td>
-                                    <td class="timeline-grid-cell"></td>
-                                    <td class="timeline-grid-cell"></td>
+                                    <c:forEach var="dayIdx" begin="1" end="7">
+                                        <td class="timeline-grid-cell" data-day="${dayIdx}">
+                                            <c:forEach items="${r.bookingBars}" var="bar">
+                                                <c:if test="${bar.startCol eq dayIdx}">
+                                                    <div class="booking-bar ${bar.cssClass}" 
+                                                         style="left: 4px; width: calc(${bar.colSpan * 100}% - 8px); z-index: 10;"
+                                                         title="[${bar.maBooking}] ${bar.tenKhachHang} (${bar.trangThaiBooking eq 'DaCheckIn' ? 'Đang lưu trú' : 'Đã xác nhận'})"
+                                                         onclick="handleBookingBarClick('${r.maPhong}', '${r.soPhong}', '${bar.maBooking}', '${bar.tenKhachHang}', '${bar.soDienThoai}', '${bar.soCccd}', '${bar.trangThaiBooking}', '${bar.ngayNhanDuKien}', '${bar.ngayTraDuKien}')">
+                                                        [${bar.maBooking}] ${bar.tenKhachHang} (${bar.trangThaiBooking eq 'DaCheckIn' ? 'Đang ở' : 'Chờ nhận'})
+                                                    </div>
+                                                </c:if>
+                                            </c:forEach>
+                                        </td>
+                                    </c:forEach>
                                 </c:otherwise>
                             </c:choose>
                         </tr>
@@ -293,13 +300,14 @@
             <button type="button" class="pms-btn pms-btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="closeModal('checkInModal')">[ Đóng ]</button>
         </div>
         <div class="modal-body">
+            <input type="hidden" id="ciRoomIdVal" value="">
             <div class="detail-grid">
                 <div>Mã Booking: <strong id="ciBookingId">BK003</strong></div>
                 <div>Khách đại diện: <strong id="ciGuestName">Mai Đức Quang</strong></div>
                 <div>Số điện thoại: <span id="ciPhone">0987.654.321</span></div>
-                <div>Thời gian ở: <strong>01/10 (14:00) -> 03/10 (12:00)</strong></div>
-                <div>Phòng bàn giao: <strong id="ciRoomId" style="color: #15803d;">P101 (Tầng 1)</strong></div>
-                <div>Trạng thái: <span class="badge-clean">[Đã dọn sạch]</span></div>
+                <div>Số CCCD: <span id="ciCccd">079198003344</span></div>
+                <div>Thời gian ở: <strong id="ciDates">29/09/2026 -> 01/10/2026</strong></div>
+                <div>Phòng bàn giao: <strong id="ciRoomId" style="color: #15803d;">P101</strong></div>
             </div>
 
             <div style="background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
@@ -309,17 +317,16 @@
             </div>
 
             <div style="background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
-                <div style="font-weight: 700; margin-bottom: 8px;">DỊCH VỤ ĐÓN TIẾP BAN ĐẦU (NẾU CÓ):</div>
-                <label style="display: block; margin-bottom: 6px;"><input type="checkbox"> [ ] Đăng ký thêm Buffet sáng tự chọn (150.000 đ/người/ngày)</label>
-                <label style="display: block;"><input type="checkbox"> [ ] Dịch vụ xe đưa đón sân bay khi trả phòng</label>
+                <div style="font-weight: 700; margin-bottom: 8px;">GHI CHÚ TIẾP ĐÓN / DỊCH VỤ BAN ĐẦU:</div>
+                <input type="text" id="ciNote" class="pms-input" style="width: 100%; box-sizing: border-box;" placeholder="Nhập ghi chú tiếp đón (nếu có)...">
             </div>
 
             <div style="color: #64748b; font-size: 12px;">
-                Lưu ý: Sau khi xác nhận, phòng P101 trên Timeline sẽ lập tức chuyển sang trạng thái <strong>[ Đang có khách ] (Màu Đỏ)</strong>.
+                Lưu ý: Sau khi xác nhận, phòng bàn giao trên Timeline sẽ lập tức chuyển sang trạng thái <strong>[ Đang có khách ] (Màu Đỏ)</strong>.
             </div>
         </div>
         <div class="modal-foot">
-            <button type="button" class="pms-btn pms-btn-success" onclick="confirmCheckInMock()">[ Xác nhận Check-in & Giao phòng ]</button>
+            <button type="button" class="pms-btn pms-btn-success" onclick="confirmCheckInReal()">[ Xác nhận Check-in & Giao phòng ]</button>
             <button type="button" class="pms-btn pms-btn-secondary" onclick="closeModal('checkInModal')">[ Hủy bỏ ]</button>
         </div>
     </div>
@@ -430,6 +437,15 @@
         document.getElementById(modalId).style.display = 'none';
     }
 
+    // Điều phối click vào Booking Bar
+    function handleBookingBarClick(roomId, roomNo, bookingId, guestName, phone, cccd, status, inDate, outDate) {
+        if (status === 'DaCheckIn') {
+            openRoomDetailModal(roomId, bookingId, guestName, phone, cccd, inDate, outDate);
+        } else {
+            openCheckInModal(roomId, roomNo, bookingId, guestName, phone, cccd, inDate, outDate);
+        }
+    }
+
     // Mở Modal Chi Tiết Phòng Đang Ở
     function openRoomDetailModal(roomId, bookingId, guestName, phone, cccd, inDate, outDate) {
         document.getElementById('modalRoomDetailTitle').innerText = 'THÔNG TIN CHI TIẾT PHÒNG ĐANG LƯU TRÚ - ' + roomId;
@@ -441,11 +457,15 @@
     }
 
     // Mở Modal Check-in
-    function openCheckInModal(roomId, bookingId, guestName, phone, inDate, outDate, price) {
-        document.getElementById('ciRoomId').innerText = roomId + ' (Tầng 1)';
+    function openCheckInModal(roomId, roomNo, bookingId, guestName, phone, cccd, inDate, outDate) {
+        document.getElementById('ciRoomIdVal').value = roomId;
+        document.getElementById('ciRoomId').innerText = roomId + ' (Phòng ' + roomNo + ')';
         document.getElementById('ciBookingId').innerText = bookingId;
         document.getElementById('ciGuestName').innerText = guestName;
         document.getElementById('ciPhone').innerText = phone;
+        document.getElementById('ciCccd').innerText = cccd;
+        document.getElementById('ciDates').innerText = inDate + ' -> ' + outDate;
+        document.getElementById('chkCccd').checked = true;
         openModal('checkInModal');
     }
 
@@ -506,20 +526,63 @@
         backToRoomDetail();
     }
 
-    // Xác Nhận Check-In Mô Phỏng
-    function confirmCheckInMock() {
-        if (!document.getElementById('chkCccd').checked) {
-            alert('[Cảnh báo] Vui lòng xác nhận đã đối chiếu CCCD của khách!');
+    // Xác Nhận Check-In Thật (Gửi AJAX POST đến ReceptionistCheckInServlet)
+    function confirmCheckInReal() {
+        const chkCccd = document.getElementById('chkCccd');
+        if (!chkCccd || !chkCccd.checked) {
+            alert('[Cảnh báo] Vui lòng xác nhận đã đối chiếu CCCD / Hộ chiếu bản gốc của khách!');
             return;
         }
-        alert('[Thành công] Xác nhận Check-in nhận phòng P101 thành công!\nPhòng P101 đã chuyển sang trạng thái Đang lưu trú (Màu Đỏ).');
-        closeModal('checkInModal');
-        // Mô phỏng đổi màu dải phòng trên Timeline
-        const p101Bar = document.querySelector('.room-row[data-room="P101"] .booking-bar');
-        if (p101Bar) {
-            p101Bar.className = 'booking-bar bar-occupied';
-            p101Bar.innerText = '[BK003] Mai Đức Quang (Đang lưu trú - Nhấp xem dịch vụ)';
-            p101Bar.setAttribute('onclick', "openRoomDetailModal('P101', 'BK003', 'Mai Đức Quang', '0987.654.321', '079198003344', '01/10/2026', '03/10/2026')");
+
+        const bookingId = document.getElementById('ciBookingId').innerText.trim();
+        const roomId = document.getElementById('ciRoomIdVal').value.trim();
+        const note = document.getElementById('ciNote') ? document.getElementById('ciNote').value.trim() : '';
+
+        const params = new URLSearchParams();
+        params.append('maBooking', bookingId);
+        params.append('maPhong', roomId);
+        params.append('ghiChu', note);
+        params.append('chkCccd', 'true');
+
+        fetch('${pageContext.request.contextPath}/receptionist/checkin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+            body: params.toString()
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('[Thành công] ' + data.message);
+                closeModal('checkInModal');
+                updateTimelineAfterCheckIn(roomId, bookingId);
+            } else {
+                alert('[Lỗi Check-in] ' + data.message);
+            }
+        })
+        .catch(err => {
+            alert('[Lỗi kết nối] Không thể kết nối đến máy chủ lễ tân.');
+        });
+    }
+
+    // Cập nhật DOM tức thì sau khi Check-In thành công
+    function updateTimelineAfterCheckIn(roomId, bookingId) {
+        const roomRow = document.querySelector('.room-row[data-room="' + roomId + '"]');
+        if (roomRow) {
+            roomRow.setAttribute('data-status', 'Occupied');
+            const badgeSpan = roomRow.querySelector('td:nth-child(2) span');
+            if (badgeSpan) {
+                badgeSpan.className = 'badge-occupied';
+                badgeSpan.innerText = '[Đang có khách]';
+            }
+            const bar = roomRow.querySelector('.booking-bar');
+            if (bar) {
+                bar.className = 'booking-bar bar-occupied';
+                const guestName = document.getElementById('ciGuestName').innerText;
+                const phone = document.getElementById('ciPhone').innerText;
+                const cccd = document.getElementById('ciCccd').innerText;
+                bar.innerText = '[' + bookingId + '] ' + guestName + ' (Đang ở)';
+                bar.setAttribute('onclick', "openRoomDetailModal('" + roomId + "', '" + bookingId + "', '" + guestName + "', '" + phone + "', '" + cccd + "', '', '')");
+            }
         }
     }
 </script>

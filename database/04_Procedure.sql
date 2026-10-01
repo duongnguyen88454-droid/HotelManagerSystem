@@ -113,6 +113,11 @@ BEGIN
           AND (@MaPhong IS NULL OR MaPhong = @MaPhong)
           AND NgayCheckInThucTe IS NULL;
 
+        IF @@ROWCOUNT = 0
+        BEGIN
+            RAISERROR(N'Phòng chỉ định không thuộc đơn đặt phòng này hoặc đã Check-in trước đó!', 16, 1);
+        END
+
         -- Cập nhật trạng thái đơn đặt phòng sang 'DaCheckIn' và ghi nhận nhân viên làm thủ tục
         UPDATE BOOKING
         SET TrangThai = 'DaCheckIn', MaNV = @MaNV

@@ -59,7 +59,7 @@ public class Run20TestCasesPhase2ImpactFN31 {
                 "Số lượng phòng trong getAllRoomsForTimeline() không đổi (12 phòng)");
         String tempBookingId1 = null;
         try {
-            tempBookingId1 = bookingDAO.createOnlineBookingWithServices("KH001", "TK001", "P101", checkInFuture, checkOutFuture, 450000, 1350000, null, "Test TC01");
+            tempBookingId1 = bookingDAO.createOnlineBookingWithServices("KH001", "TK_G01", "P101", checkInFuture, checkOutFuture, 450000, 1350000, null, "Test TC01");
             List<RoomTimelineDTO> rooms = roomDAO.getAllRoomsForTimeline();
             tc01.passed = (rooms.size() == 12);
             tc01.actual = "Số phòng trả về = " + rooms.size();
@@ -110,7 +110,7 @@ public class Run20TestCasesPhase2ImpactFN31 {
             svcs.put("DV05", 3); // 3 nước ngọt
             Date dIn = Date.valueOf(baseDate.plusDays(10));
             Date dOut = Date.valueOf(baseDate.plusDays(12));
-            tempBookingId2 = bookingDAO.createOnlineBookingWithServices("KH002", "TK002", "P103", dIn, dOut, 650000, 1690000, svcs, "Test TC04");
+            tempBookingId2 = bookingDAO.createOnlineBookingWithServices("KH002", "TK_G02", "P103", dIn, dOut, 650000, 1690000, svcs, "Test TC04");
             RoomMapKpiDTO kpi = roomDAO.getRoomMapKpi();
             int sum = kpi.getSoPhongAvailable() + kpi.getSoPhongOccupied() + kpi.getSoPhongDirty()
                     + kpi.getSoPhongCleaning() + kpi.getSoPhongDamaged() + kpi.getSoPhongBooked();
@@ -148,7 +148,7 @@ public class Run20TestCasesPhase2ImpactFN31 {
                 "Khách hàng hủy đơn online, kiểm tra getAllRoomsForTimeline() vẫn duy trì 12 phòng",
                 "Số lượng phòng sau khi hủy vẫn bằng 12");
         try {
-            boolean cancelled = bookingDAO.cancelBooking(tempBookingId1, "KH001", "TK001");
+            boolean cancelled = bookingDAO.cancelBooking(tempBookingId1, "KH001", "TK_G01");
             List<RoomTimelineDTO> rooms = roomDAO.getAllRoomsForTimeline();
             tc06.passed = cancelled && (rooms.size() == 12);
             tc06.actual = "Hủy thành công=" + cancelled + ", Số phòng=" + rooms.size();
@@ -213,7 +213,7 @@ public class Run20TestCasesPhase2ImpactFN31 {
                 "Cố tình chèn đơn đặt phòng vào P401 phải bị chặn bởi hệ thống",
                 "Ném ngoại lệ chặn phòng đang Damaged hoặc không khả dụng");
         try {
-            bookingDAO.createOnlineBookingWithServices("KH001", "TK001", "P401", checkInFuture, checkOutFuture, 4500000, 13500000, null, "Test Damaged");
+            bookingDAO.createOnlineBookingWithServices("KH001", "TK_G01", "P401", checkInFuture, checkOutFuture, 4500000, 13500000, null, "Test Damaged");
             tc10.passed = false;
             tc10.actual = "Không bị chặn (Thất bại)";
         } catch (Exception e) {
