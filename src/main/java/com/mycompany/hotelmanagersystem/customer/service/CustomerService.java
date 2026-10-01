@@ -40,7 +40,8 @@ public class CustomerService {
     }
 
     /**
-     * Tra cứu hồ sơ khách hàng lưu trú theo mã tài khoản hoặc email đăng nhập (phục vụ Autofill)
+     * Tra cứu hồ sơ khách hàng lưu trú theo mã tài khoản hoặc email đăng nhập (phục
+     * vụ Autofill)
      */
     public Customer getGuestProfileByAccount(String maTaiKhoan, String email) {
         return customerDAO.getGuestProfileByAccount(maTaiKhoan, email);
@@ -49,10 +50,11 @@ public class CustomerService {
     /**
      * Đồng bộ hoặc tạo mới hồ sơ khách hàng lưu trú dựa theo CCCD
      */
-    public String findOrUpsertGuestByCCCD(String hoTen, String email, String soDT, String cccd, String maTaiKhoan) throws Exception {
+    public String findOrUpsertGuestByCCCD(String hoTen, String email, String soDT, String cccd, String maTaiKhoan)
+            throws Exception {
         if (hoTen == null || hoTen.trim().isEmpty() ||
-            email == null || email.trim().isEmpty() ||
-            soDT == null || soDT.trim().isEmpty()) {
+                email == null || email.trim().isEmpty() ||
+                soDT == null || soDT.trim().isEmpty()) {
             throw new IllegalArgumentException("Họ tên, Email và Số điện thoại của người lưu trú không được để trống!");
         }
 
