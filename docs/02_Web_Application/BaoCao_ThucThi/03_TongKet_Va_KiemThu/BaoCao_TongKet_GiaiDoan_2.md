@@ -288,8 +288,8 @@ Dữ liệu đơn đặt phòng sinh ra từ Giai đoạn 2 đã ở trạng th�
    - [`RoomDAO.java`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/dao/room/RoomDAO.java): Cập nhật `searchAvailableRooms` và `isRoomAvailable` sang `WHERE p.TrangThai <> 'Damaged'` và mở rộng kiểm tra lịch trạng thái `ChoXacNhan`, `DaXacNhan`, `DaCheckIn`.
    - [`BookingDAO.java`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/dao/booking/BookingDAO.java): Cập nhật `validateRoomAvailability` để cho phép phòng `Dirty`/`Cleaning` được đặt nếu không trùng lịch.
 2. **Cơ sở dữ liệu SQL Server:**
-   - [`SQL_Scripts/Function.sql`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/SQL_Scripts/Function.sql): Hàm `fn_KiemTraPhongTrongTrongKhoang` và `fn_TraCuuPhongTrongTheoYeuCau` chỉ chặn `Damaged`.
-   - [`SQL_Scripts/Trigger.sql`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/SQL_Scripts/Trigger.sql): Trigger `trg_Check_XungDotDatPhong` chỉ chặn đặt phòng `Damaged` và bảo vệ toàn vẹn lịch đặt phòng.
+   - [`database/Function.sql`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/database/Function.sql): Hàm `fn_KiemTraPhongTrongTrongKhoang` và `fn_TraCuuPhongTrongTheoYeuCau` chỉ chặn `Damaged`.
+   - [`database/Trigger.sql`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/database/Trigger.sql): Trigger `trg_Check_XungDotDatPhong` chỉ chặn đặt phòng `Damaged` và bảo vệ toàn vẹn lịch đặt phòng.
 
 ### 9.3. Kết Quả Nghiệm Thu (Automated Test Pass 100%)
 * **20/20 Test Cases** hệ thống (từ Phase 0 đến Phase 2) đạt **PASS tuyệt đối**.
@@ -321,16 +321,16 @@ Dữ liệu đơn đặt phòng sinh ra từ Giai đoạn 2 đã ở trạng th�
   5. Đồng thời, toàn bộ hệ thống Java ([`KeyGenerator.java`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/util/KeyGenerator.java) và [`BookingDAO.java`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/dao/booking/BookingDAO.java)) và dữ liệu mẫu khởi tạo (`Script_QuanLyKhachSan.sql`) đều dùng định dạng chuẩn **liền mạch không gạch dưới**: `HD` + chuỗi số (`HD001`, `HD002`, ..., `HD762`, `HD862`).
 
 ### 10.2. Các File Đã Chuẩn Hóa
-1. **[`SQL_Scripts/Trigger.sql`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/SQL_Scripts/Trigger.sql#L166):**
+1. **[`database/Trigger.sql`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/database/Trigger.sql#L166):**
    ```sql
    -- TRƯỚC KHI SỬA:
    'HD_' + SUBSTRING(i.MaBooking, 4, 7)
    -- SAU KHI SỬA:
    'HD' + SUBSTRING(i.MaBooking, 3, 8)
    ```
-2. **[`SQL_Scripts/Script_QuanLyKhachSan.sql`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/SQL_Scripts/Script_QuanLyKhachSan.sql#L969):**
+2. **[`database/Script_QuanLyKhachSan.sql`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/database/Script_QuanLyKhachSan.sql#L969):**
    Đồng bộ trigger `trg_TuDongTaoHoaDonKhiDatPhong` sang `'HD' + SUBSTRING(i.MaBooking, 3, 8)`.
-3. **[`SQL_Scripts/Transaction.sql`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/SQL_Scripts/Transaction.sql#L66):**
+3. **[`database/Transaction.sql`](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/database/Transaction.sql#L66):**
    Đồng bộ thủ tục `sp_Transaction_TaoBookingTronGoi` sang `'HD' + SUBSTRING(@MaBookingMoi, 3, 8)`.
 4. **Cơ sở dữ liệu SQL Server (`QuanLyKhachSan`):**
    - Đã biên dịch lại trigger `trg_TuDongTaoHoaDonKhiDatPhong` và thủ tục giao dịch.

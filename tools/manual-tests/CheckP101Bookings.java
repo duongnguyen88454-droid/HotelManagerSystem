@@ -1,6 +1,4 @@
-package scratch;
-
-import com.mycompany.hotelmanagersystem.util.DBContext;
+import com.mycompany.hotelmanagersystem.common.config.DBContext;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

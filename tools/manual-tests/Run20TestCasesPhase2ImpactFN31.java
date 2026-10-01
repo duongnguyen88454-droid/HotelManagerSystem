@@ -1,11 +1,9 @@
-package scratch;
-
-import com.mycompany.hotelmanagersystem.dao.booking.BookingDAO;
-import com.mycompany.hotelmanagersystem.dao.room.RoomDAO;
-import com.mycompany.hotelmanagersystem.dto.room.AvailableRoomDTO;
-import com.mycompany.hotelmanagersystem.dto.receptionist.RoomMapKpiDTO;
-import com.mycompany.hotelmanagersystem.dto.receptionist.RoomTimelineDTO;
-import com.mycompany.hotelmanagersystem.util.DBContext;
+import com.mycompany.hotelmanagersystem.booking.dao.BookingDAO;
+import com.mycompany.hotelmanagersystem.room.dao.RoomDAO;
+import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
+import com.mycompany.hotelmanagersystem.room.dto.RoomMapKpiDTO;
+import com.mycompany.hotelmanagersystem.room.dto.RoomTimelineDTO;
+import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.io.File;
 import java.nio.file.Files;

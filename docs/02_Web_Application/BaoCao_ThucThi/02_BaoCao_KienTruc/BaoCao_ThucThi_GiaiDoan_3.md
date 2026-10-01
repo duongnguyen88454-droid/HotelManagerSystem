@@ -481,7 +481,7 @@ Toàn bộ giao diện phân hệ lễ tân tuân thủ triệt để: **100% Te
 4. **`NHANVIEN` & `TAIKHOAN`:** Lưu vết nhân viên lễ tân trực ca (`MaNV = 'NV001'`) đã thực hiện tiếp đón và ghi nhận dịch vụ.
 
 ### 6.2. Kế Thừa Stored Procedure `sp_CheckInNhanPhong`
-Được định nghĩa sẵn trong `SQL_Scripts/Procedure.sql`:
+Được định nghĩa sẵn trong `database/Procedure.sql`:
 ```sql
 CREATE PROCEDURE sp_CheckInNhanPhong
     @MaBooking VARCHAR(20),
@@ -507,7 +507,7 @@ END
 ```
 
 ### 6.3. Kế Thừa Trigger `trg_DongBoTrangThaiPhongCheckIn`
-Được định nghĩa sẵn trong `SQL_Scripts/Trigger.sql`:
+Được định nghĩa sẵn trong `database/Trigger.sql`:
 * Tự động bắt sự kiện cập nhật trên bảng `BOOKING` khi chuyển sang `DaCheckIn`.
 * Tự động kích hoạt chuyển trạng thái của các phòng trong `BOOKING_PHONG` sang `'Occupied'` mà mã nguồn Java không cần viết thêm câu lệnh `UPDATE PHONG`.
 

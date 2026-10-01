@@ -278,7 +278,7 @@ Một tính năng trong Giai đoạn 3 chỉ được coi là hoàn tất khi th
 2. **Kế thừa và khớp chuẩn CSDL 100%:** Sử dụng đúng các bảng (`PHONG`, `BOOKING`, `BOOKING_PHONG`, `DICHVU`, `BOOKING_DICHVU`), trigger và procedure đã định nghĩa ở đề án DBMS.
 3. **Tuân thủ quy tắc an toàn mã nguồn:** Mọi thay đổi đều được phân tích, trình bày Before/After và User duyệt trước khi viết code theo đúng quy tắc `.agents/rules/GEMINI.md`.
 4. **Bộ kiểm thử tự động 20 Test Cases (TC3.1.1 -> TC3.4.5) đạt 100% PASS.**
-5. **Có biên bản nghiệm thu và báo cáo thực thi chi tiết** cập nhật vào thư mục `TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/`.
+5. **Có biên bản nghiệm thu và báo cáo thực thi chi tiết** cập nhật vào thư mục `docs/02_Web_Application/BaoCao_ThucThi/`.
 
 ---
 

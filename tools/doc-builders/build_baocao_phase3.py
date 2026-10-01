@@ -484,7 +484,7 @@ Toàn bộ giao diện phân hệ lễ tân tuân thủ triệt để: **100% Te
 4. **`NHANVIEN` & `TAIKHOAN`:** Lưu vết nhân viên lễ tân trực ca (`MaNV = 'NV001'`) đã thực hiện tiếp đón và ghi nhận dịch vụ.
 
 ### 6.2. Kế Thừa Stored Procedure `sp_CheckInNhanPhong`
-Được định nghĩa sẵn trong `SQL_Scripts/Procedure.sql`:
+Được định nghĩa sẵn trong `database/Procedure.sql`:
 ```sql
 CREATE PROCEDURE sp_CheckInNhanPhong
     @MaBooking VARCHAR(20),
@@ -510,7 +510,7 @@ END
 ```
 
 ### 6.3. Kế Thừa Trigger `trg_DongBoTrangThaiPhongCheckIn`
-Được định nghĩa sẵn trong `SQL_Scripts/Trigger.sql`:
+Được định nghĩa sẵn trong `database/Trigger.sql`:
 * Tự động bắt sự kiện cập nhật trên bảng `BOOKING` khi chuyển sang `DaCheckIn`.
 * Tự động kích hoạt chuyển trạng thái của các phòng trong `BOOKING_PHONG` sang `'Occupied'` mà mã nguồn Java không cần viết thêm câu lệnh `UPDATE PHONG`.
 
@@ -615,7 +615,7 @@ Giai đoạn 3 được nghiệm thu hoàn tất khi thỏa mãn 5 tiêu chí b�
 5. **Bảo toàn dữ liệu bàn giao cho Giai đoạn 4:** Mọi đơn Check-in và dịch vụ phát sinh đều sẵn sàng để phân hệ Thu ngân thanh toán và xuất hóa đơn.
 """
 
-target_path = "TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/BaoCao_ThucThi_GiaiDoan_3.md"
+target_path = "docs/02_Web_Application/BaoCao_ThucThi/BaoCao_ThucThi_GiaiDoan_3.md"
 with open(target_path, "w", encoding="utf-8") as f:
     f.write(content.strip() + "\\n")
 

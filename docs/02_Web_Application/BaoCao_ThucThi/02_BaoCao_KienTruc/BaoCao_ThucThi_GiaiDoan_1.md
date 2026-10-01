@@ -580,7 +580,7 @@ package com.mycompany.hotelmanagersystem.dao;
 import com.mycompany.hotelmanagersystem.dto.UserSessionDTO;
 import com.mycompany.hotelmanagersystem.model.KhachHang;
 import com.mycompany.hotelmanagersystem.model.TaiKhoan;
-import com.mycompany.hotelmanagersystem.util.DBContext;
+import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -1855,12 +1855,12 @@ GO
    - Xử lý an toàn giá trị `null` của CCCD bằng `psKH.setNull(6, java.sql.Types.VARCHAR)` khi khách hàng đăng ký mới.
 5. [Customer.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/model/Customer.java):
    - Bổ sung thêm constructor quá tải không chứa trường CCCD: `Customer(String maKH, String maTaiKhoan, String hoTen, String email, String soDT)`.
-6. [Script_QuanLyKhachSan.sql](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/SQL_Scripts/Script_QuanLyKhachSan.sql):
+6. [Script_QuanLyKhachSan.sql](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/database/Script_QuanLyKhachSan.sql):
    - Cập nhật định nghĩa bảng `KHACHHANG` ban đầu với `MaTaiKhoan`, `Email`, `CCCD` cho phép `NULL`.
    - Bổ sung ràng buộc Check: `CK_KHACHHANG_CCCD_12Digits` (`CCCD IS NULL OR (LEN(CCCD) = 12 AND CCCD NOT LIKE '%[^0-9]%')`).
    - Tích hợp sẵn 3 Filtered Unique Indexes (`UQ_KHACHHANG_MaTaiKhoan_Filtered`, `UQ_KHACHHANG_Email_Filtered`, `UQ_KHACHHANG_CCCD_Filtered`) trực tiếp sau bảng `KHACHHANG`.
    - **Lợi ích:** Bất kỳ ai tải dự án về chỉ cần chạy 1 lần duy nhất toàn bộ file `Script_QuanLyKhachSan.sql` là có ngay CSDL hoàn chỉnh, không cần chạy thêm bất kỳ câu lệnh `ALTER TABLE` nào.
-7. [Index.sql](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/SQL_Scripts/Index.sql):
+7. [Index.sql](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/database/Index.sql):
    - Bổ sung định nghĩa các Filtered Unique Indexes (Index 6, 7, 8) vào tệp chỉ mục độc lập có kèm điều kiện kiểm tra tồn tại `IF NOT EXISTS`.
 
 ---
@@ -1969,7 +1969,7 @@ Theo thống nhất với Người dùng, toàn bộ hệ thống sử dụng qu
 ### 14.3. Các tệp tin đã tạo và cập nhật
 * [KeyGenerator.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/util/KeyGenerator.java): Lớp tiện ích sinh mã dùng chung cho toàn bộ dự án.
 * [AuthService.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/service/auth/AuthService.java): Thay thế đoạn sinh mã ngẫu nhiên timestamp bằng gọi hàm `KeyGenerator.generateAccountId()` và `KeyGenerator.generateCustomerId()`.
-* [KienTruc_Va_NhiemVu_Cac_ThuMuc_Code.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/KienTruc_Va_LoTrinh/KienTruc_Va_NhiemVu_Cac_ThuMuc_Code.md): Bổ sung tài liệu mô tả cho lớp `KeyGenerator.java` trong tầng `util/`.
+* [KienTruc_Va_NhiemVu_Cac_ThuMuc_Code.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/docs/02_Web_Application/KienTruc_Va_LoTrinh/KienTruc_Va_NhiemVu_Cac_ThuMuc_Code.md): Bổ sung tài liệu mô tả cho lớp `KeyGenerator.java` trong tầng `util/`.
 
 ---
 
@@ -2009,7 +2009,7 @@ Theo thống nhất với Người dùng, toàn bộ hệ thống sử dụng qu
 | 4 | **Áp dụng Filtered Unique Indexes trong SQL Server** | Trong SQL Server, ràng buộc `UNIQUE` thông thường chỉ cho phép duy nhất 1 dòng mang giá trị `NULL`. Nếu nhiều khách không có CCCD hoặc nhiều khách vãng lai không có tài khoản thì sẽ bị lỗi xung đột khóa duy nhất. | Xóa bỏ các `UNIQUE` cũ, thay thế bằng **Filtered Unique Index**: `CREATE UNIQUE NONCLUSTERED INDEX ... WHERE ... IS NOT NULL` cho cả 3 cột `MaTaiKhoan`, `Email`, `CCCD`. | ✅ Hoàn thành |
 | 5 | **Lưu trữ CCCD vĩnh viễn sau Check-out** | Phục vụ 2 mục đích pháp lý và kinh doanh: 1) Thanh tra cư trú của cơ quan Công an quản lý trật tự xã hội (thời hạn 1-5 năm); 2) Nhận diện khách quen để Fast Check-in trong 15 giây ở những lần sau. | CCCD được bảo lưu vĩnh viễn trên bản ghi `KHACHHANG`, không bị xóa hoặc null hóa khi khách trả phòng. | ✅ Hoàn thành |
 | 6 | **Quy chuẩn sinh mã tự động tăng liền mạch (`KeyGenerator`)** | Thay thế cơ chế sinh mã bằng timestamp ngẫu nhiên cũ. Đảm bảo mã tăng dần đẹp mắt, thống nhất một chuẩn duy nhất cho toàn bộ hệ thống (`TK001`, `KH001`, `NV001`, `BK001`, `HD001`...). | Xây dựng [KeyGenerator.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/src/main/java/com/mycompany/hotelmanagersystem/util/KeyGenerator.java): Quét số lớn nhất ($MAX$) ở đuôi mã hiện có, tăng lên 1 đơn vị ($MAX + 1$) và kiểm tra vòng lặp `while (isExists)` để đảm bảo tính độc nhất 100% (Collision-proof), không bao giờ lỗi trùng khóa chính. | ✅ Hoàn thành |
-| 7 | **Đồng bộ hóa toàn bộ tệp khởi tạo CSDL gốc** | Đảm bảo bất kỳ thành viên nào hoặc giảng viên tải dự án về chỉ cần chạy duy nhất 1 tệp SQL từ đầu đến cuối là có CSDL hoàn chỉnh, không phải chạy bất kỳ lệnh `ALTER` thủ công nào. | Cập nhật trực tiếp vào [Script_QuanLyKhachSan.sql](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/SQL_Scripts/Script_QuanLyKhachSan.sql) và [Index.sql](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/SQL_Scripts/Index.sql). | ✅ Hoàn thành |
+| 7 | **Đồng bộ hóa toàn bộ tệp khởi tạo CSDL gốc** | Đảm bảo bất kỳ thành viên nào hoặc giảng viên tải dự án về chỉ cần chạy duy nhất 1 tệp SQL từ đầu đến cuối là có CSDL hoàn chỉnh, không phải chạy bất kỳ lệnh `ALTER` thủ công nào. | Cập nhật trực tiếp vào [Script_QuanLyKhachSan.sql](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/database/Script_QuanLyKhachSan.sql) và [Index.sql](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/database/Index.sql). | ✅ Hoàn thành |
 
 ---
 

@@ -4,7 +4,7 @@
 > **Chủ đề kiểm thử:** Tác động qua lại giữa các nghiệp vụ Phase 2 (Đặt phòng trực tuyến, Dịch vụ đi kèm, Hủy phòng, Tìm kiếm phòng trống) lên FN-3.1 (Sơ đồ buồng phòng thời gian thực & Thống kê KPI dọn phòng).  
 > **Thời điểm kiểm thử:** 01/10/2026  
 > **Người thực hiện:** Antigravity AI Assistant  
-> **Bộ test runner tự động:** [Run20TestCasesPhase2ImpactFN31.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/scratch/Run20TestCasesPhase2ImpactFN31.java)  
+> **Bộ test runner tự động:** [Run20TestCasesPhase2ImpactFN31.java](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/tools/manual-tests/Run20TestCasesPhase2ImpactFN31.java)  
 > **Quy chuẩn giao diện:** 100% Zero-Emoji, Zero-Icon-Font, bảo tồn tính toàn vẹn CSDL.
 
 ---
@@ -266,4 +266,4 @@ Mục tiêu của đợt kiểm thử này là đánh giá mức độ tương t
 1. **Về chức năng FN-3.1:** Hoạt động độc lập hoàn hảo, sơ đồ hiển thị đúng 12 phòng, đúng tầng, đúng phân loại nhãn và CSS không chứa icon/emoji, thống kê KPI buồng phòng và tỷ lệ lấp đầy phòng chính xác 100%.
 2. **Về tính tương thích giữa Phase 2 và FN-3.1:** Đạt chuẩn tuyệt đối **20/20 PASS (100%)**.
 3. **Về lỗi kiến trúc đã giải quyết:** Lỗi Deadlock tại `TC-3.1-P2.04` đã được khắc phục triệt để bằng cơ chế **Trigger tự động sinh khóa chính `INSTEAD OF INSERT`** trên SQL Server kết hợp gợi ý `WITH (NOLOCK)` trong `KeyGenerator.java`. Hệ thống chạy mượt mà, không còn hiện tượng treo luồng hay khóa chéo giữa các kết nối.
-4. **Tài liệu hóa DBMS:** Toàn bộ nguyên lý và mã T-SQL của 6 Trigger tự sinh khóa chính (Triggers 8 -> 13) đã được ghi nhận chi tiết vào tài liệu [Ke_Hoach_Thuc_Thi_Trigger_Va_View.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/01_DBMS/Ke_Hoach_Thuc_Thi_Trigger_Va_View.md) phục vụ tra cứu và ôn tập đồ án môn học DBMS.
+4. **Tài liệu hóa DBMS:** Toàn bộ nguyên lý và mã T-SQL của 6 Trigger tự sinh khóa chính (Triggers 8 -> 13) đã được ghi nhận chi tiết vào tài liệu [Ke_Hoach_Thuc_Thi_Trigger_Va_View.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/docs/01_DBMS/Ke_Hoach_Thuc_Thi_Trigger_Va_View.md) phục vụ tra cứu và ôn tập đồ án môn học DBMS.

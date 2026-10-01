@@ -1,8 +1,6 @@
-package scratch;
-
-import com.mycompany.hotelmanagersystem.dao.room.RoomDAO;
-import com.mycompany.hotelmanagersystem.dto.receptionist.RoomMapKpiDTO;
-import com.mycompany.hotelmanagersystem.dto.receptionist.RoomTimelineDTO;
+import com.mycompany.hotelmanagersystem.room.dao.RoomDAO;
+import com.mycompany.hotelmanagersystem.room.dto.RoomMapKpiDTO;
+import com.mycompany.hotelmanagersystem.room.dto.RoomTimelineDTO;
 
 import java.io.File;
 import java.nio.file.Files;

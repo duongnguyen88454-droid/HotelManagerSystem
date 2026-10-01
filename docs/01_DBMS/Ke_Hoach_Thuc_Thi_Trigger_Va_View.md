@@ -807,5 +807,5 @@ GO
 2. **Tính toàn vẹn & Tương thích ngược:**
    - Mã nguồn Java cũ vẫn có thể truyền mã tường minh nếu muốn; mã nguồn mới có thể bỏ trống để CSDL tự xử lý.
 3. **Kết quả kiểm thử thực tế:**
-   - Bộ 20 test case kiểm thử tác động chéo giữa Phase 2 và FN-3.1 ([BaoCao_KiemThu_Phase2_TacDong_FN31.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/TaiLieu_DuAn/02_Web_Application/BaoCao_ThucThi/03_TongKet_Va_KiemThu/BaoCao_KiemThu_Phase2_TacDong_FN31.md)) đạt tỷ lệ thành công tuyệt đối: **20/20 PASS (100%)**.
+   - Bộ 20 test case kiểm thử tác động chéo giữa Phase 2 và FN-3.1 ([BaoCao_KiemThu_Phase2_TacDong_FN31.md](file:///d:/Learn/College/Lap%20trinh%20web/HotelManagerSystem/docs/02_Web_Application/BaoCao_ThucThi/03_TongKet_Va_KiemThu/BaoCao_KiemThu_Phase2_TacDong_FN31.md)) đạt tỷ lệ thành công tuyệt đối: **20/20 PASS (100%)**.
 

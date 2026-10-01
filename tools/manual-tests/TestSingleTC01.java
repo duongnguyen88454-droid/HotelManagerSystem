@@ -1,7 +1,5 @@
-package scratch;
-
-import com.mycompany.hotelmanagersystem.dao.booking.BookingDAO;
-import com.mycompany.hotelmanagersystem.dao.room.RoomDAO;
+import com.mycompany.hotelmanagersystem.booking.dao.BookingDAO;
+import com.mycompany.hotelmanagersystem.room.dao.RoomDAO;
 import java.sql.Date;
 import java.time.LocalDate;
 

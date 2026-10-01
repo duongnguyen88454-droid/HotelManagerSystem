@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-target_path = r"d:\Learn\College\Lap trinh web\HotelManagerSystem\TaiLieu_DuAn\02_Web_Application\BaoCao_ThucThi\02_BaoCao_KienTruc\BaoCao_ThucThi_GiaiDoan_3.md"
+target_path = r"d:\Learn\College\Lap trinh web\HotelManagerSystem\docs\02_Web_Application\BaoCao_ThucThi\02_BaoCao_KienTruc\BaoCao_ThucThi_GiaiDoan_3.md"
 
 with open(target_path, "r", encoding="utf-8") as f:
     text = f.read()

@@ -29,7 +29,7 @@
 * **Số lượng Servlet (`@WebServlet`):** **14 Servlets** đăng ký bằng annotation (0 khai báo trong `web.xml`).
 * **Số lượng Filter (`@WebFilter`):** **2 Filters** (`EncodingFilter`, `AuthFilter`) đăng ký bằng annotation.
 * **Số lượng trang JSP:** **16 file JSP** (1 `index.jsp` tại gốc webapp, 6 trong `views/common`, 6 trong `views/customer`, 1 `views/housekeeper`, 1 `views/manager`, 1 `views/receptionist`, và 1 thư mục rỗng `views/guest`).
-* **Tệp `index.jsp`:** Đang import FQN `com.mycompany.hotelmanagersystem.util.DBContext` tại dòng 2.
+* **Tệp `index.jsp`:** Đang import FQN `com.mycompany.hotelmanagersystem.common.config.DBContext` tại dòng 2.
 
 ### 1.2. Khảo sát tham chiếu chéo toàn hệ thống (Grep Results)
 1. **Tham chiếu tới `scratch`:** Xuất hiện trong 1 file báo cáo (`BaoCao_KiemThu_Phase2_TacDong_FN31.md`), và khai báo `package scratch;` trong 5 file Java test độc lập.
@@ -120,9 +120,9 @@ Tất cả 52 file Java được phân loại chính xác theo domain nghiệp v
 | `target/` (133 files) | *(Không theo dõi Git)* | `git rm -r --cached` | Thư mục build nhị phân không được commit vào Git | **Thấp:** Sau khi bỏ theo dõi, chạy `mvn clean package` để sinh lại bình thường. |
 | *(Chưa có)* | `.gitignore` | Tạo mới | Chặn `target/`, file `.class`, IDE caches bị commit | **Không:** Đảm bảo repo luôn sạch sẽ. |
 | *(Chưa có)* | `README.md` (root) | Tạo mới | Cung cấp tài liệu tổng quan, công nghệ, hướng dẫn build/run | **Không:** Tăng tính chuyên nghiệp của đồ án. |
-| `SQL_Scripts/` (7 files) | `database/` (7 files) + `README.md` | Di chuyển (`git mv`) | Quy chuẩn tên thư mục quốc tế, đánh số thứ tự chạy tránh lỗi phụ thuộc khóa ngoại | **Thấp:** Đánh số `01_` đến `07_`, giữ nguyên 100% nội dung SQL bên trong. |
-| `TaiLieu_DuAn/` (15 files) | `docs/` (15 files) | Di chuyển (`git mv`) | Chuẩn hóa theo cấu hình người dùng yêu cầu | **Thấp:** Cập nhật các đường dẫn tương đối trong Markdown, xóa link tuyệt đối `file:///d:...`. |
-| `scratch/Run20TestCases*.java`, `Test*.java`, `Check*.java` (5 files) | `tools/manual-tests/` | Di chuyển (`git mv`) | Nhóm các tệp kiểm thử độc lập vào công cụ hỗ trợ dev | **Thấp:** Cập nhật import mới, kiểm chứng bằng lệnh `javac` độc lập. |
+| `database/` (7 files) | `database/` (7 files) + `README.md` | Di chuyển (`git mv`) | Quy chuẩn tên thư mục quốc tế, đánh số thứ tự chạy tránh lỗi phụ thuộc khóa ngoại | **Thấp:** Đánh số `01_` đến `07_`, giữ nguyên 100% nội dung SQL bên trong. |
+| `docs/` (15 files) | `docs/` (15 files) | Di chuyển (`git mv`) | Chuẩn hóa theo cấu hình người dùng yêu cầu | **Thấp:** Cập nhật các đường dẫn tương đối trong Markdown, xóa link tuyệt đối `file:///d:...`. |
+| `tools/manual-tests/Run20TestCases*.java`, `Test*.java`, `Check*.java` (5 files) | `tools/manual-tests/` | Di chuyển (`git mv`) | Nhóm các tệp kiểm thử độc lập vào công cụ hỗ trợ dev | **Thấp:** Cập nhật import mới, kiểm chứng bằng lệnh `javac` độc lập. |
 | `scratch/*.py` (4 files) | `tools/doc-builders/` | Di chuyển (`git mv`) | Gom các script hỗ trợ biên soạn tài liệu | **Không:** Cập nhật đường dẫn file nếu cần chạy lại. |
 | `scratch/*.class` (5 files) | *(Xóa bỏ)* | `git rm` | File nhị phân không được lưu trong Git | **Không:** Có thể biên dịch lại bất cứ khi nào. |
 | `scratch/test_utf8.txt` | *(Xóa bỏ)* | `git rm` | File kiểm tra tạm thời, không có giá trị sản phẩm | **Không:** Đã xác minh UTF-8 thông qua filter và DB. |
@@ -141,11 +141,11 @@ Tất cả 52 file Java được phân loại chính xác theo domain nghiệp v
 | Nhóm Tệp Tin | Số Lượng File | Chi Tiết Nội Dung Cần Thay Đổi |
 | :--- | :---: | :--- |
 | **Java Source trong `src/main/java/`** | **50 file** | - Cập nhật dòng khai báo `package com.mycompany.hotelmanagersystem.<feature>.<layer>;`<br>- Thay thế toàn bộ các dòng `import` trỏ tới FQCN cũ sang FQCN mới theo Bảng Ánh Xạ. |
-| **Trang Web `src/main/webapp/index.jsp`** | **1 file** | Thay đổi dòng 2:<br>`<%@ page import="com.mycompany.hotelmanagersystem.util.DBContext" %>`<br>thành:<br>`<%@ page import="com.mycompany.hotelmanagersystem.common.config.DBContext" %>` |
+| **Trang Web `src/main/webapp/index.jsp`** | **1 file** | Thay đổi dòng 2:<br>`<%@ page import="com.mycompany.hotelmanagersystem.common.config.DBContext" %>`<br>thành:<br>`<%@ page import="com.mycompany.hotelmanagersystem.common.config.DBContext" %>` |
 | **Công cụ kiểm thử độc lập trong `tools/`** | **5 file** | Thay đổi khai báo `package tools.manual_tests;` và cập nhật các dòng `import` trỏ tới DAO, DTO, DBContext mới. |
 | **Tài liệu dự án trong `docs/`** | **7 file** | Cập nhật đường dẫn tài liệu tương đối, loại bỏ các link tuyệt đối `file:///d:/...`, sửa mô tả package trong tài liệu kiến trúc. |
 | **Scripts trong `tools/doc-builders/`** | **4 file** | Cập nhật biến đường dẫn `TaiLieu_DuAn` thành `docs`. |
-| **Quy tắc Agent `.agents/.../SKILL.md`** | **1 file** | Cập nhật đường dẫn lưu báo cáo từ `TaiLieu_DuAn/` sang `docs/`. |
+| **Quy tắc Agent `.agents/.../SKILL.md`** | **1 file** | Cập nhật đường dẫn lưu báo cáo từ `docs/` sang `docs/`. |
 | **TỔNG CỘNG** | **68 file** | Đã được định vị chính xác vị trí và số dòng cần sửa đổi. |
 
 ---
@@ -302,8 +302,8 @@ Mỗi nhóm thay đổi là một commit riêng biệt kèm theo lệnh kiểm t
   - Di chuyển `scratch/` sang `tools/` (tách thành `manual-tests/` và `doc-builders/`).
   - Xóa bỏ các file `.class` trong `tools/`, xóa `test_utf8.txt` và 2 thư mục `temp_images/`, `temp_images2/`.
 * **Commit N2 (Chuẩn hóa CSDL & Tài liệu):**
-  - Di chuyển `SQL_Scripts/` sang `database/` với tiền tố số thứ tự chạy (`01_Script_QuanLyKhachSan.sql` -> `07_Transaction.sql`) kèm `database/README.md`.
-  - Đổi tên thư mục tài liệu `TaiLieu_DuAn/` thành `docs/` theo cấu hình người dùng. Cập nhật đường dẫn trong `.agents/skills/strict-review-before-code/SKILL.md`.
+  - Di chuyển `database/` sang `database/` với tiền tố số thứ tự chạy (`01_Script_QuanLyKhachSan.sql` -> `07_Transaction.sql`) kèm `database/README.md`.
+  - Đổi tên thư mục tài liệu `docs/` thành `docs/` theo cấu hình người dùng. Cập nhật đường dẫn trong `.agents/skills/strict-review-before-code/SKILL.md`.
 * **Commit N3 (Di chuyển Java theo thứ tự phụ thuộc tô-pô):**
   - Thực hiện theo đúng thứ tự:
     1. `common` (`DBContext`, `EncodingFilter`)
