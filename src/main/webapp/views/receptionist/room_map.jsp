@@ -181,7 +181,12 @@
                             <tr class="floor-row" data-floor="T${r.soTang}"><td colspan="9">-- TẦNG ${r.soTang} --</td></tr>
                         </c:if>
                         <tr class="room-row" data-floor="T${r.soTang}" data-status="${r.trangThaiPhong}" data-room="${r.maPhong}">
-                            <td class="room-cell-info">${r.soPhong} (${r.tenLoaiPhong})</td>
+                            <td class="room-cell-info">
+                                ${r.soPhong} (${r.tenLoaiPhong})
+                                <c:if test="${r.trangThaiPhong eq 'Occupied'}">
+                                    <button type="button" class="pms-btn pms-btn-primary" style="padding: 2px 6px; font-size: 11px; margin-left: 6px;" onclick="openServiceOrderForRoom('${r.maPhong}', '${r.soPhong}')">[Gọi DV]</button>
+                                </c:if>
+                            </td>
                             <td><span class="${r.trangThaiCssClass}">${r.trangThaiBadgeText}</span></td>
                             <c:choose>
                                 <c:when test="${r.trangThaiPhong eq 'Dirty'}">
@@ -234,12 +239,12 @@
         </div>
         <div class="modal-body">
             <div class="detail-grid">
-                <div>Mã Booking: <strong id="dtlBookingId">BK001</strong></div>
+                <div>Mã Booking: <strong id="dtlBookingId">--</strong></div>
                 <div>Trạng thái: <span class="badge-occupied">[Đang có khách]</span></div>
-                <div>Khách đại diện: <strong id="dtlGuestName">Trần Ngọc Khiêm</strong></div>
-                <div>Số điện thoại: <span id="dtlPhone">0912.345.678</span></div>
-                <div>Số CCCD: <span id="dtlCccd">079202001234</span></div>
-                <div>Thời gian ở: <strong>4 đêm (Đêm thứ 2)</strong></div>
+                <div>Khách đại diện: <strong id="dtlGuestName">--</strong></div>
+                <div>Số điện thoại: <span id="dtlPhone">--</span></div>
+                <div>Số CCCD: <span id="dtlCccd">--</span></div>
+                <div>Thời gian ở: <strong id="dtlStayDuration">--</strong></div>
             </div>
 
             <div style="font-weight: 700; color: #0f172a; margin-bottom: 6px;">DANH SÁCH DỊCH VỤ PHÁT SINH TẠI PHÒNG:</div>
@@ -254,21 +259,12 @@
                 </thead>
                 <tbody id="usedServiceList">
                     <tr>
-                        <td>Nước ngọt lon minibar (DV05)</td>
-                        <td style="text-align: center;">2</td>
-                        <td style="text-align: right;">30.000 đ</td>
-                        <td style="text-align: right; font-weight: 600;">60.000 đ</td>
-                    </tr>
-                    <tr>
-                        <td>Buffet sáng cao cấp (DV01)</td>
-                        <td style="text-align: center;">1</td>
-                        <td style="text-align: right;">150.000 đ</td>
-                        <td style="text-align: right; font-weight: 600;">150.000 đ</td>
+                        <td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic;">Chưa có dịch vụ phát sinh nào cho phòng này.</td>
                     </tr>
                 </tbody>
             </table>
             <div style="text-align: right; font-size: 13px; margin-top: 8px;">
-                Tổng tiền dịch vụ: <strong style="color: #b91c1c;" id="totalServiceCost">210.000 đ</strong>
+                Tổng tiền dịch vụ: <strong style="color: #b91c1c;" id="totalServiceCost">0 đ</strong>
             </div>
 
             <div style="margin-top: 15px; padding: 12px; background: #eff6ff; border-radius: 6px; border: 1px solid #bfdbfe;">
@@ -338,34 +334,30 @@
 <div id="orderServiceModal" class="pms-modal-backdrop">
     <div class="pms-modal-card">
         <div class="modal-head" style="background: #1e3a8a;">
-            <h3>GỌI THÊM ĐỒ UỐNG / DỊCH VỤ - PHÒNG 202</h3>
+            <h3 id="modalOrderServiceTitle">GỌI THÊM ĐỒ UỐNG / DỊCH VỤ TẠI PHÒNG</h3>
             <button type="button" class="pms-btn pms-btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="closeModal('orderServiceModal')">[ Đóng ]</button>
         </div>
         <div class="modal-body">
-            <div style="margin-bottom: 15px;">
-                <label style="font-weight: 700; display: block; margin-bottom: 6px;">1. CHỌN DANH MỤC DỊCH VỤ:</label>
-                <div style="display: flex; gap: 15px;">
-                    <label><input type="radio" name="svcCat" value="MINIBAR" checked onchange="changeServiceCategory()"> [x] Minibar / Đồ uống</label>
-                    <label><input type="radio" name="svcCat" value="FOOD" onchange="changeServiceCategory()"> [ ] Ăn uống Buffet</label>
-                    <label><input type="radio" name="svcCat" value="LAUNDRY" onchange="changeServiceCategory()"> [ ] Giặt ủi & Spa</label>
-                </div>
-            </div>
+            <input type="hidden" id="ordRoomId" value="">
+            <input type="hidden" id="ordBookingId" value="">
 
             <div style="margin-bottom: 15px;">
-                <label style="font-weight: 700; display: block; margin-bottom: 6px;">2. CHỌN MÓN / DỊCH VỤ CỤ THỂ:</label>
+                <label style="font-weight: 700; display: block; margin-bottom: 6px;">1. CHỌN MÓN / DỊCH VỤ CỤ THỂ:</label>
                 <select id="serviceSelect" class="pms-select" style="width: 100%; padding: 10px;" onchange="updatePriceCalculation()">
-                    <option value="DV05" data-price="30000" data-unit="Lon">Nước Ngọt Lon Minibar (DV05) - 30.000 đ/Lon</option>
-                    <option value="DV03" data-price="20000" data-unit="Gói">Cà Phê Hòa Tan (DV03) - 20.000 đ/Gói</option>
-                    <option value="DV02" data-price="80000" data-unit="Kg">Giặt Ủi Nhanh Lấy Liền (DV02) - 80.000 đ/Kg</option>
-                    <option value="DV01" data-price="150000" data-unit="Suất">Buffet Sáng Tự Chọn (DV01) - 150.000 đ/Suất</option>
+                    <option value="DV05" data-price="30000" data-unit="Lon" selected>Nước uống Mini Bar (DV05) - 30.000 đ/Lon</option>
+                    <option value="DV01" data-price="150000" data-unit="Suất">Ăn sáng Buffet (DV01) - 150.000 đ/Suất</option>
+                    <option value="DV02" data-price="60000" data-unit="Bộ">Giặt ủi quần áo (DV02) - 60.000 đ/Bộ</option>
+                    <option value="DV03" data-price="350000" data-unit="Chuyến">Đưa đón sân bay (DV03) - 350.000 đ/Chuyến</option>
+                    <option value="DV04" data-price="450000" data-unit="Lượt">Massage & Spa Body (DV04) - 450.000 đ/Lượt</option>
+                    <option value="DV06" data-price="180000" data-unit="Ngày">Thuê xe máy tự lái (DV06) - 180.000 đ/Ngày</option>
                 </select>
             </div>
 
             <div style="margin-bottom: 15px;">
-                <label style="font-weight: 700; display: block; margin-bottom: 6px;">3. SỐ LƯỢNG:</label>
+                <label style="font-weight: 700; display: block; margin-bottom: 6px;">2. SỐ LƯỢNG:</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <button type="button" class="pms-btn pms-btn-secondary" onclick="adjustQty(-1)">[ Giảm ]</button>
-                    <input type="number" id="orderQty" class="pms-input" value="2" min="1" max="20" style="width: 70px; text-align: center; font-weight: 700;" onchange="updatePriceCalculation()">
+                    <input type="number" id="orderQty" class="pms-input" value="1" min="1" max="20" style="width: 70px; text-align: center; font-weight: 700;" onchange="updatePriceCalculation()">
                     <button type="button" class="pms-btn pms-btn-secondary" onclick="adjustQty(1)">[ Tăng ]</button>
                     <span id="unitText" style="color: #64748b; font-weight: 600;">(Lon)</span>
                 </div>
@@ -374,12 +366,12 @@
             <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 14px; border-radius: 6px; margin-bottom: 15px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 13px; color: #475569;">Thành tiền tạm tính:</span>
-                    <strong id="subtotalText" style="font-size: 18px; color: #1e3a8a;">60.000 đ</strong>
+                    <strong id="subtotalText" style="font-size: 18px; color: #1e3a8a;">30.000 đ</strong>
                 </div>
             </div>
 
             <div style="margin-bottom: 15px;">
-                <label style="font-weight: 700; display: block; margin-bottom: 6px;">4. GHI CHÚ BỔ SUNG:</label>
+                <label style="font-weight: 700; display: block; margin-bottom: 6px;">3. GHI CHÚ BỔ SUNG:</label>
                 <input type="text" id="orderNote" class="pms-input" style="width: 100%; box-sizing: border-box;" placeholder="Ví dụ: Khách gọi từ điện thoại phòng, xin thêm 1 xô đá lạnh...">
             </div>
 
@@ -388,7 +380,7 @@
             </div>
         </div>
         <div class="modal-foot">
-            <button type="button" class="pms-btn pms-btn-primary" onclick="saveServiceOrderMock()">[ Lưu dịch vụ vào phòng ]</button>
+            <button type="button" class="pms-btn pms-btn-primary" onclick="saveServiceOrderReal()">[ Lưu dịch vụ vào phòng ]</button>
             <button type="button" class="pms-btn pms-btn-secondary" onclick="backToRoomDetail()">[ Quay lại ]</button>
         </div>
     </div>
@@ -449,11 +441,70 @@
     // Mở Modal Chi Tiết Phòng Đang Ở
     function openRoomDetailModal(roomId, bookingId, guestName, phone, cccd, inDate, outDate) {
         document.getElementById('modalRoomDetailTitle').innerText = 'THÔNG TIN CHI TIẾT PHÒNG ĐANG LƯU TRÚ - ' + roomId;
-        document.getElementById('dtlBookingId').innerText = bookingId;
-        document.getElementById('dtlGuestName').innerText = guestName;
-        document.getElementById('dtlPhone').innerText = phone;
-        document.getElementById('dtlCccd').innerText = cccd;
+        document.getElementById('dtlBookingId').innerText = bookingId || '--';
+        document.getElementById('dtlGuestName').innerText = guestName || '--';
+        document.getElementById('dtlPhone').innerText = phone || '--';
+        document.getElementById('dtlCccd').innerText = cccd || '--';
+        document.getElementById('dtlStayDuration').innerText = (inDate && outDate) ? (inDate + ' -> ' + outDate) : '--';
+
+        document.getElementById('ordRoomId').value = roomId;
+        document.getElementById('ordBookingId').value = bookingId || '';
+        document.getElementById('modalOrderServiceTitle').innerText = 'GỌI THÊM ĐỒ UỐNG / DỊCH VỤ - PHÒNG ' + roomId;
+
+        loadServicesUsed(bookingId, roomId);
         openModal('roomDetailModal');
+    }
+
+    // Tải danh sách dịch vụ phòng đã dùng từ API (FN-3.5)
+    function loadServicesUsed(bookingId, roomId) {
+        const tbody = document.getElementById('usedServiceList');
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #64748b;">Đang tải danh sách dịch vụ...</td></tr>';
+
+        const url = '${pageContext.request.contextPath}/api/receptionist/services?action=usage&maBooking='
+                  + encodeURIComponent(bookingId || '') + '&maPhong=' + encodeURIComponent(roomId || '');
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.services && data.services.length > 0) {
+                    tbody.innerHTML = '';
+                    data.services.forEach(s => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = '<td>' + escapeHtml(s.tenDichVu) + '</td>'
+                                     + '<td style="text-align: center;">' + s.soLuong + '</td>'
+                                     + '<td style="text-align: right;">' + s.donGia.toLocaleString('vi-VN') + ' đ</td>'
+                                     + '<td style="text-align: right; font-weight: 600;">' + s.thanhTien.toLocaleString('vi-VN') + ' đ</td>';
+                        tbody.appendChild(tr);
+                    });
+                    document.getElementById('totalServiceCost').innerText = data.totalCost.toLocaleString('vi-VN') + ' đ';
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic;">Chưa có dịch vụ phát sinh nào cho phòng này.</td></tr>';
+                    document.getElementById('totalServiceCost').innerText = '0 đ';
+                }
+            })
+            .catch(err => {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ef4444;">Lỗi khi tải dịch vụ: ' + err.message + '</td></tr>';
+            });
+    }
+
+    // Mở trực tiếp Modal Gọi Dịch Vụ từ nút trên thẻ phòng
+    function openServiceOrderForRoom(roomId, roomNo) {
+        document.getElementById('ordRoomId').value = roomId;
+        document.getElementById('modalOrderServiceTitle').innerText = 'GỌI THÊM ĐỒ UỐNG / DỊCH VỤ - PHÒNG ' + roomNo;
+
+        fetch('${pageContext.request.contextPath}/api/receptionist/services?action=usage&maPhong=' + encodeURIComponent(roomId))
+            .then(res => res.json())
+            .then(data => {
+                if (data.maBooking) {
+                    document.getElementById('ordBookingId').value = data.maBooking;
+                }
+                openModal('orderServiceModal');
+                updatePriceCalculation();
+            })
+            .catch(() => {
+                openModal('orderServiceModal');
+                updatePriceCalculation();
+            });
     }
 
     // Mở Modal Check-in
@@ -509,21 +560,54 @@
         updatePriceCalculation();
     }
 
-    // Lưu Dịch Vụ Mô Phỏng Vào Bảng
-    function saveServiceOrderMock() {
+    // Thoát ký tự HTML an toàn
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.innerText = text;
+        return div.innerHTML;
+    }
+
+    // Gọi Dịch Vụ Thật Qua API (FN-3.4)
+    function saveServiceOrderReal() {
+        const bookingId = document.getElementById('ordBookingId').value.trim();
+        const roomId = document.getElementById('ordRoomId').value.trim();
         const select = document.getElementById('serviceSelect');
+        const maDichVu = select.value;
         const svcName = select.options[select.selectedIndex].text.split(' - ')[0];
-        const price = parseInt(select.options[select.selectedIndex].getAttribute('data-price'));
-        const qty = parseInt(document.getElementById('orderQty').value);
-        const subtotal = price * qty;
+        const qty = parseInt(document.getElementById('orderQty').value) || 1;
+        const note = document.getElementById('orderNote').value.trim();
 
-        const tbody = document.getElementById('usedServiceList');
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = '<td>' + svcName + '</td><td style="text-align: center;">' + qty + '</td><td style="text-align: right;">' + price.toLocaleString('vi-VN') + ' đ</td><td style="text-align: right; font-weight: 600;">' + subtotal.toLocaleString('vi-VN') + ' đ</td>';
-        tbody.appendChild(newRow);
+        if (!maDichVu) {
+            alert('[Cảnh báo] Vui lòng chọn một dịch vụ!');
+            return;
+        }
 
-        alert('[Thành công] Đã ghi nhận ' + qty + ' x ' + svcName + ' vào phòng 202!');
-        backToRoomDetail();
+        const params = new URLSearchParams();
+        params.append('maBooking', bookingId);
+        params.append('maPhong', roomId);
+        params.append('maDichVu', maDichVu);
+        params.append('soLuong', qty);
+        params.append('ghiChu', note);
+
+        fetch('${pageContext.request.contextPath}/api/receptionist/services', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+            body: params.toString()
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('[Thành công] Đã ghi nhận ' + qty + ' x ' + svcName + ' vào phòng ' + roomId + '!');
+                closeModal('orderServiceModal');
+                openRoomDetailModal(roomId, bookingId, '', '', '', '', '');
+            } else {
+                alert('[Lỗi] Không thể thêm dịch vụ: ' + (data.message || 'Lỗi không xác định'));
+            }
+        })
+        .catch(err => {
+            alert('[Lỗi kết nối] Không thể kết nối đến máy chủ lễ tân: ' + err.message);
+        });
     }
 
     // Xác Nhận Check-In Thật (Gửi AJAX POST đến ReceptionistCheckInServlet)
