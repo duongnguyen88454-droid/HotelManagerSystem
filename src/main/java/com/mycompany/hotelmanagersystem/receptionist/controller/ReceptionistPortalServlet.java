@@ -1,4 +1,4 @@
-package com.mycompany.hotelmanagersystem.controller.receptionist;
+package com.mycompany.hotelmanagersystem.receptionist.controller;
 
 import com.mycompany.hotelmanagersystem.room.dao.RoomDAO;
 import com.mycompany.hotelmanagersystem.room.dto.RoomMapKpiDTO;
