@@ -308,8 +308,8 @@ public class BookingDAO {
      */
     private void insertBookingHeader(Connection conn, String maBooking, String maKH, String maTaiKhoan,
             double tongChiPhi) throws SQLException {
-        String insertBookingSql = "INSERT INTO BOOKING (MaBooking, MaKH, MaTaiKhoan, MaNV, NgayDat, TrangThai, ChiPhiDuKien, PhuongPhapBooking) "
-                + "VALUES (?, ?, ?, NULL, GETDATE(), 'DaXacNhan', ?, 'Online')";
+        String insertBookingSql = "INSERT INTO BOOKING (MaBooking, MaKH, MaTaiKhoan, MaNV, NgayDat, TrangThai, ChiPhiDuKien) "
+                + "VALUES (?, ?, ?, NULL, GETDATE(), 'DaXacNhan', ?)";
         try (PreparedStatement psBooking = conn.prepareStatement(insertBookingSql)) {
             psBooking.setString(1, maBooking);
             psBooking.setString(2, maKH);
@@ -548,7 +548,7 @@ public class BookingDAO {
      * Trách nhiệm: Truy vấn thông tin chung của đơn đặt phòng (Header)
      */
     private BookingDetailDTO fetchBookingHeader(Connection conn, String maBooking) throws SQLException {
-        String bookingSql = "SELECT b.MaBooking, b.MaTaiKhoan, b.NgayDat, b.TrangThai AS TrangThaiBooking, b.PhuongPhapBooking, "
+        String bookingSql = "SELECT b.MaBooking, b.MaTaiKhoan, b.NgayDat, b.TrangThai AS TrangThaiBooking, "
                 + "       b.ChiPhiDuKien, kh.MaKH, kh.HoTen, kh.SoDT, kh.Email, kh.CCCD, "
                 + "       hd.MaHoaDon, hd.TrangThai AS TrangThaiHoaDon "
                 + "FROM BOOKING b "
@@ -565,7 +565,6 @@ public class BookingDAO {
                     dto.setMaTaiKhoan(rs.getString("MaTaiKhoan"));
                     dto.setNgayDat(rs.getTimestamp("NgayDat"));
                     dto.setTrangThaiBooking(rs.getString("TrangThaiBooking"));
-                    dto.setPhuongPhapBooking(rs.getString("PhuongPhapBooking"));
                     dto.setMaKH(rs.getString("MaKH"));
                     dto.setHoTenKhachHang(rs.getNString("HoTen"));
                     dto.setSoDT(rs.getString("SoDT"));

@@ -206,7 +206,6 @@ CREATE TABLE BOOKING (
     NgayDat           DATETIME        CONSTRAINT DF_BOOKING_NgayDat DEFAULT GETDATE() NOT NULL,
     TrangThai         VARCHAR (20)    CONSTRAINT DF_BOOKING_TrangThai DEFAULT 'DaXacNhan' NOT NULL,
     ChiPhiDuKien      DECIMAL (12, 2) CONSTRAINT DF_BOOKING_ChiPhiDuKien DEFAULT 0 NOT NULL,
-    PhuongPhapBooking VARCHAR (10)    NOT NULL,
     ThoiDiemHuy       DATETIME        NULL,
     PhiHuy            DECIMAL (12, 2) CONSTRAINT DF_BOOKING_PhiHuy DEFAULT 0 NULL,
     CONSTRAINT PK_BOOKING PRIMARY KEY (MaBooking),
@@ -214,7 +213,6 @@ CREATE TABLE BOOKING (
     CONSTRAINT FK_BOOKING_TAIKHOAN FOREIGN KEY (MaTaiKhoan) REFERENCES TAIKHOAN (MaTaiKhoan),
     CONSTRAINT FK_BOOKING_NHANVIEN FOREIGN KEY (MaNV) REFERENCES NHANVIEN (MaNV),
     CONSTRAINT CK_BOOKING_TrangThai CHECK (TrangThai IN ('DaXacNhan', 'DaCheckIn', 'DaCheckOut', 'DaHuy')),
-    CONSTRAINT CK_BOOKING_PhuongPhap CHECK (PhuongPhapBooking IN ('Online', 'Offline')),
     CONSTRAINT CK_BOOKING_ChiPhiDuKien CHECK (ChiPhiDuKien >= 0),
     CONSTRAINT CK_BOOKING_PhiHuy CHECK (PhiHuy IS NULL
                                         OR PhiHuy >= 0)
@@ -533,22 +531,21 @@ INSERT  INTO BOOKING (
     NgayDat,
     TrangThai,
     ChiPhiDuKien,
-    PhuongPhapBooking,
     ThoiDiemHuy,
     PhiHuy
 )
 VALUES               -- BK001: Đang ở (DaCheckIn)
-                     ('BK001', 'KH001', NULL, '2026-09-25 08:30:00', 'DaCheckIn', 1300000.00, 'Online', NULL, NULL),
+                     ('BK001', 'KH001', NULL, '2026-09-25 08:30:00', 'DaCheckIn', 1300000.00, NULL, NULL),
                      -- BK002: Đang ở (DaCheckIn)
-                     ('BK002', 'KH002', 'NV001', '2026-09-26 14:00:00', 'DaCheckIn', 3700000.00, 'Offline', NULL, NULL),
+                     ('BK002', 'KH002', 'NV001', '2026-09-26 14:00:00', 'DaCheckIn', 3700000.00, NULL, NULL),
                      -- BK003: Đã đặt trước, chưa check-in (DaXacNhan)
-                     ('BK003', 'KH003', NULL, '2026-09-27 10:15:00', 'DaXacNhan', 2200000.00, 'Online', NULL, NULL),
+                     ('BK003', 'KH003', NULL, '2026-09-27 10:15:00', 'DaXacNhan', 2200000.00, NULL, NULL),
                      -- BK004: Đã hoàn tất trả phòng và thanh toán xong (DaCheckOut)
-                     ('BK004', 'KH004', 'NV002', '2026-09-20 09:00:00', 'DaCheckOut', 900000.00, 'Offline', NULL, NULL),
+                     ('BK004', 'KH004', 'NV002', '2026-09-20 09:00:00', 'DaCheckOut', 900000.00, NULL, NULL),
                      -- BK005: Khách hủy đặt phòng (DaHuy)
-                     ('BK005', 'KH005', NULL, '2026-09-22 11:00:00', 'DaHuy', 1100000.00, 'Online', '2026-09-23 09:00:00', 100000.00),
+                     ('BK005', 'KH005', NULL, '2026-09-22 11:00:00', 'DaHuy', 1100000.00, '2026-09-23 09:00:00', 100000.00),
                      -- BK006: Lịch sử hoàn tất trả phòng tuần trước (DaCheckOut)
-                     ('BK006', 'KH001', 'NV001', '2026-09-15 13:00:00', 'DaCheckOut', 1100000.00, 'Offline', NULL, NULL);
+                     ('BK006', 'KH001', 'NV001', '2026-09-15 13:00:00', 'DaCheckOut', 1100000.00, NULL, NULL);
 
 
 GO

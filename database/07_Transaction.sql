@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- ĐỒ ÁN MÔN HỌC: HỆ QUẢN TRỊ CƠ SỞ DỮ LIỆU (DBMS330284) - HCMUTE
 -- HỆ THỐNG QUẢN LÝ KHÁCH SẠN (HOTEL MANAGEMENT SYSTEM) - NHÓM 10
 -- TẬP LỆNH: HỆ THỐNG TRANSACTION (GIAO DỊCH TOÀN VẸN CHUẨN ACID)
@@ -15,7 +15,6 @@ CREATE OR ALTER PROCEDURE sp_Transaction_TaoBookingTronGoi
     @MaPhong VARCHAR(10),
     @NgayNhan DATE,
     @NgayTra DATE,
-    @PhuongPhapBooking VARCHAR(10) = 'Online', -- 'Online' hoặc 'Offline'
     @MaBookingMoi VARCHAR(20) OUTPUT
 AS
 BEGIN
@@ -52,8 +51,8 @@ BEGIN
         BEGIN TRANSACTION;
 
         -- Bước A: Tạo đơn đặt phòng
-        INSERT INTO BOOKING (MaBooking, MaKH, NgayDat, ChiPhiDuKien, TrangThai, MaNV, PhuongPhapBooking)
-        VALUES (@MaBookingMoi, @MaKH, GETDATE(), @ChiPhiDuKien, 'DaXacNhan', NULL, @PhuongPhapBooking);
+        INSERT INTO BOOKING (MaBooking, MaKH, NgayDat, ChiPhiDuKien, TrangThai, MaNV)
+        VALUES (@MaBookingMoi, @MaKH, GETDATE(), @ChiPhiDuKien, 'DaXacNhan', NULL);
 
         -- Bước B: Gán phòng vào đơn (dùng @DonGia đã lấy từ LOAIPHONG)
         INSERT INTO BOOKING_PHONG (MaBooking, MaPhong, DonGiaPhong, NgayNhanDuKien, NgayTraDuKien, NgayCheckInThucTe, NgayCheckOutThucTe)

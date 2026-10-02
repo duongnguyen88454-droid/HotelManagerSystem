@@ -14,7 +14,6 @@ public class BookingDetailDTO implements Serializable {
     private String maBooking;
     private Timestamp ngayDat;
     private String trangThaiBooking;
-    private String phuongPhapBooking;
     private String ghiChu;
 
     private String maKH;
@@ -81,14 +80,6 @@ public class BookingDetailDTO implements Serializable {
         this.trangThaiBooking = trangThaiBooking;
         this.coTheHuy = "DaXacNhan".equalsIgnoreCase(this.trangThaiBooking);
         this.coTheThemDichVu = "DaXacNhan".equalsIgnoreCase(this.trangThaiBooking) || "DaCheckIn".equalsIgnoreCase(this.trangThaiBooking);
-    }
-
-    public String getPhuongPhapBooking() {
-        return phuongPhapBooking;
-    }
-
-    public void setPhuongPhapBooking(String phuongPhapBooking) {
-        this.phuongPhapBooking = phuongPhapBooking;
     }
 
     public String getGhiChu() {

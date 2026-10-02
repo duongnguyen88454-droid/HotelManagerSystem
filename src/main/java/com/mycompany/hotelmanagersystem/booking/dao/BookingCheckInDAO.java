@@ -62,11 +62,12 @@ public class BookingCheckInDAO {
         LocalDate localTra = tra.toLocalDate();
 
         long daysFromStart = ChronoUnit.DAYS.between(startDate, localNhan);
-        int startCol = (int) Math.max(1, daysFromStart + 1);
+        int startCol = (int) Math.max(1, Math.min(7, daysFromStart + 1));
 
         long daysToEnd = ChronoUnit.DAYS.between(startDate, localTra);
-        int endCol = (int) Math.min(7, daysToEnd);
-        int colSpan = Math.max(1, endCol - startCol + 1);
+        int endCol = (int) Math.max(startCol, Math.min(7, daysToEnd));
+        int maxAllowedSpan = 7 - startCol + 1;
+        int colSpan = Math.max(1, Math.min(maxAllowedSpan, endCol - startCol + 1));
 
         String status = rs.getString("TrangThaiBooking");
         String cssClass = "DaCheckIn".equalsIgnoreCase(status) ? "bar-occupied" : "bar-confirmed";

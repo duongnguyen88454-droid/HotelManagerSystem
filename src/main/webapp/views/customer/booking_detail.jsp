@@ -109,7 +109,6 @@
                 </h2>
                 <div style="font-size: 13px; color: #cbd5e0; margin-top: 4px;">
                     Thời gian tạo: <fmt:formatDate value="${bookingDetail.ngayDat}" pattern="dd/MM/yyyy HH:mm:ss"/>
-                    &nbsp;|&nbsp; Kênh đặt: <strong>${bookingDetail.phuongPhapBooking}</strong>
                 </div>
             </div>
 

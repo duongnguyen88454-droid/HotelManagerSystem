@@ -203,6 +203,7 @@
 
             .timeline-table {
                 width: 100%;
+                table-layout: fixed;
                 border-collapse: collapse;
                 min-width: 1100px;
                 font-size: 12px;
@@ -274,7 +275,7 @@
                 position: absolute;
                 top: 8px;
                 bottom: 8px;
-                border-radius: 6px;
+                border-radius: 8px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -285,7 +286,7 @@
                 color: #ffffff;
                 cursor: pointer;
                 z-index: 5;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
                 border: 1px solid rgba(255, 255, 255, 0.4);
                 white-space: nowrap;
                 overflow: hidden;
@@ -313,14 +314,14 @@
                 border-left: 4px solid #7c2d12;
             }
 
-            /* DẢI ĐỘ RỘNG TIMELINE THEO SỐ NGÀY CHIẾM DỤNG (COLSPAN 1-7) */
-            .span-1 { width: calc(100% - 12px); }
-            .span-2 { width: calc(200% - 12px); }
-            .span-3 { width: calc(300% - 12px); }
-            .span-4 { width: calc(400% - 12px); }
-            .span-5 { width: calc(500% - 12px); }
-            .span-6 { width: calc(600% - 12px); }
-            .span-7 { width: calc(700% - 12px); }
+            /* DẢI ĐỘ RỘNG TIMELINE VỚI KHOẢNG HỞ TÁCH BIỆT 24PX GIỮA CÁC ĐƠN LIỀN KỀ */
+            .span-1 { width: calc(100% - 24px); max-width: calc(100% - 24px); }
+            .span-2 { width: calc(200% - 24px); max-width: calc(200% - 24px); }
+            .span-3 { width: calc(300% - 24px); max-width: calc(300% - 24px); }
+            .span-4 { width: calc(400% - 24px); max-width: calc(400% - 24px); }
+            .span-5 { width: calc(500% - 24px); max-width: calc(500% - 24px); }
+            .span-6 { width: calc(600% - 24px); max-width: calc(600% - 24px); }
+            .span-7 { width: calc(700% - 24px); max-width: calc(700% - 24px); }
 
             /* CENTERED POPUP MODAL VA BACKDROP OVERLAY */
             .pms-modal-backdrop {
@@ -506,13 +507,13 @@
                                         </c:forEach>
                                     </c:when>
                                     <c:otherwise>
-                                        <th class="day-col-header">Thứ 2 (29/09)</th>
-                                        <th class="day-col-header">Thứ 3 (30/09)</th>
-                                        <th class="day-col-header">Thứ 4 (01/10)</th>
-                                        <th class="day-col-header">Thứ 5 (02/10)</th>
-                                        <th class="day-col-header">Thứ 6 (03/10)</th>
-                                        <th class="day-col-header">Thứ 7 (04/10)</th>
-                                        <th class="day-col-header">Chủ Nhật (05/10)</th>
+                                        <th class="day-col-header">Thứ 2</th>
+                                        <th class="day-col-header">Thứ 3</th>
+                                        <th class="day-col-header">Thứ 4</th>
+                                        <th class="day-col-header">Thứ 5</th>
+                                        <th class="day-col-header">Thứ 6</th>
+                                        <th class="day-col-header">Thứ 7</th>
+                                        <th class="day-col-header">Chủ Nhật</th>
                                     </c:otherwise>
                                 </c:choose>
                             </tr>
@@ -547,7 +548,7 @@
                                             <c:forEach items="${r.bookingBars}" var="bar">
                                                 <c:if test="${bar.startCol eq dayIdx}">
                                                     <div class="booking-bar ${bar.cssClass} span-${bar.colSpan}"
-                                                        style="left: 6px; z-index: 10;"
+                                                        style="left: 12px; z-index: 10;"
                                                         title="[${bar.maBooking}] ${bar.tenKhachHang} (${bar.trangThaiBooking eq 'DaCheckIn' ? 'Đang lưu trú' : 'Đã xác nhận'})"
                                                         onclick="handleBookingBarClick('${r.maPhong}', '${r.soPhong}', '${bar.maBooking}', '${bar.tenKhachHang}', '${bar.soDienThoai}', '${bar.soCccd}', '${bar.trangThaiBooking}', '${bar.ngayNhanDuKien}', '${bar.ngayTraDuKien}', '${bar.formattedNgayCheckInThucTe}', '${bar.formattedNgayCheckOutThucTe}')">
                                                         ${bar.tenKhachHang}

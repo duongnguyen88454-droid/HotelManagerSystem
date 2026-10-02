@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- ĐỒ ÁN MÔN HỌC: HỆ QUẢN TRỊ CƠ SỞ DỮ LIỆU (DBMS330284) - HCMUTE
 -- HỆ THỐNG QUẢN LÝ KHÁCH SẠN (HOTEL MANAGEMENT SYSTEM) - NHÓM 10
 -- TẬP LỆNH: HỆ THỐNG STORED PROCEDURE (THỦ TỤC NGHIỆP VỤ)
@@ -15,7 +15,6 @@ CREATE OR ALTER PROCEDURE sp_TaoDonDatPhongOnline
     @MaPhong VARCHAR(10),
     @NgayNhan DATE,
     @NgayTra DATE,
-    @PhuongPhapBooking VARCHAR(10) = 'Online', -- 'Online' hoặc 'Offline'
     @MaBookingMoi VARCHAR(20) OUTPUT
 AS
 BEGIN
@@ -59,8 +58,8 @@ BEGIN
         -- 6. Chèn vào bảng BOOKING và BOOKING_PHONG trong Transaction
         BEGIN TRANSACTION;
 
-        INSERT INTO BOOKING (MaBooking, MaKH, NgayDat, ChiPhiDuKien, TrangThai, MaNV, PhuongPhapBooking)
-        VALUES (@MaBookingMoi, @MaKH, GETDATE(), @ChiPhiDuKien, 'DaXacNhan', NULL, @PhuongPhapBooking);
+        INSERT INTO BOOKING (MaBooking, MaKH, NgayDat, ChiPhiDuKien, TrangThai, MaNV)
+        VALUES (@MaBookingMoi, @MaKH, GETDATE(), @ChiPhiDuKien, 'DaXacNhan', NULL);
 
         INSERT INTO BOOKING_PHONG (MaBooking, MaPhong, DonGiaPhong, NgayNhanDuKien, NgayTraDuKien, NgayCheckInThucTe, NgayCheckOutThucTe)
         VALUES (@MaBookingMoi, @MaPhong, @GiaPhong, @NgayNhan, @NgayTra, NULL, NULL);

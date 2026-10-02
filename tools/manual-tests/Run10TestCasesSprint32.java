@@ -202,8 +202,8 @@ public class Run10TestCasesSprint32 {
         try {
             // 1. Chèn đơn test vào CSDL
             try (Connection conn = DBContext.getConnection()) {
-                String insertB = "INSERT INTO BOOKING (MaBooking, MaKH, TrangThai, ChiPhiDuKien, PhuongPhapBooking) "
-                               + "VALUES (?, 'KH001', 'DaXacNhan', 1000000, 'Offline')";
+                String insertB = "INSERT INTO BOOKING (MaBooking, MaKH, TrangThai, ChiPhiDuKien) "
+                               + "VALUES (?, 'KH001', 'DaXacNhan', 1000000)";
                 try (PreparedStatement ps = conn.prepareStatement(insertB)) {
                     ps.setString(1, testBookingId);
                     ps.executeUpdate();
@@ -312,8 +312,8 @@ public class Run10TestCasesSprint32 {
         String concurBookingId = "T32B" + (System.currentTimeMillis() % 9000 + 1000);
         try {
             try (Connection conn = DBContext.getConnection()) {
-                String insertB = "INSERT INTO BOOKING (MaBooking, MaKH, TrangThai, ChiPhiDuKien, PhuongPhapBooking) "
-                               + "VALUES (?, 'KH001', 'DaXacNhan', 1000000, 'Offline')";
+                String insertB = "INSERT INTO BOOKING (MaBooking, MaKH, TrangThai, ChiPhiDuKien) "
+                               + "VALUES (?, 'KH001', 'DaXacNhan', 1000000)";
                 try (PreparedStatement ps = conn.prepareStatement(insertB)) {
                     ps.setString(1, concurBookingId);
                     ps.executeUpdate();

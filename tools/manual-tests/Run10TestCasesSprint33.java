@@ -55,8 +55,8 @@ public class Run10TestCasesSprint33 {
 
         try (Connection conn = DBContext.getConnection()) {
             // Tạo đơn test lưu trú DaCheckIn
-            String insertB = "INSERT INTO BOOKING (MaBooking, MaKH, TrangThai, ChiPhiDuKien, PhuongPhapBooking) "
-                           + "VALUES (?, 'KH001', 'DaCheckIn', 2000000, 'Offline')";
+            String insertB = "INSERT INTO BOOKING (MaBooking, MaKH, TrangThai, ChiPhiDuKien) "
+                           + "VALUES (?, 'KH001', 'DaCheckIn', 2000000)";
             try (PreparedStatement ps = conn.prepareStatement(insertB)) {
                 ps.setString(1, testBookingId);
                 ps.executeUpdate();

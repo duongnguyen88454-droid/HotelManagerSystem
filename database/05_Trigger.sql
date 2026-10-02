@@ -309,7 +309,7 @@ BEGIN
     FROM BOOKING WITH (NOLOCK);
 
     INSERT INTO BOOKING (
-        MaBooking, MaKH, MaTaiKhoan, MaNV, NgayDat, TrangThai, ChiPhiDuKien, PhuongPhapBooking, ThoiDiemHuy, PhiHuy
+        MaBooking, MaKH, MaTaiKhoan, MaNV, NgayDat, TrangThai, ChiPhiDuKien, ThoiDiemHuy, PhiHuy
     )
     SELECT
         CASE 
@@ -323,7 +323,6 @@ BEGIN
         ISNULL(i.NgayDat, GETDATE()),
         ISNULL(i.TrangThai, 'ChoXacNhan'),
         i.ChiPhiDuKien,
-        ISNULL(i.PhuongPhapBooking, 'Online'),
         i.ThoiDiemHuy,
         i.PhiHuy
     FROM inserted i;

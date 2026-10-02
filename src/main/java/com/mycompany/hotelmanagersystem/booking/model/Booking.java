@@ -16,7 +16,6 @@ public class Booking implements Serializable {
     private Timestamp ngayDat;
     private String trangThai; // 'DaXacNhan', 'DaCheckIn', 'DaCheckOut', 'DaHuy'
     private double chiPhiDuKien;
-    private String phuongPhapBooking; // 'Online', 'Offline'
     private Timestamp thoiDiemHuy;
     private Double phiHuy;
 
@@ -24,7 +23,7 @@ public class Booking implements Serializable {
     }
 
     public Booking(String maBooking, String maKH, String maTaiKhoan, String maNV, Timestamp ngayDat, String trangThai, double chiPhiDuKien,
-            String phuongPhapBooking, Timestamp thoiDiemHuy, Double phiHuy) {
+            Timestamp thoiDiemHuy, Double phiHuy) {
         this.maBooking = maBooking;
         this.maKH = maKH;
         this.maTaiKhoan = maTaiKhoan;
@@ -32,14 +31,13 @@ public class Booking implements Serializable {
         this.ngayDat = ngayDat;
         this.trangThai = trangThai;
         this.chiPhiDuKien = chiPhiDuKien;
-        this.phuongPhapBooking = phuongPhapBooking;
         this.thoiDiemHuy = thoiDiemHuy;
         this.phiHuy = phiHuy;
     }
 
     public Booking(String maBooking, String maKH, String maNV, Timestamp ngayDat, String trangThai, double chiPhiDuKien,
-            String phuongPhapBooking, Timestamp thoiDiemHuy, Double phiHuy) {
-        this(maBooking, maKH, null, maNV, ngayDat, trangThai, chiPhiDuKien, phuongPhapBooking, thoiDiemHuy, phiHuy);
+            Timestamp thoiDiemHuy, Double phiHuy) {
+        this(maBooking, maKH, null, maNV, ngayDat, trangThai, chiPhiDuKien, thoiDiemHuy, phiHuy);
     }
 
     public String getMaBooking() {
@@ -88,14 +86,6 @@ public class Booking implements Serializable {
 
     public void setChiPhiDuKien(double chiPhiDuKien) {
         this.chiPhiDuKien = chiPhiDuKien;
-    }
-
-    public String getPhuongPhapBooking() {
-        return phuongPhapBooking;
-    }
-
-    public void setPhuongPhapBooking(String phuongPhapBooking) {
-        this.phuongPhapBooking = phuongPhapBooking;
     }
 
     public Timestamp getThoiDiemHuy() {
