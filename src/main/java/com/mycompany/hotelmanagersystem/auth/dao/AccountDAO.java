@@ -27,14 +27,15 @@ public class AccountDAO {
             return null;
         }
 
+        // Lưu ý: KHACHHANG không còn cột MaTaiKhoan sau khi chuẩn hóa 3NF.
+        // SoDT và MaDinhDanh của khách hàng được tra cứu riêng qua CustomerDAO khi cần.
         String sql = "SELECT tk.MaTaiKhoan, tk.MatKhau, tk.MaVaiTro, vt.TenVaiTro, tk.TrangThai, "
                 + "COALESCE(tk.HoTenTaiKhoan, N'Người Dùng') AS HoTen, "
                 + "tk.Email, "
-                + "COALESCE(kh.SoDT, nv.SoDienThoai, '') AS SoDT, "
-                + "COALESCE(kh.MaKH, nv.MaNV, '') AS MaDinhDanh "
+                + "COALESCE(nv.SoDienThoai, '') AS SoDT, "
+                + "COALESCE(nv.MaNV, '') AS MaDinhDanh "
                 + "FROM TAIKHOAN tk "
                 + "JOIN VAITRO vt ON tk.MaVaiTro = vt.MaVaiTro "
-                + "LEFT JOIN KHACHHANG kh ON tk.MaTaiKhoan = kh.MaTaiKhoan "
                 + "LEFT JOIN NHANVIEN nv ON tk.MaTaiKhoan = nv.MaTaiKhoan "
                 + "WHERE tk.Email = ?";
 

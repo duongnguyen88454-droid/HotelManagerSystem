@@ -1,6 +1,8 @@
 package com.mycompany.hotelmanagersystem.room.dto;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 public class BookingBarDTO {
     private String maBooking;
@@ -10,6 +12,8 @@ public class BookingBarDTO {
     private String soCccd;
     private Date ngayNhanDuKien;
     private Date ngayTraDuKien;
+    private Timestamp ngayCheckInThucTe;
+    private Timestamp ngayCheckOutThucTe;
     private String trangThaiBooking; // DaXacNhan, DaCheckIn, DaTraPhong
     private int startCol; // 1-7
     private int colSpan;  // Số cột chiếm dụng
@@ -119,5 +123,35 @@ public class BookingBarDTO {
 
     public void setCssClass(String cssClass) {
         this.cssClass = cssClass;
+    }
+
+    public Timestamp getNgayCheckInThucTe() {
+        return ngayCheckInThucTe;
+    }
+
+    public void setNgayCheckInThucTe(Timestamp ngayCheckInThucTe) {
+        this.ngayCheckInThucTe = ngayCheckInThucTe;
+    }
+
+    public Timestamp getNgayCheckOutThucTe() {
+        return ngayCheckOutThucTe;
+    }
+
+    public void setNgayCheckOutThucTe(Timestamp ngayCheckOutThucTe) {
+        this.ngayCheckOutThucTe = ngayCheckOutThucTe;
+    }
+
+    public String getFormattedNgayCheckInThucTe() {
+        if (ngayCheckInThucTe == null) {
+            return "___";
+        }
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ngayCheckInThucTe);
+    }
+
+    public String getFormattedNgayCheckOutThucTe() {
+        if (ngayCheckOutThucTe == null) {
+            return "___";
+        }
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ngayCheckOutThucTe);
     }
 }

@@ -56,18 +56,9 @@ INCLUDE (SoTien, PhuongThucThanhToan, MaHoaDon);
 GO
 
 -- ----------------------------------------------------------------------------
--- Index 6, 7, 8: Filtered Unique Indexes cho bảng KHACHHANG
--- Cho phép nhiều bản ghi có MaTaiKhoan/Email/CCCD mang giá trị NULL 
--- (hỗ trợ khách vãng lai check-in trực tiếp & khách đăng ký tài khoản online),
--- đồng thời đảm bảo tính duy nhất tuyệt đối khi các trường này có giá trị.
+-- Index 6, 7: Filtered Unique Indexes cho bảng KHACHHANG (Email, CCCD)
+-- MaTaiKhoan đã được chuyển về BOOKING — không còn index trên KHACHHANG
 -- ----------------------------------------------------------------------------
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'UQ_KHACHHANG_MaTaiKhoan_Filtered' AND object_id = OBJECT_ID('KHACHHANG'))
-BEGIN
-    CREATE UNIQUE NONCLUSTERED INDEX UQ_KHACHHANG_MaTaiKhoan_Filtered
-    ON KHACHHANG (MaTaiKhoan)
-    WHERE MaTaiKhoan IS NOT NULL;
-END;
-GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'UQ_KHACHHANG_Email_Filtered' AND object_id = OBJECT_ID('KHACHHANG'))
 BEGIN

@@ -40,21 +40,14 @@ public class CustomerService {
     }
 
     /**
-     * Tra cứu hồ sơ khách hàng lưu trú theo mã tài khoản hoặc email đăng nhập (phục
-     * vụ Autofill)
+     * Đồng bộ hoặc tạo mới hồ sơ khách hàng lưu trú dựa theo CCCD.
+     * Ai đặt phòng (MaTaiKhoan) được ghi nhận riêng tại BOOKING, không lưu trong KHACHHANG.
      */
-    public Customer getGuestProfileByAccount(String maTaiKhoan, String email) {
-        return customerDAO.getGuestProfileByAccount(maTaiKhoan, email);
-    }
-
-    /**
-     * Đồng bộ hoặc tạo mới hồ sơ khách hàng lưu trú dựa theo CCCD
-     */
-    public String findOrUpsertGuestByCCCD(String hoTen, String email, String soDT, String cccd, String maTaiKhoan)
+    public String findOrUpsertGuestByCCCD(String hoTen, String email, String soDT, String cccd)
             throws Exception {
-        if (hoTen == null || hoTen.trim().isEmpty() ||
-                email == null || email.trim().isEmpty() ||
-                soDT == null || soDT.trim().isEmpty()) {
+        if (hoTen == null || hoTen.trim().isEmpty()
+                || email == null || email.trim().isEmpty()
+                || soDT == null || soDT.trim().isEmpty()) {
             throw new IllegalArgumentException("Họ tên, Email và Số điện thoại của người lưu trú không được để trống!");
         }
 
@@ -62,6 +55,6 @@ public class CustomerService {
             throw new IllegalArgumentException("Số Căn Cước Công Dân (CCCD) không hợp lệ (phải gồm đúng 12 chữ số)!");
         }
 
-        return customerDAO.findOrUpsertGuestByCCCD(hoTen.trim(), email.trim(), soDT.trim(), cccd.trim(), maTaiKhoan);
+        return customerDAO.findOrUpsertGuestByCCCD(hoTen.trim(), email.trim(), soDT.trim(), cccd.trim());
     }
 }

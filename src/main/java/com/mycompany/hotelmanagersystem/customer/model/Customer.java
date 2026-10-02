@@ -6,7 +6,6 @@ public class Customer implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String maKH;
-    private String maTaiKhoan;
     private String hoTen;
     private String email;
     private String soDT;
@@ -15,17 +14,16 @@ public class Customer implements Serializable {
     public Customer() {
     }
 
-    public Customer(String maKH, String maTaiKhoan, String hoTen, String email, String soDT, String cccd) {
+    public Customer(String maKH, String hoTen, String email, String soDT, String cccd) {
         this.maKH = maKH;
-        this.maTaiKhoan = maTaiKhoan;
         this.hoTen = hoTen;
         this.email = email;
         this.soDT = soDT;
         this.cccd = cccd;
     }
 
-    public Customer(String maKH, String maTaiKhoan, String hoTen, String email, String soDT) {
-        this(maKH, maTaiKhoan, hoTen, email, soDT, null);
+    public Customer(String maKH, String hoTen, String email, String soDT) {
+        this(maKH, hoTen, email, soDT, null);
     }
 
     public String getMaKH() {
@@ -34,14 +32,6 @@ public class Customer implements Serializable {
 
     public void setMaKH(String maKH) {
         this.maKH = maKH;
-    }
-
-    public String getMaTaiKhoan() {
-        return maTaiKhoan;
-    }
-
-    public void setMaTaiKhoan(String maTaiKhoan) {
-        this.maTaiKhoan = maTaiKhoan;
     }
 
     public String getHoTen() {

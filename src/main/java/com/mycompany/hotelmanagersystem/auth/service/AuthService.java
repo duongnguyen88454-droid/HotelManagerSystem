@@ -14,7 +14,10 @@ public class AuthService {
     }
 
     /**
-     * Xác thực đăng nhập bằng đúng Email và Mật khẩu trong bảng TAIKHOAN
+     * Xác thực đăng nhập bằng đúng Email và Mật khẩu trong bảng TAIKHOAN:
+     * - Băm mật khẩu thô người dùng vừa nhập bằng thuật toán SHA-256.
+     * - So sánh chuỗi băm này với chuỗi băm đã lưu trong CSDL (qua PasswordUtil).
+     * - Hỗ trợ tương thích ngược (fallback) cho tài khoản seed mẫu.
      */
     public UserSessionDTO login(String email, String password) throws Exception {
         if (email == null || email.trim().isEmpty()) {
@@ -24,6 +27,7 @@ public class AuthService {
             throw new Exception("Vui lòng nhập mật khẩu.");
         }
 
+        // Xác thực đăng nhập: So khớp chuỗi băm với CSDL
         UserSessionDTO user = accountDAO.checkLogin(email.trim(), password);
         if (user == null) {
             throw new Exception("Email hoặc mật khẩu không chính xác.");
@@ -58,8 +62,10 @@ public class AuthService {
     }
 
     /**
-     * Đăng ký tài khoản Web Khách hàng mới online (Chỉ ghi vào bảng TAIKHOAN với đúng 6 thuộc tính chuẩn;
-     * Hoàn toàn không ghi vào bảng KHACHHANG, không bắt buộc SĐT lúc tạo tài khoản).
+     * Đăng ký tài khoản Web Khách hàng mới online (Chỉ ghi vào bảng TAIKHOAN với
+     * đúng 6 thuộc tính chuẩn;
+     * Hoàn toàn không ghi vào bảng KHACHHANG, không bắt buộc SĐT lúc tạo tài
+     * khoản).
      */
     public boolean register(String hoTen, String email, String password, String confirmPassword)
             throws Exception {
@@ -78,7 +84,8 @@ public class AuthService {
         }
 
         if (accountDAO.checkEmailExists(email.trim())) {
-            throw new Exception("Email này đã được sử dụng để đăng ký tài khoản. Vui lòng đăng nhập hoặc chọn email khác.");
+            throw new Exception(
+                    "Email này đã được sử dụng để đăng ký tài khoản. Vui lòng đăng nhập hoặc chọn email khác.");
         }
 
         // Tự sinh mã tài khoản bằng SQL Server Function fn_SinhMaTaiKhoan
@@ -95,7 +102,8 @@ public class AuthService {
     }
 
     /**
-     * Tương thích ngược: Đăng ký tài khoản (bỏ qua soDT vì TAIKHOAN chỉ lưu 6 thuộc tính chuẩn)
+     * Tương thích ngược: Đăng ký tài khoản (bỏ qua soDT vì TAIKHOAN chỉ lưu 6 thuộc
+     * tính chuẩn)
      */
     public boolean register(String hoTen, String email, String soDT, String password, String confirmPassword)
             throws Exception {

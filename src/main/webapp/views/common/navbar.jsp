@@ -43,7 +43,7 @@
                     <a href="${pageContext.request.contextPath}/receptionist/room-map"
                         style="color: #edf2f7; text-decoration: none;">Sơ Đồ Phòng</a>
                     <a href="${pageContext.request.contextPath}/receptionist/checkin"
-                        style="color: #edf2f7; text-decoration: none;">Lễ Tân</a>
+                        style="color: #edf2f7; text-decoration: none;">Quầy Tiếp Đón</a>
                 </c:if>
                 <c:if test="${sessionScope.CURRENT_USER.housekeeper}">
                     <a href="${pageContext.request.contextPath}/housekeeper/tasks"

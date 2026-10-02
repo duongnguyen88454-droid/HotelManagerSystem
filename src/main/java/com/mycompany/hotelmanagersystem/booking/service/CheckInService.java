@@ -1,6 +1,9 @@
 package com.mycompany.hotelmanagersystem.booking.service;
 
 import com.mycompany.hotelmanagersystem.booking.dao.BookingCheckInDAO;
+import com.mycompany.hotelmanagersystem.booking.dao.BookingCheckInQueryDAO;
+import com.mycompany.hotelmanagersystem.booking.dto.CheckInArrivalItemDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.CheckInDetailDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CheckInRequestDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CheckInResultDTO;
 import com.mycompany.hotelmanagersystem.room.dto.BookingBarDTO;
@@ -15,13 +18,16 @@ import java.util.List;
 public class CheckInService {
 
     private final BookingCheckInDAO checkInDAO;
+    private final BookingCheckInQueryDAO checkInQueryDAO;
 
     public CheckInService() {
         this.checkInDAO = new BookingCheckInDAO();
+        this.checkInQueryDAO = new BookingCheckInQueryDAO();
     }
 
-    public CheckInService(BookingCheckInDAO checkInDAO) {
+    public CheckInService(BookingCheckInDAO checkInDAO, BookingCheckInQueryDAO checkInQueryDAO) {
         this.checkInDAO = checkInDAO;
+        this.checkInQueryDAO = checkInQueryDAO;
     }
 
     /**
@@ -35,7 +41,51 @@ public class CheckInService {
     }
 
     /**
-     * Thực hiện thủ tục Check-in nhận phòng tại quầy lễ tân.
+     * Lấy danh sách các đơn đặt phòng chờ tiếp nhận tại Quầy Check-in.
+     * Hỗ trợ lọc độc lập theo: HoTen (LIKE), CCCD (khớp chính xác), MaBooking (LIKE).
+     */
+    public List<CheckInArrivalItemDTO> getArrivalBookings(String hoTen, String cccd, String maBK) {
+        return checkInQueryDAO.getArrivalBookings(hoTen, cccd, maBK);
+    }
+
+    /**
+     * Lấy chi tiết đơn đặt phòng gồm danh sách phòng và dịch vụ đặt trước.
+     */
+    public CheckInDetailDTO getBookingCheckInDetail(String maBooking) {
+        if (maBooking == null || maBooking.trim().isEmpty()) {
+            return null;
+        }
+        return checkInQueryDAO.getBookingCheckInDetail(maBooking.trim());
+    }
+
+    /**
+     * Thực hiện Check-in cho nhiều phòng được chọn trong đơn.
+     */
+    public CheckInResultDTO executeCheckInMultipleRooms(String maBooking, List<String> roomIds, String maNV) {
+        if (maBooking == null || maBooking.trim().isEmpty()) {
+            return new CheckInResultDTO(false, "Mã Booking không được để trống!", null, null, null);
+        }
+        if (roomIds == null || roomIds.isEmpty()) {
+            return new CheckInResultDTO(false, "Vui lòng chọn ít nhất một phòng để Check-in!", maBooking, null, null);
+        }
+
+        String empId = (maNV != null && !maNV.trim().isEmpty()) ? maNV.trim() : "NV001";
+        boolean success = checkInDAO.executeCheckInRooms(maBooking.trim(), roomIds, empId);
+
+        if (success) {
+            String roomListStr = String.join(", ", roomIds);
+            return new CheckInResultDTO(true,
+                    "Xác nhận Check-in nhận phòng (" + roomListStr + ") thành công!",
+                    maBooking, roomListStr, "Occupied");
+        } else {
+            return new CheckInResultDTO(false,
+                    "Không thể thực hiện Check-in do lỗi hệ thống CSDL!",
+                    maBooking, null, null);
+        }
+    }
+
+    /**
+     * Thực hiện thủ tục Check-in nhận 1 phòng (tương thích ngược).
      */
     public CheckInResultDTO executeCheckIn(CheckInRequestDTO request) {
         if (request == null) {
@@ -52,10 +102,6 @@ public class CheckInService {
         }
         if (maPhong == null || maPhong.trim().isEmpty()) {
             return new CheckInResultDTO(false, "Mã phòng không được để trống!", maBooking, maPhong, null);
-        }
-        if (!request.isDaDoiChieuCccd()) {
-            return new CheckInResultDTO(false, "Vui lòng xác nhận đã đối chiếu CCCD / Hộ chiếu bản gốc!",
-                    maBooking, maPhong, null);
         }
 
         boolean eligible = checkInDAO.isBookingEligibleForCheckIn(maBooking.trim(), maPhong.trim());

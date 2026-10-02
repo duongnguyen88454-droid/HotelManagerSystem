@@ -106,27 +106,21 @@ CREATE TABLE TAIKHOAN (
 
 GO
 -- BẢNG 3: KHACHHANG
+-- Ghi chú: MaTaiKhoan đã được chuyển về BOOKING.MaTaiKhoan (ai đặt phòng)
+-- KHACHHANG chỉ lưu hồ sơ lưu trú (nhận dạng theo CCCD), đạt chuẩn 3NF
 CREATE TABLE KHACHHANG (
-    MaKH       VARCHAR (10)   NOT NULL,
-    MaTaiKhoan VARCHAR (10)   NULL,
-    HoTen      NVARCHAR (100) NOT NULL,
-    Email      VARCHAR (100)  NOT NULL,
-    SoDT       VARCHAR (15)   NOT NULL,
-    CCCD       VARCHAR (20)   NOT NULL,
+    MaKH  VARCHAR (10)   NOT NULL,
+    HoTen NVARCHAR (100) NOT NULL,
+    Email VARCHAR (100)  NOT NULL,
+    SoDT  VARCHAR (15)   NOT NULL,
+    CCCD  VARCHAR (20)   NOT NULL,
     CONSTRAINT PK_KHACHHANG PRIMARY KEY (MaKH),
-    CONSTRAINT UQ_KHACHHANG_SoDT UNIQUE (SoDT),
+    CONSTRAINT UQ_KHACHHANG_SoDT  UNIQUE (SoDT),
     CONSTRAINT UQ_KHACHHANG_Email UNIQUE (Email),
-    CONSTRAINT UQ_KHACHHANG_CCCD UNIQUE (CCCD),
-    CONSTRAINT FK_KHACHHANG_TAIKHOAN FOREIGN KEY (MaTaiKhoan) REFERENCES TAIKHOAN (MaTaiKhoan),
+    CONSTRAINT UQ_KHACHHANG_CCCD  UNIQUE (CCCD),
     CONSTRAINT CK_KHACHHANG_CCCD_12Digits CHECK (LEN(CCCD) = 12
                                                  AND CCCD NOT LIKE '%[^0-9]%')
 );
-
-
-GO
--- Filtered Unique Index cho MaTaiKhoan (cho phép nhiều giá trị NULL cho khách vãng lai, nhưng khi liên kết thì bắt buộc duy nhất)
-CREATE UNIQUE NONCLUSTERED INDEX UQ_KHACHHANG_MaTaiKhoan_Filtered
-    ON KHACHHANG(MaTaiKhoan) WHERE MaTaiKhoan IS NOT NULL;
 
 
 GO
@@ -441,17 +435,16 @@ GO
 -- 3. NẠP KHACHHANG
 INSERT  INTO KHACHHANG (
     MaKH,
-    MaTaiKhoan,
     HoTen,
     Email,
     SoDT,
     CCCD
 )
-VALUES                 ('KH001', 'TK_G01', N'Nguyễn Văn An', 'an.nguyen@gmail.com', '0901111111', '079200012345'),
-                       ('KH002', 'TK_G02', N'Trần Thị Bích Mai', 'mai.tran@gmail.com', '0912222222', '079300023456'),
-                       ('KH003', 'TK_G03', N'Lê Quốc Hùng', 'hung.le@gmail.com', '0923333333', '079400034567'),
-                       ('KH004', 'TK_G04', N'Phạm Thanh Thảo', 'thao.pham@gmail.com', '0934444444', '079500045678'),
-                       ('KH005', 'TK_G05', N'Hoàng Minh Tuấn', 'tuan.hoang@gmail.com', '0945000001', '079600056789');
+VALUES                 ('KH001', N'Nguyễn Văn An', 'an.nguyen@gmail.com', '0901111111', '079200012345'),
+                       ('KH002', N'Trần Thị Bích Mai', 'mai.tran@gmail.com', '0912222222', '079300023456'),
+                       ('KH003', N'Lê Quốc Hùng', 'hung.le@gmail.com', '0923333333', '079400034567'),
+                       ('KH004', N'Phạm Thanh Thảo', 'thao.pham@gmail.com', '0934444444', '079500045678'),
+                       ('KH005', N'Hoàng Minh Tuấn', 'tuan.hoang@gmail.com', '0945000001', '079600056789');
 
 
 GO

@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 -- ĐỒ ÁN MÔN HỌC: HỆ QUẢN TRỊ CƠ SỞ DỮ LIỆU (DBMS330284) - HCMUTE
 -- HỆ THỐNG QUẢN LÝ KHÁCH SẠN (HOTEL MANAGEMENT SYSTEM) - NHÓM 10
 -- TẬP LỆNH: HỆ THỐNG STORED PROCEDURE (THỦ TỤC NGHIỆP VỤ)

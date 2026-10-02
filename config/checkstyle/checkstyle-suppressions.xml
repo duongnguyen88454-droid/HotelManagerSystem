@@ -34,9 +34,7 @@
   <suppress checks="ImportControl"        files="RoomService\.java"    message="java\.sql\.Date"/>
 
   <!-- ===== NỢ 3: Controller chứa nghiệp vụ (method quá dài/phức tạp) ===== -->
-  <suppress checks="MethodLength"         files="CustomerBookingServlet\.java" message="doPost"/>
   <suppress checks="CyclomaticComplexity" files="CustomerBookingServlet\.java" lines="34"/>   <!-- doGet: 17 -->
-  <suppress checks="CyclomaticComplexity" files="CustomerBookingServlet\.java" lines="95"/>   <!-- doPost: 31 -->
   <suppress checks="MethodLength"         files="CustomerCartServlet\.java"    message="handleAddRoom"/>
   <suppress checks="CyclomaticComplexity" files="CustomerCartServlet\.java"    lines="76"/>   <!-- handleAddRoom: 23 -->
 
@@ -45,8 +43,6 @@
   <suppress checks="ImportControl" files="ReceptionistPortalServlet\.java"  message="RoomDAO"/>
 
   <!-- ===== NỢ 5: DAO có method quá dài/phức tạp ===== -->
-  <suppress checks="MethodLength"         files="CustomerDAO\.java" message="findOrUpsertGuestByCCCD"/>
-  <suppress checks="CyclomaticComplexity" files="CustomerDAO\.java" lines="122"/>  <!-- findOrUpsertGuestByCCCD: 26 -->
   <suppress checks="MethodLength"         files="RoomDAO\.java"     message="searchAvailableRooms"/>
 
 </suppressions>

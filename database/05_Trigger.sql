@@ -346,15 +346,14 @@ BEGIN
     FROM KHACHHANG WITH (NOLOCK);
 
     INSERT INTO KHACHHANG (
-        MaKH, MaTaiKhoan, HoTen, Email, SoDT, CCCD
+        MaKH, HoTen, Email, SoDT, CCCD
     )
     SELECT
-        CASE 
-            WHEN ISNULL(i.MaKH, '') = '' 
+        CASE
+            WHEN ISNULL(i.MaKH, '') = ''
                 THEN 'KH' + RIGHT('000' + CAST(@MaxID + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR(10)), 3)
             ELSE i.MaKH
         END,
-        i.MaTaiKhoan,
         i.HoTen,
         i.Email,
         i.SoDT,
