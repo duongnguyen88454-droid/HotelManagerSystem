@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+          "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<!--
+  HotelManagerSystem - Kiểm tra kiến trúc & kích thước code (chạy ở phase "validate" của Maven).
+  Giải thích quy tắc: .agents/rules/ARCHITECTURE_RULES.md
+  CẤM tự ý nâng ngưỡng hoặc thêm dòng vào checkstyle-suppressions.xml khi chưa được duyệt.
+  ${cs_config_dir} do maven-checkstyle-plugin truyền vào (xem pom-additions.xml).
+-->
+<module name="Checker">
+  <property name="charset" value="UTF-8"/>
+  <property name="severity" value="error"/>
+  <property name="fileExtensions" value="java"/>
+
+  <module name="SuppressionFilter">
+    <property name="file" value="${cs_config_dir}/checkstyle-suppressions.xml"/>
+  </module>
+
+  <!-- QT 1.1: file Java tối đa 300 dòng -->
+  <module name="FileLength">
+    <property name="max" value="300"/>
+  </module>
+
+  <!-- QT 5.3: cấm tắt kiểm tra bằng @SuppressWarnings("checkstyle...") -->
+  <module name="RegexpSingleline">
+    <property name="format" value="SuppressWarnings\s*\(\s*&quot;checkstyle"/>
+    <property name="message" value="Cấm tắt Checkstyle bằng @SuppressWarnings. Dùng quy trình duyệt nợ kỹ thuật (QT 5.3)."/>
+  </module>
+
+  <module name="TreeWalker">
+    <!-- QT 3: chiều phụ thuộc giữa các tầng (controller không được gọi dao...) -->
+    <module name="ImportControl">
+      <property name="file" value="${cs_config_dir}/import-control.xml"/>
+    </module>
+
+    <!-- QT 1.2: method tối đa 50 dòng -->
+    <module name="MethodLength">
+      <property name="max" value="50"/>
+      <property name="countEmpty" value="false"/>
+    </module>
+
+    <!-- QT 1.3: độ phức tạp chu trình tối đa 15 (mục tiêu <= 10) -->
+    <module name="CyclomaticComplexity">
+      <property name="max" value="15"/>
+    </module>
+
+    <!-- QT 1.4: tối đa 6 tham số (dto/model được miễn, xem suppressions) -->
+    <module name="ParameterNumber">
+      <property name="max" value="6"/>
+      <property name="tokens" value="METHOD_DEF,CTOR_DEF"/>
+    </module>
+
+    <!-- QT 1.5: tối đa 12 public / 20 tổng method mỗi class (dto/model được miễn) -->
+    <module name="MethodCount">
+      <property name="maxPublic" value="12"/>
+      <property name="maxTotal" value="20"/>
+    </module>
+
+    <!-- QT 2.4: cấm tên lớp kết thúc bằng Manager/Helper/Misc/Common -->
+    <module name="TypeName">
+      <property name="format" value="^(?!.*(Manager|Helper|Misc|Common)$)[A-Z][a-zA-Z0-9]*$"/>
+      <property name="tokens" value="CLASS_DEF,INTERFACE_DEF,ENUM_DEF"/>
+      <message key="name.invalidPattern"
+               value="Tên lớp ''{0}'' mơ hồ (kết thúc bằng Manager/Helper/Misc/Common). Hãy đặt tên theo đúng một trách nhiệm (QT 2.4)."/>
+    </module>
+
+  </module>
+</module>
