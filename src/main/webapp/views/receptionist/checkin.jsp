@@ -563,11 +563,12 @@
     }
 
     // Tự động mở modal nếu chuyển từ Sơ đồ phòng sang kèm mã Booking
-    <c:if test="${not empty autoSelectBooking}">
+    const autoSelectBooking = '${autoSelectBooking}';
+    if (autoSelectBooking && autoSelectBooking.trim() !== '') {
         document.addEventListener('DOMContentLoaded', function() {
-            openCheckInDetailModal('${autoSelectBooking}');
+            openCheckInDetailModal(autoSelectBooking);
         });
-    </c:if>
+    }
 </script>
 
 <jsp:include page="/views/common/footer.jsp" />

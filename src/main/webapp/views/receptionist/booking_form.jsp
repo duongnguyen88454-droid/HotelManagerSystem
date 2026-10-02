@@ -1,11 +1,19 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <jsp:include page="/views/common/header.jsp">
     <jsp:param name="pageTitle" value="Đặt Phòng Tại Quầy - Bàn Làm Việc Lễ Tân" />
 </jsp:include>
 <jsp:include page="/views/common/navbar.jsp" />
+
+<style>
+    .svc-box-shown { display: block; }
+    .svc-box-hidden { display: none; }
+    .svc-holder-shown { display: inline; }
+    .svc-holder-hidden { display: none; }
+</style>
 
 <div class="content-wrapper" style="background-color: #f1f5f9; min-height: calc(100vh - 120px); padding: 24px 0;">
     <div class="container-fluid" style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
@@ -112,7 +120,7 @@
                             3. CHỌN PHÒNG TRỐNG KHẢ DỤNG
                         </h3>
                         <span style="font-size: 12px; color: #64748b; font-weight: 600;">
-                            Tìm thấy: <strong style="color: #0284c7;">${availableRooms.size()}</strong> phòng khả dụng
+                            Tìm thấy: <strong style="color: #0284c7;">${fn:length(availableRooms)}</strong> phòng khả dụng
                         </span>
                     </div>
 
@@ -130,7 +138,7 @@
                                             <th style="width: 40px; text-align: center; padding: 10px 8px;">Chọn</th>
                                             <th style="padding: 10px 12px;">Số Phòng</th>
                                             <th style="padding: 10px 12px;">Hạng Phòng</th>
-                                            <th style="padding: 10px 12px;">Tầng</th>
+                                            <th style="padding: 10px 12px;">Sức Chứa & Giường</th>
                                             <th style="padding: 10px 12px; text-align: right;">Đơn Giá / Đêm</th>
                                             <th style="padding: 10px 12px;">Thêm Dịch Vụ Phòng</th>
                                         </tr>
@@ -139,13 +147,18 @@
                                         <c:forEach var="rm" items="${availableRooms}">
                                             <tr style="border-bottom: 1px solid #f1f5f9;">
                                                 <td style="text-align: center; padding: 10px 8px;">
-                                                    <input type="checkbox" name="selectedRooms" value="${rm.maPhong}" id="chk_${rm.maPhong}"
-                                                        <c:if test="${rm.maPhong eq preselectedRoomId}">checked</c:if>
-                                                        onchange="toggleRoomServices('${rm.maPhong}')">
+                                                    <c:choose>
+                                                        <c:when test="${rm.maPhong eq preselectedRoomId}">
+                                                            <input type="checkbox" name="selectedRooms" value="${rm.maPhong}" id="chk_${rm.maPhong}" checked onchange="toggleRoomServices('${rm.maPhong}')">
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <input type="checkbox" name="selectedRooms" value="${rm.maPhong}" id="chk_${rm.maPhong}" onchange="toggleRoomServices('${rm.maPhong}')">
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                     <input type="hidden" name="soPhong_${rm.maPhong}" value="${rm.soPhong}">
                                                     <input type="hidden" name="tenLoaiPhong_${rm.maPhong}" value="${rm.tenLoaiPhong}">
                                                     <input type="hidden" name="maLoaiPhong_${rm.maPhong}" value="${rm.maLoaiPhong}">
-                                                    <input type="hidden" name="donGia_${rm.maPhong}" value="${rm.giaMoiDem}">
+                                                    <input type="hidden" name="donGia_${rm.maPhong}" value="${rm.giaPhong}">
                                                 </td>
                                                 <td style="padding: 10px 12px; font-weight: 700; color: #0f172a;">
                                                     ${rm.soPhong}
@@ -154,21 +167,21 @@
                                                     ${rm.tenLoaiPhong}
                                                 </td>
                                                 <td style="padding: 10px 12px; color: #64748b;">
-                                                    Tầng ${rm.soTang}
+                                                    ${rm.soNguoiToiDa} khách (${rm.loaiGiuong})
                                                 </td>
                                                 <td style="padding: 10px 12px; text-align: right; font-weight: 700; color: #0284c7;">
-                                                    <fmt:formatNumber value="${rm.giaMoiDem}" type="currency" currencySymbol="" maxFractionDigits="0"/> VNĐ
+                                                    <fmt:formatNumber value="${rm.giaPhong}" pattern="#,###"/> VNĐ
                                                 </td>
                                                 <td style="padding: 10px 12px;">
-                                                    <div id="svcBox_${rm.maPhong}" style="display: <c:choose><c:when test='${rm.maPhong eq preselectedRoomId}'>block</c:when><c:otherwise>none</c:otherwise></c:choose>;">
+                                                    <div id="svcBox_${rm.maPhong}" class="${rm.maPhong eq preselectedRoomId ? 'svc-box-shown' : 'svc-box-hidden'}">
                                                         <c:forEach var="s" items="${services}">
                                                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 11px;">
-                                                                <span>${s.tenDichVu} (<fmt:formatNumber value="${s.donGia}" type="currency" currencySymbol="" maxFractionDigits="0"/>đ):</span>
+                                                                <span>${s.tenDichVu} (<fmt:formatNumber value="${s.donGia}" pattern="#,###"/>đ):</span>
                                                                 <input type="number" name="svc_${rm.maPhong}_${s.maDichVu}" min="0" max="20" value="0" style="width: 50px; padding: 2px 4px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center;">
                                                             </div>
                                                         </c:forEach>
                                                     </div>
-                                                    <span id="svcPlaceholder_${rm.maPhong}" style="color: #94a3b8; font-style: italic; font-size: 11px; display: <c:choose><c:when test='${rm.maPhong eq preselectedRoomId}'>none</c:when><c:otherwise>inline</c:otherwise></c:choose>;">
+                                                    <span id="svcPlaceholder_${rm.maPhong}" class="${rm.maPhong eq preselectedRoomId ? 'svc-holder-hidden' : 'svc-holder-shown'}" style="color: #94a3b8; font-style: italic; font-size: 11px;">
                                                         (Tích chọn phòng để mở menu dịch vụ)
                                                     </span>
                                                 </td>
