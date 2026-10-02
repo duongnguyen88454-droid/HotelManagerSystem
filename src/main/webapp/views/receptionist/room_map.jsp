@@ -435,9 +435,8 @@
                 <div style="display: flex; gap: 10px;">
                     <a href="${pageContext.request.contextPath}/receptionist/checkin"
                         class="pms-btn pms-btn-success" style="text-decoration: none;">[ Quầy Tiếp Đón Check-in ]</a>
-                    <button class="pms-btn pms-btn-primary"
-                        onclick="alert('Chức năng đặt phòng nhanh tại quầy sẽ được kích hoạt ở các bước tiếp theo.')">[
-                        Đặt phòng mới ]</button>
+                    <a href="${pageContext.request.contextPath}/receptionist/booking"
+                        class="pms-btn pms-btn-primary" style="text-decoration: none;">[ Đặt phòng mới ]</a>
                     <a href="${pageContext.request.contextPath}/receptionist/room-map?startDate=${startDate}"
                         class="pms-btn pms-btn-secondary">[ Tải lại sơ đồ ]</a>
                 </div>
@@ -1041,6 +1040,13 @@
                         bar.setAttribute('onclick', "handleBookingBarClick('" + roomId + "', '" + roomNo + "', '" + bookingId + "', '" + guestName + "', '" + phone + "', '" + cccd + "', 'DaCheckIn', '" + inDate + "', '" + outDate + "', '" + nowStr + "', '___')");
                     }
                 }
+            }
+
+            // Xử lý thông báo khi tạo đơn đặt phòng thành công từ màn hình Đặt phòng mới
+            const urlParams = new URLSearchParams(window.location.search);
+            const bSuccess = urlParams.get('bookingSuccess');
+            if (bSuccess) {
+                alert('[Thành công] Đã tiếp nhận đơn đặt phòng mới: ' + bSuccess);
             }
         </script>
 
