@@ -69,7 +69,7 @@ public class ReceptionistBookingServlet extends HttpServlet {
         String note = request.getParameter("note");
 
         try {
-            validateRequiredFields(cccd, hoTen, soDT, checkInStr, checkOutStr);
+            validateRequiredFields(cccd, hoTen, soDT, email, checkInStr, checkOutStr);
             if (selectedRooms == null || selectedRooms.length == 0) {
                 throw new IllegalArgumentException("Vui lòng tích chọn ít nhất một phòng trống để đặt!");
             }
@@ -196,13 +196,16 @@ public class ReceptionistBookingServlet extends HttpServlet {
         return cart;
     }
 
-    private void validateRequiredFields(String cccd, String hoTen, String soDT,
+    private void validateRequiredFields(String cccd, String hoTen, String soDT, String email,
             String checkInStr, String checkOutStr) {
-        if (cccd == null || cccd.trim().isEmpty()) {
-            throw new IllegalArgumentException("Vui lòng nhập số CCCD của khách lưu trú!");
-        }
         if (hoTen == null || hoTen.trim().isEmpty()) {
             throw new IllegalArgumentException("Vui lòng nhập họ và tên khách hàng đại diện!");
+        }
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Vui lòng nhập địa chỉ email liên hệ!");
+        }
+        if (cccd == null || cccd.trim().isEmpty()) {
+            throw new IllegalArgumentException("Vui lòng nhập số CCCD của khách lưu trú!");
         }
         if (soDT == null || soDT.trim().isEmpty()) {
             throw new IllegalArgumentException("Vui lòng nhập số điện thoại liên lạc của khách!");
