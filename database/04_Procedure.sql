@@ -578,71 +578,106 @@ GO
 -- Procedure 6: Quy trình buồng phòng nhận và hoàn thành dọn dẹp
 -- ----------------------------------------------------------------------------
 CREATE OR ALTER PROCEDURE sp_CapNhatTienDoDonPhong
-@MaNhiemVu VARCHAR (10), @MaNV VARCHAR (10), @HanhDong VARCHAR (20), -- 'NhanViec' hoặc 'HoanThanh'
-@KetQua VARCHAR (20)='KhongThietHai'
+    @MaNhiemVu VARCHAR(10),
+    @MaNV VARCHAR(10),
+    @HanhDong VARCHAR(20),     -- 'NhanViec' hoặc 'HoanThanh'
+    @KetQua VARCHAR(20) = 'KhongThietHai'
 AS
 BEGIN
     SET NOCOUNT ON;
     BEGIN TRY
-        DECLARE @MaPhong AS VARCHAR (10);
-        DECLARE @TrangThaiNhiemVu AS VARCHAR (20);
+        DECLARE @MaPhong VARCHAR(10);
+        DECLARE @TrangThaiNhiemVu VARCHAR(20);
+        DECLARE @NguoiDangDon VARCHAR(10);
+
         SELECT @MaPhong = MaPhong,
-               @TrangThaiNhiemVu = TrangThai
-        FROM   NHIEMVUDOPHONG
-        WHERE  MaNhiemVu = @MaNhiemVu;
+               @TrangThaiNhiemVu = TrangThai,
+               @NguoiDangDon = MaNV
+        FROM NHIEMVUDOPHONG
+        WHERE MaNhiemVu = @MaNhiemVu;
+
         IF @MaPhong IS NULL
-            BEGIN
-                RAISERROR (N'Nhiệm vụ dọn phòng không tồn tại!', 16, 1);
-                RETURN -1;
-            END
+        BEGIN
+            RAISERROR (N'Nhiệm vụ dọn phòng không tồn tại!', 16, 1);
+            RETURN -1;
+        END
+
         BEGIN TRANSACTION;
+
         IF @HanhDong = 'NhanViec'
+        BEGIN
+            -- 1. Kiểm tra nhân viên có đang dọn dở phòng nào không
+            IF EXISTS (SELECT 1 FROM NHIEMVUDOPHONG WHERE MaNV = @MaNV AND TrangThai = 'DangDon')
             BEGIN
-                IF @TrangThaiNhiemVu <> 'ChoXuLy'
-                    BEGIN
-                        RAISERROR (N'Nhiệm vụ này đã được nhận dọn dẹp hoặc đã hoàn thành trước đó!', 16, 1);
-                        ROLLBACK;
-                        RETURN -2;
-                    END
-                UPDATE NHIEMVUDOPHONG
-                SET    MaNV           = @MaNV,
-                       ThoiGianBatDau = GETDATE(),
-                       TrangThai      = 'DangDon'
-                WHERE  MaNhiemVu = @MaNhiemVu;
-                UPDATE PHONG
-                SET    TrangThai = 'Cleaning'
-                WHERE  MaPhong = @MaPhong;
+                RAISERROR (N'Bạn đang có một phòng đang dọn dẹp dở! Vui lòng hoàn tất phòng hiện tại trước khi nhận thêm.', 16, 1);
+                ROLLBACK;
+                RETURN -4;
             END
-        ELSE
-            IF @HanhDong = 'HoanThanh'
+
+            -- 2. Cập nhật có khóa hàng nguyên tử để chống tranh chấp đồng thời
+            UPDATE NHIEMVUDOPHONG WITH (UPDLOCK, ROWLOCK)
+            SET MaNV = @MaNV,
+                ThoiGianBatDau = GETDATE(),
+                TrangThai = 'DangDon'
+            WHERE MaNhiemVu = @MaNhiemVu AND TrangThai = 'ChoXuLy';
+
+            IF @@ROWCOUNT = 0
+            BEGIN
+                DECLARE @TenNguoiNhan NVARCHAR(100);
+                SELECT @TenNguoiNhan = nv.HoTen 
+                FROM NHIEMVUDOPHONG nvdp LEFT JOIN NHANVIEN nv ON nvdp.MaNV = nv.MaNV 
+                WHERE nvdp.MaNhiemVu = @MaNhiemVu;
+
+                IF @TenNguoiNhan IS NOT NULL
                 BEGIN
-                    IF @TrangThaiNhiemVu <> 'DangDon'
-                        BEGIN
-                            RAISERROR (N'Chỉ có thể hoàn thành nhiệm vụ đang trong quá trình dọn dẹp (DangDon)!', 16, 1);
-                            ROLLBACK;
-                            RETURN -3;
-                        END
-                    UPDATE NHIEMVUDOPHONG
-                    SET    ThoiGianKetThuc = GETDATE(),
-                           TrangThai       = 'HoanThanh',
-                           KetQua          = @KetQua
-                    WHERE  MaNhiemVu = @MaNhiemVu;
-                    IF @KetQua = 'KhongThietHai'
-                        UPDATE PHONG
-                        SET    TrangThai = 'Available'
-                        WHERE  MaPhong = @MaPhong;
-                    ELSE
-                        UPDATE PHONG
-                        SET    TrangThai = 'Damaged'
-                        WHERE  MaPhong = @MaPhong;
+                    DECLARE @Msg NVARCHAR(200) = N'Phòng này vừa được tiếp nhận bởi nhân viên: ' + @TenNguoiNhan + N'!';
+                    RAISERROR (@Msg, 16, 1);
                 END
+                ELSE
+                BEGIN
+                    RAISERROR (N'Phòng này không còn ở trạng thái chờ dọn hoặc đã được nhận trước đó!', 16, 1);
+                END
+                ROLLBACK;
+                RETURN -2;
+            END
+
+            -- Chuyển trạng thái phòng sang Cleaning
+            UPDATE PHONG SET TrangThai = 'Cleaning' WHERE MaPhong = @MaPhong;
+        END
+        ELSE IF @HanhDong = 'HoanThanh'
+        BEGIN
+            IF @TrangThaiNhiemVu <> 'DangDon'
+            BEGIN
+                RAISERROR (N'Chỉ có thể hoàn tất phòng đang trong tiến trình dọn dẹp (Cleaning)!', 16, 1);
+                ROLLBACK;
+                RETURN -3;
+            END
+
+            IF @NguoiDangDon <> @MaNV
+            BEGIN
+                RAISERROR (N'Bạn không thể hoàn tất phòng do nhân viên khác đang phụ trách!', 16, 1);
+                ROLLBACK;
+                RETURN -5;
+            END
+
+            UPDATE NHIEMVUDOPHONG
+            SET ThoiGianKetThuc = GETDATE(),
+                TrangThai = 'HoanThanh',
+                KetQua = @KetQua
+            WHERE MaNhiemVu = @MaNhiemVu;
+
+            IF @KetQua = 'KhongThietHai'
+                UPDATE PHONG SET TrangThai = 'Available' WHERE MaPhong = @MaPhong;
+            ELSE
+                UPDATE PHONG SET TrangThai = 'Damaged' WHERE MaPhong = @MaPhong;
+        END
+
         COMMIT TRANSACTION;
         RETURN 0;
     END TRY
     BEGIN CATCH
-        IF @@TRANCOUNT > 0
-            ROLLBACK;
-        DECLARE @ErrMsg AS NVARCHAR (4000) = ERROR_MESSAGE();
+        IF @@TRANCOUNT > 0 ROLLBACK;
+        DECLARE @ErrMsg NVARCHAR(4000) = ERROR_MESSAGE();
         RAISERROR (@ErrMsg, 16, 1);
         RETURN -99;
     END CATCH
