@@ -640,7 +640,7 @@
                     <a id="btnGoToCheckIn" href="#" class="pms-btn pms-btn-success" style="display: none; text-decoration: none;">[ Chuyển sang Quầy Check-in ]</a>
                     <button type="button" id="btnOrderService" class="pms-btn pms-btn-primary" onclick="switchToOrderServiceModal()">[ Thêm dịch vụ phòng ]</button>
                     <button type="button" id="btnCheckOut" class="pms-btn pms-btn-danger"
-                        onclick="alert('Đã sẵn sàng chuyển dữ liệu sang phân hệ Thu ngân (Giai đoạn 4) để quyết toán!')">[ Check-out trả phòng ]</button>
+                        onclick="goToCheckOutCashier()">[ Check-out trả phòng ]</button>
                     <button type="button" class="pms-btn pms-btn-secondary" onclick="closeModal('bookingModal')">[ Đóng ]</button>
                 </div>
             </div>
@@ -896,6 +896,16 @@
             function backToRoomDetail() {
                 closeModal('orderServiceModal');
                 openModal('bookingModal');
+            }
+
+            // Chuyển sang phân hệ Thu Ngân để quyết toán / trả phòng
+            function goToCheckOutCashier() {
+                var bookingId = document.getElementById('bmBookingIdVal').value;
+                if (bookingId && bookingId.trim() !== '') {
+                    window.location.href = '${pageContext.request.contextPath}/cashier/booking-detail?maBooking=' + encodeURIComponent(bookingId.trim());
+                } else {
+                    window.location.href = '${pageContext.request.contextPath}/cashier/dashboard';
+                }
             }
 
             // 3. TÍNH TOÁN VA GỌI DỊCH VỤ

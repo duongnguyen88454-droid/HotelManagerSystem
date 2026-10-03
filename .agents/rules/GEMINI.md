@@ -10,3 +10,12 @@
   5. **DỪNG LẠI HOÀN TOÀN** để chờ User đọc, thẩm định và duyệt.
 - **CHỈ KHI NÀO USER NÓI ĐỒNG Ý / CHO PHÉP CODE:** Lúc đó mới được phép thực thi chỉnh sửa code, rebuild và chạy lại test case để kiểm chứng.
 - Trước khi sửa bất kỳ file .java nào, phải đọc .agents/rules/ARCHITECTURE_RULES.md và tuân thủ.
+
+## 2. Quy Ước Kiểm Thử (Testing Convention) - Tuyệt Đối Không Sửa Test Để Pass
+- **NGHIÊM CẤM SỬA TEST CASE KHI FAIL:** Khi một test case (ArchUnit, JUnit, Integration test, SQL test script, v.v.) bị **FAIL**, tuyệt đối **KHÔNG ĐƯỢC PHÉP** chỉnh sửa logic của test case, đổi assertion, giảm nhẹ tiêu chuẩn kiểm tra, bỏ qua (skip/ignore/@Disabled) hoặc sửa dữ liệu kỳ vọng chỉ nhằm mục đích làm cho test case chuyển sang màu xanh (PASS).
+- **NGUYÊN TẮC XỬ LÝ TEST FAIL:**
+  1. Thừa nhận trung thực kết quả test fail, ghi nhận rõ thông báo lỗi và file/dòng gây lỗi.
+  2. Phân tích nguyên nhân gốc rễ (Root Cause) nằm ở mã nguồn thực thi hoặc logic nghiệp vụ.
+  3. Lập đề xuất sửa **mã nguồn thực thi** (hoặc cấu trúc hệ thống) để thỏa mãn đúng yêu cầu mà test case đang bảo vệ.
+  4. **Ngoại lệ duy nhất:** Chỉ được phép sửa test case khi chính User xác nhận rằng yêu cầu nghiệp vụ đã thay đổi hoặc test case ban đầu được viết sai logic thực tế, và User có hiệu lệnh yêu cầu cập nhật test case.
+

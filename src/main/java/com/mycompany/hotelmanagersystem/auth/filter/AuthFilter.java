@@ -10,10 +10,11 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebFilter(filterName = "AuthFilter", urlPatterns = {
-    "/customer/*",
-    "/receptionist/*",
-    "/housekeeper/*",
-    "/manager/*"
+        "/customer/*",
+        "/receptionist/*",
+        "/housekeeper/*",
+        "/manager/*",
+        "/cashier/*"
 })
 public class AuthFilter implements Filter {
 
@@ -52,6 +53,8 @@ public class AuthFilter implements Filter {
             isAuthorized = "VT03".equalsIgnoreCase(role); // DUY NHẤT Buồng phòng
         } else if (path.startsWith("/manager/")) {
             isAuthorized = "VT04".equalsIgnoreCase(role); // DUY NHẤT Quản lý
+        } else if (path.startsWith("/cashier/")) {
+            isAuthorized = "VT02".equalsIgnoreCase(role) || "VT04".equalsIgnoreCase(role); // Lễ tân & Quản lý
         }
 
         if (isAuthorized) {

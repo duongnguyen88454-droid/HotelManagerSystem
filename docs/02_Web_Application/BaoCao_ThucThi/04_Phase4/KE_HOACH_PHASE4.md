@@ -45,44 +45,41 @@ PHONG.Occupied           ──►    TRIGGER DON PHONG   ──►    PHONG.Dir
 ### Sprint 4.1-A - Stored Procedures
 
 #### Task DB-01: `sp_CheckOut`
-- [ ] Input: @MaBooking VARCHAR(10), @MaNV VARCHAR(10)
-- [ ] Logic: Validate trang thai DaCheckIn -> Update BOOKING.TrangThai = 'DaCheckOut' -> Ghi NgayCheckOutThucTe = GETDATE()
-- [ ] Boc trong BEGIN TRANSACTION ... COMMIT / ROLLBACK
+- [x] Input: @MaBooking VARCHAR(10), @MaNV VARCHAR(10), @MaPhong VARCHAR(10) = NULL
+- [x] Logic: Validate trang thai DaCheckIn -> Ghi NgayCheckOutThucTe = GETDATE() -> Chi chuyen BOOKING.TrangThai = 'DaCheckOut' khi tat ca phong da check-out
+- [x] Boc trong BEGIN TRANSACTION ... COMMIT / ROLLBACK (Da deploy & test thanh cong tren SQL Server)
 
 #### Task DB-02: `sp_TaoHoaDon`
-- [ ] Input: @MaBooking VARCHAR(10), @MaNV VARCHAR(10), @MaHoaDonMoi VARCHAR(20) OUTPUT
-- [ ] Tinh TienPhong = DonGiaPhong * SoDemThucTe tu BOOKING_PHONG
-- [ ] Tinh TienDichVu = SUM(DonGia * SoLuong) tu BOOKING_DICHVU
-- [ ] Kiem tra tra phong muon sau 12:00 PM -> phu thu 50% don gia 1 dem
-- [ ] TongTienCuoiCung = TienPhong + TienDichVu + PhuThu
-- [ ] INSERT vao HOADON voi TrangThai = 'ChuaThanhToan', tra @MaHoaDonMoi OUTPUT
-- [ ] Constraint: 1 Booking chi co 1 hoa don (UQ_HOADON_MaBooking da co)
+- [x] Input: @MaBooking VARCHAR(10), @MaNV VARCHAR(10), @MaHoaDonMoi VARCHAR(20) OUTPUT
+- [x] Tinh TongTien = fn_TinhTongTienThucTePhaiTra(@MaBooking) (Phuong an B: ho tro tinh tam tinh khi con phong chua tra va chot tong khi da tra het)
+- [x] INSERT/UPDATE vao HOADON voi TrangThai dong bo theo THANHTOAN, tra @MaHoaDonMoi OUTPUT
+- [x] Constraint: 1 Booking chi co 1 hoa don (UQ_HOADON_MaBooking) - Da deploy & test thanh cong tren SQL Server
 
 #### Task DB-03: `sp_GhiNhanThanhToan`
-- [ ] Input: @MaHoaDon, @MaNV, @SoTien DECIMAL(12,2), @PhuongThuc VARCHAR(20)
-- [ ] INSERT vao THANHTOAN -> Tinh tong da tra -> Tu cap nhat HOADON.TrangThai
-- [ ] Tong da tra >= Tong tien -> 'DaThanhToanDu' | Tong da tra < Tong tien -> 'MotPhan'
-- [ ] Boc trong Transaction
+- [x] Input: @MaHoaDon, @MaNV, @SoTien DECIMAL(18,2), @PhuongThuc VARCHAR(20), @MaThanhToanMoi OUTPUT
+- [x] Cho phep thanh toan tung phan trong luc luu tru (DaCheckIn)
+- [x] RANG BUOC PHUONG AN B: Chan tat toan du 100% khi booking con phong chua Check-out
+- [x] INSERT vao THANHTOAN -> Trigger trg_CapNhatTrangThaiHoaDon tu cap nhat HOADON.TrangThai -> Boc trong Transaction (Da deploy & test thanh cong tren SQL Server)
 
 ---
 
 ### Sprint 4.1-B - Triggers
 
 #### Task TRG-01: `trg_DonPhongSauCheckOut`
-- [ ] Bang: BOOKING_PHONG, su kien: AFTER UPDATE
-- [ ] Dieu kien: Khi NgayCheckOutThucTe thay doi tu NULL -> co gia tri
-- [ ] Hanh dong: Update PHONG.TrangThai = 'Dirty' + INSERT NHIEMVUDOPHONG (TrangThai = 'ChoXuLy')
+- [x] Bang: BOOKING_PHONG, su kien: AFTER UPDATE (trg_TuDongDonPhongSauCheckOut)
+- [x] Dieu kien: Khi NgayCheckOutThucTe thay doi tu NULL -> co gia tri
+- [x] Hanh dong: Update PHONG.TrangThai = 'Dirty' + INSERT NHIEMVUDOPHONG (TrangThai = 'ChoXuLy') (Da test kich hoat tu dong)
 
 #### Task TRG-02: Kiem tra trigger CheckIn tu Phase 3 khong xung dot
-- [ ] Xac nhan trg_DongBoTrangThaiPhongCheckIn hoat dong dung
-- [ ] Kiem thu: CheckIn -> Occupied; CheckOut -> Dirty; Don xong -> Available
+- [x] Xac nhan trg_DongBoTrangThaiPhongCheckIn hoat dong dung
+- [x] Kiem thu: CheckIn -> Occupied; CheckOut -> Dirty; Don xong -> Available
 
 ---
 
 **Tieu chi hoan thanh Phan 1:**
-- [ ] Ca 3 SP chay thanh cong khi test bang sqlcmd
-- [ ] Trigger trg_DonPhongSauCheckOut tu kich hoat khi update NgayCheckOutThucTe
-- [ ] `mvn test "-Dcheckstyle.skip=true"` -> 7/7 ArchUnit Tests Passed
+- [x] Ca 3 SP (sp_CheckOut, sp_TaoHoaDon, sp_GhiNhanThanhToan) chay thanh cong khi test bang sqlcmd
+- [x] Trigger trg_TuDongDonPhongSauCheckOut tu kich hoat khi update NgayCheckOutThucTe
+- [x] `mvn test "-Dcheckstyle.skip=true"` -> 7/7 ArchUnit Tests Passed
 
 ---
 
@@ -92,29 +89,32 @@ PHONG.Occupied           ──►    TRIGGER DON PHONG   ──►    PHONG.Dir
 > **File anh huong:** Tao moi trong `src/main/java/.../cashier/dao/`
 
 #### Task DAO-01: `CheckOutDAO.java`
-- [ ] `executeCheckOut(String maBooking, String maNV)` -> goi sp_CheckOut, tra ve boolean
+- [x] `executeCheckOutAll(String maBooking, String maNV)` -> goi sp_CheckOut, tra ve boolean
+- [x] `executeCheckOutRoom(String maBooking, String maPhong, String maNV)` -> tra phong rieng le
 
 #### Task DAO-02: `InvoiceDAO.java`
-- [ ] `createInvoice(String maBooking, String maNV)` -> goi sp_TaoHoaDon, tra ve String maHoaDon
-- [ ] `getInvoiceDetail(String maHoaDon)` -> JOIN HOADON + BOOKING + KHACHHANG + NHANVIEN
-- [ ] `getServiceBreakdown(String maBooking)` -> danh sach BOOKING_DICHVU chi tiet
-- [ ] `findInvoiceByBooking(String maBooking)` -> kiem tra da co hoa don chua
+- [x] `createOrUpdateInvoice(String maBooking, String maNV)` -> goi sp_TaoHoaDon, tra ve String maHoaDon
+- [x] `getInvoiceHeader(String maHoaDon)` -> JOIN HOADON + BOOKING + KHACHHANG + NHANVIEN
+- [x] `getInvoiceRooms(String maBooking)` -> danh sach phong va tinh so dem thuc te
+- [x] `getInvoiceServices(String maBooking)` -> danh sach BOOKING_DICHVU chi tiet
+- [x] `findInvoiceIdByBooking(String maBooking)` -> tim hoa don theo ma booking
 
 #### Task DAO-03: `PaymentDAO.java`
-- [ ] `recordPayment(maHoaDon, maNV, soTien, phuongThuc)` -> goi sp_GhiNhanThanhToan
-- [ ] `getPaymentHistory(String maHoaDon)` -> danh sach dot da thanh toan
-- [ ] `getTotalPaid(String maHoaDon)` -> tong da thanh toan
+- [x] `recordPayment(maHoaDon, maNV, soTien, phuongThuc)` -> goi sp_GhiNhanThanhToan
+- [x] `getPaymentHistory(String maHoaDon)` -> danh sach dot da thanh toan
+- [x] `getTotalPaid(String maHoaDon)` -> tong da thanh toan
 
 #### Task DAO-04: `ActiveBookingDAO.java`
-- [ ] `findCheckedInBookings(String keyword)` -> tim booking DaCheckIn theo ten/CCCD/SDT/MaBooking
-- [ ] `getBookingCheckOutDetail(String maBooking)` -> day du thong tin de lap hoa don
+- [x] `findCheckedInBookings(String keyword)` -> tim booking DaCheckIn theo ten/CCCD/SDT/MaBooking (STRING_AGG + COUNT + SUM SoPhongChuaTra)
+- [x] `hasUncheckedOutRooms(String maBooking)` -> kiem tra con phong nao chua Check-out khong
 
 ---
 
 **Tieu chi hoan thanh Phan 2:**
-- [ ] Tat ca DAO nam trong package cashier.dao (khong de trong booking.dao)
-- [ ] Khong co DAO nao goi truc tiep sang DAO khac package
-- [ ] `mvn compile` -> BUILD SUCCESS
+- [x] Tat ca DAO nam trong package cashier.dao (khong de trong booking.dao)
+- [x] Khong co DAO nao goi truc tiep sang DAO khac package
+- [x] `mvn checkstyle:check` -> 0 Checkstyle violations
+- [x] `mvn test` -> 7/7 ArchUnit Tests Passed, BUILD SUCCESS
 
 ---
 
@@ -124,27 +124,38 @@ PHONG.Occupied           ──►    TRIGGER DON PHONG   ──►    PHONG.Dir
 > **File anh huong:** Tao moi trong `src/main/java/.../cashier/service/`
 
 #### Task SVC-01: `CheckOutService.java`
-- [ ] `processCheckOut(String maBooking, String maNV)`:
-  - Goi CheckOutDAO.executeCheckOut()
-  - Goi InvoiceDAO.createInvoice() ngay sau check-out thanh cong
-  - Tra ve String maHoaDon cho Controller dieu huong
+- [x] `processCheckOutAll(String maBooking, String maNV)`:
+  - Goi CheckOutDAO.executeCheckOutAll()
+  - Goi InvoiceDAO.createOrUpdateInvoice() ngay sau check-out thanh cong
+  - Tra ve CheckOutResultDTO kem String maHoaDon cho Controller dieu huong
+- [x] `processCheckOutRoom(String maBooking, String maPhong, String maNV)`:
+  - Goi CheckOutDAO.executeCheckOutRoom()
+  - Cap nhat hoa don tam tinh va bao tinh trang con phong chua tra
 
 #### Task SVC-02: `InvoiceService.java`
-- [ ] `getFullInvoiceForDisplay(String maHoaDon)` -> tong hop InvoiceDTO day du cho view
-- [ ] `calculateRemainingAmount(String maHoaDon)` -> TongTien - TongDaTra
-- [ ] `isFullyPaid(String maHoaDon)` -> kiem tra hoa don da thanh toan du chua
+- [x] `getFullInvoiceForDisplay(String maHoaDon)` -> tong hop InvoiceDetailDTO day du cho view (Header, Phong, Dich vu, Da tra, Con thieu)
+- [x] `getInvoiceByBooking(String maBooking, String maNV)` -> tim hoac tao hoa don theo ma booking
+- [x] `isFullyPaid(String maHoaDon)` -> kiem tra hoa don da thanh toan du chua
 
 #### Task SVC-03: `PaymentService.java`
-- [ ] `processPayment(maHoaDon, maNV, soTien, phuongThuc)`:
-  - Validate soTien > 0 va khong vuot qua so con lai
+- [x] `processPayment(maHoaDon, maNV, soTien, phuongThuc)`:
+  - Validate soTien > 0
   - Goi PaymentDAO.recordPayment()
-  - Tra ve trang thai hoa don moi sau thanh toan
+  - Tra ve PaymentResultDTO kem ma giao dich va trang thai hoa don moi sau thanh toan
+- [x] `getPaymentHistory(String maHoaDon)` -> danh sach lich su thanh toan
+- [x] `calculateRemainingAmount(String maHoaDon)` -> tinh so tien con thieu
+
+#### Bo sung: `ActiveBookingService.java`
+- [x] `findCheckedInBookings(String keyword)` -> ho tro tim kiem don luu tru cho dashboard Thu Ngan
+- [x] `hasUncheckedOutRooms(String maBooking)` -> kiem tra con phong nao chua Check-out khong
 
 ---
 
 **Tieu chi hoan thanh Phan 3:**
-- [ ] Khong co Service nao import DAO tu package khac ngoai cashier.dao
-- [ ] `mvn test` -> 7/7 ArchUnit Tests Passed
+- [x] Khong co Service nao import DAO tu package khac ngoai cashier.dao
+- [x] Khong co Service nao dung java.sql.* hoac javax.servlet.* (Tuan thu tuyet doi QT 3.2)
+- [x] `mvn checkstyle:check` -> 0 Checkstyle violations
+- [x] `mvn test` -> 7/7 ArchUnit Tests Passed, BUILD SUCCESS
 
 ---
 
@@ -155,52 +166,59 @@ PHONG.Occupied           ──►    TRIGGER DON PHONG   ──►    PHONG.Dir
 
 ### Sprint 4.4-A - HTTP Servlets
 
-#### Task CTL-01: `CashierPortalServlet.java` - Dashboard Thu Ngan
-- [ ] Route: GET /cashier/dashboard
-- [ ] Hien thi danh sach booking DaCheckIn, ho tro tim kiem nhanh
-- [ ] Forward toi views/cashier/cashier_dashboard.jsp
+#### Task CTL-01: `CashierDashboardServlet.java` - Dashboard Thu Ngan
+- [x] Route: GET /cashier/dashboard
+- [x] Hien thi danh sach booking can thu tien (ChuaThanhToan, MotPhan), ho tro tim kiem nhanh
+- [x] Forward toi views/cashier/cashier_dashboard.jsp
 
-#### Task CTL-02: `CashierCheckOutServlet.java`
-- [ ] GET /cashier/checkout?maBooking=BK_XXXX -> Hien thi chi tiet + preview hoa don
-- [ ] POST /cashier/checkout -> Thuc hien check-out + tao hoa don, redirect sang trang thanh toan
-- [ ] Forward toi views/cashier/checkout_invoice.jsp
+#### Task CTL-02: `CashierBookingDetailServlet.java` & `CashierCheckOutServlet.java`
+- [x] GET /cashier/booking-detail?maBooking=BK_XXXX -> Hien thi chi tiet tung phong, dich vu kem theo
+- [x] POST /cashier/checkout -> Thuc hien check-out tung phong hoac toan bo phong duoc chon
+- [x] Forward toi views/cashier/booking_detail.jsp va redirect sang /cashier/payment
 
-#### Task CTL-03: `CashierPaymentServlet.java`
-- [ ] GET /cashier/payment?maHoaDon=HD_XXXX -> Hien thi hoa don + lich su + form thanh toan
-- [ ] POST /cashier/payment -> Ghi nhan 1 dot thanh toan, redirect refresh lai trang
-- [ ] Forward toi views/cashier/payment.jsp
+#### Task CTL-03: `CashierPaymentServlet.java` & `CashierInvoiceServlet.java`
+- [x] GET /cashier/payment?maHoaDon=HD_XXXX -> Hien thi 3 khoi tai chinh (Tong, Da tra, Con thieu), khong dung icon
+- [x] POST /cashier/payment -> Ghi nhan dot thanh toan theo ca, ho tro thanh toan mot phan / toan bo
+- [x] GET /cashier/invoice?maHoaDon=HD_XXXX -> Hien thi ban in hoa don quyet toan, nhat ky thu tien cac ca, nut in
 
 ---
 
 ### Sprint 4.4-B - Giao Dien JSP
 
 #### Task UI-01: `cashier_dashboard.jsp` - Dashboard tong quan
-- [ ] 4 KPI Cards: Khach cho check-out hom nay | HD da thanh toan | Doanh thu hom nay | HD chua thanh toan
-- [ ] Bang danh sach booking DaCheckIn: Ma Booking | Ten Khach | Phong | Ngay CheckIn | Ngay Tra DK | Trang Thai HD | Hanh Dong
-- [ ] Nut [Xem HD & Tra Phong] dieu huong sang checkout_invoice.jsp
-- [ ] O tim kiem nhanh
+- [x] Thanh tim kiem nhanh theo Ten, CCCD, SDT, Ma Booking
+- [x] Bang danh sach booking can thu tien (ChuaThanhToan, MotPhan)
+- [x] Nut [Chi Tiet & Tra Phong] dieu huong sang booking_detail.jsp
+- [x] Khong su dung icon/emoji theo dung yeu cau cua User
 
-#### Task UI-02: `checkout_invoice.jsp` - Hoa don & xac nhan tra phong
-- [ ] Panel thong tin khach: Ho ten, CCCD, SDT, Email
-- [ ] Panel chi tiet phong: So phong | Loai phong | Ngay nhan TT | Ngay tra TT | So dem | Don gia/dem | Thanh tien
-- [ ] Panel dich vu phat sinh: Ten dich vu | So luong | Don gia | Thanh tien | Thoi diem goi
-- [ ] Panel tong ket: Tien phong + Tien dich vu + Phu thu (neu tra muon) = Tong tien (in dam, noi bat)
-- [ ] Nut [Xac Nhan Tra Phong & Lap Hoa Don] -> POST den Servlet
-- [ ] Canh bao mau do neu tra phong muon sau 12:00 PM
+#### Task UI-02: `booking_detail.jsp` - Chi tiet don & chon phong tra
+- [x] Panel thong tin khach hang & Doi soat tai chinh
+- [x] Bang danh sach phong voi co che checkbox rieng tung phong (ho tro multi-room khac ca)
+- [x] Bang ke dich vu phat sinh theo phong
+- [x] Form GET chuyen sang /cashier/payment (Chi Check-out dong thoi khi xac nhan thu tien theo Phuong an 2)
 
-#### Task UI-03: `payment.jsp` - Man hinh thanh toan
-- [ ] Panel hoa don (chi doc): Ma HD | Tong tien | Da thanh toan | Con lai + Progress bar
-- [ ] Form thanh toan: Input so tien + Radio group (Tien mat / The Ngan Hang / Chuyen Khoan) + Nut xac nhan
-- [ ] Bang lich su cac dot thanh toan: Thoi diem | So tien | Phuong thuc | Thu ngan
-- [ ] Khi DaThanhToanDu -> Banner xanh la "Da Thanh Toan Du" + disabled form
+#### Task UI-03: `payment_form.jsp` - Man hinh thanh toan
+- [x] 3 khoi thong ke tai chinh bat buoc: Tong tien booking, Da thanh toan, Con lai can thu
+- [x] Form thanh toan: So tien (mac dinh con thieu, co nut chon nhanh), phuong thuc thanh toan
+- [x] Bang lich su thanh toan cac ca lam viec
+- [x] Phuong an 2: Gop Tra phong & Thu tien dong thoi, co nut Huy bo an toan
+- [x] Tuyet doi khong dung icon/emoji
+
+#### Task UI-04: `invoice_detail.jsp` - Ban in hoa don quyet toan
+- [x] Tieu de khach san, thong tin booking, khach hang
+- [x] Bang ke chi tiet tien phong & bang ke dich vu
+- [x] Nhat ky giao dich thanh toan doi soat theo tung ca thu ngan
+- [x] Tong ket tai chinh & khu vuc chu ky
+- [x] Nut [In Hoa Don] (window.print()) va Print CSS an giao dien dieu huong
 
 ---
 
 **Tieu chi hoan thanh Phan 4:**
-- [ ] Ba man hinh load duoc khong loi 500
-- [ ] Luong day du: Tim booking -> Xem HD -> Xac nhan CheckOut -> Thanh Toan -> Hoan tat
-- [ ] Sau CheckOut: Phong tu dong chuyen Dirty, task NHIEMVUDOPHONG duoc tao
-- [ ] `mvn test` -> 7/7 ArchUnit Passed
+- [x] Bon man hinh hoan thanh, khong loi 500
+- [x] Luong 4 buoc chuan UX: Dashboard -> Chi tiet & Chon phong -> Thanh toan -> Hoa don
+- [x] Tuyet doi khong dung icon tren giao dien
+- [x] `mvn checkstyle:check` -> 0 violations
+- [x] `mvn test` -> 7/7 ArchUnit Passed
 
 ---
 
@@ -208,17 +226,17 @@ PHONG.Occupied           ──►    TRIGGER DON PHONG   ──►    PHONG.Dir
 
 ### Sprint 4.5-A - Data Transfer Objects
 
-#### Task DTO-01: `InvoiceDTO.java`
-- [ ] Fields: maHoaDon, maBooking, tenKhachHang, cccd, soDT, soPhong, loaiPhong
-- [ ] Fields tai chinh: soNgayThucTe, donGiaPhong, tienPhong, tienDichVu, phuThu, tongTienCuoiCung
-- [ ] Fields trang thai: trangThaiHoaDon, tongDaThanhToan, conLai
-- [ ] Collections: List<ServiceItemDTO> danhSachDichVu, List<PaymentDTO> lichSuThanhToan
+#### Task DTO-01: `InvoiceDetailDTO.java` & `InvoiceRoomItemDTO.java`
+- [x] Fields: maHoaDon, maBooking, tenKhachHang, cccd, soDT, maKH, tenNVLap, ngayLap
+- [x] Fields tai chinh: tongTienCuoiCung, daThanhToan, conThieu, trangThaiHoaDon
+- [x] Collections: List<InvoiceRoomItemDTO> rooms, List<InvoiceServiceItemDTO> services
 
-#### Task DTO-02: `ServiceItemDTO.java`
-- [ ] Fields: tenDichVu, soPhong, soLuong, donGia, thanhTien, thoiDiemGoi, nguoiGoi
+#### Task DTO-02: `InvoiceServiceItemDTO.java` & `ActiveBookingItemDTO.java`
+- [x] Fields: maBookingDichVu, maPhong, tenDichVu, soLuong, donGia, thanhTien, thoiDiemThem
+- [x] ActiveBookingItemDTO: maBooking, tenKhach, cccd, soDT, soPhongChuaTra, tongTien, soTienConNo
 
-#### Task DTO-03: `PaymentDTO.java`
-- [ ] Fields: maThanhToan, soTien, phuongThuc, thoiDiem, tenThuNgan
+#### Task DTO-03: `PaymentRecordDTO.java`, `PaymentResultDTO.java`, `CheckOutResultDTO.java`
+- [x] Fields: maThanhToan, maHoaDon, maNV, tenNV, soTien, phuongThucThanhToan, thoiDiemThanhToan
 
 ---
 
