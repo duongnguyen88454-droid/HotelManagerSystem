@@ -1,34 +1,40 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<jsp:include page="/views/common/header.jsp">
-    <jsp:param name="title" value="Bàn Làm Việc Ban Giám Đốc - Dashboard Quản Trị"/>
-</jsp:include>
-<jsp:include page="/views/common/navbar.jsp"/>
+    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+        <jsp:include page="/views/common/header.jsp">
+            <jsp:param name="title" value="Bàn Làm Việc Ban Giám Đốc - Dashboard Quản Trị" />
+        </jsp:include>
+        <jsp:include page="/views/common/navbar.jsp" />
 
-<div class="container" style="max-width: 900px; margin-top: 40px; margin-bottom: 50px;">
-    <div class="card" style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 30px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #edf2f7; padding-bottom: 15px; margin-bottom: 20px;">
-            <div>
-                <h2 style="color: #1a365d; margin: 0;">📊 TRUNG TÂM ĐIỀU HÀNH QUẢN TRỊ (DASHBOARD)</h2>
-                <p style="color: #718096; margin: 5px 0 0 0; font-size: 14px;">Báo cáo tổng hợp kinh doanh, doanh thu và tỷ lệ lấp đầy phòng</p>
+        <div class="container" style="max-width: 900px; margin-top: 40px; margin-bottom: 50px;">
+            <div class="card" style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 30px;">
+                <div
+                    style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #edf2f7; padding-bottom: 15px; margin-bottom: 20px;">
+                    <div>
+                        <h2 style="color: #1a365d; margin: 0;">📊 TRUNG TÂM ĐIỀU HÀNH QUẢN TRỊ (DASHBOARD)</h2>
+                        <p style="color: #718096; margin: 5px 0 0 0; font-size: 14px;">Báo cáo tổng hợp kinh doanh,
+                            doanh thu và tỷ lệ lấp đầy phòng</p>
+                    </div>
+                    <span class="badge"
+                        style="background: #805ad5; color: white; padding: 6px 14px; border-radius: 20px; font-weight: 600;">
+                        ${sessionScope.CURRENT_USER.role}
+                    </span>
+                </div>
+
+                <div class="alert alert-success" style="margin-bottom: 25px;">
+                    <strong>✓ Đăng nhập thành công!</strong> Xin chào Quản lý cấp cao:
+                    <strong>${sessionScope.CURRENT_USER.hoTen}</strong>
+                    (Mã NV: <code>${sessionScope.CURRENT_USER.maDinhDanh}</code>, Email:
+                    <code>${sessionScope.CURRENT_USER.email}</code>).
+                </div>
+
+                <div style="background: #f7fafc; padding: 20px; border-radius: 8px; border-left: 4px solid #805ad5;">
+                    <h4 style="color: #44337a; margin-top: 0;">Giai Đoạn 6 Chuẩn Bị Xây Dựng:</h4>
+                    <p style="color: #4a5568; line-height: 1.6; margin-bottom: 0;">
+                        Tại đây sẽ hiển thị các thẻ KPI doanh thu theo ngày/tháng/năm, tỷ lệ lấp đầy phòng (view
+                        v_TyLeLapDayPhong), biểu đồ cơ cấu nguồn thu và thống kê các dịch vụ sinh lời cao nhất.
+                    </p>
+                </div>
             </div>
-            <span class="badge" style="background: #805ad5; color: white; padding: 6px 14px; border-radius: 20px; font-weight: 600;">
-                ${sessionScope.CURRENT_USER.tenVaiTro} (${sessionScope.CURRENT_USER.maVaiTro})
-            </span>
         </div>
 
-        <div class="alert alert-success" style="margin-bottom: 25px;">
-            <strong>✓ Đăng nhập thành công!</strong> Xin chào Quản lý cấp cao: <strong>${sessionScope.CURRENT_USER.hoTen}</strong> 
-            (Mã NV: <code>${sessionScope.CURRENT_USER.maDinhDanh}</code>, Email: <code>${sessionScope.CURRENT_USER.email}</code>).
-        </div>
-
-        <div style="background: #f7fafc; padding: 20px; border-radius: 8px; border-left: 4px solid #805ad5;">
-            <h4 style="color: #44337a; margin-top: 0;">📌 Giai Đoạn 6 Chuẩn Bị Xây Dựng:</h4>
-            <p style="color: #4a5568; line-height: 1.6; margin-bottom: 0;">
-                Tại đây sẽ hiển thị các thẻ KPI doanh thu theo ngày/tháng/năm, tỷ lệ lấp đầy phòng (view v_TyLeLapDayPhong), biểu đồ cơ cấu nguồn thu và thống kê các dịch vụ sinh lời cao nhất.
-            </p>
-        </div>
-    </div>
-</div>
-
-<jsp:include page="/views/common/footer.jsp"/>
+        <jsp:include page="/views/common/footer.jsp" />

@@ -4,11 +4,11 @@ import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
 import com.mycompany.hotelmanagersystem.room.model.RoomType;
 import com.mycompany.hotelmanagersystem.room.service.RoomService;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -34,21 +34,9 @@ public class CustomerSearchRoomServlet extends HttpServlet {
             checkOut = LocalDate.now().plusDays(1).toString();
         }
 
-        // [BUG-02 FIX] Validate checkOut > checkIn trước khi query DB
         try {
-            LocalDate dateIn  = LocalDate.parse(checkIn.trim());
-            LocalDate dateOut = LocalDate.parse(checkOut.trim());
-            if (!dateOut.isAfter(dateIn)) {
-                request.setAttribute("errorMessage",
-                    "Ngày trả phòng phải sau ngày nhận phòng ít nhất 1 ngày. Vui lòng chọn lại!");
-                request.setAttribute("roomList", new java.util.ArrayList<>());
-            } else {
-                List<AvailableRoomDTO> roomList = roomService.searchRooms(checkIn, checkOut, guests, roomType);
-                request.setAttribute("roomList", roomList);
-            }
-        } catch (java.time.format.DateTimeParseException ex) {
-            request.setAttribute("errorMessage", "Định dạng ngày không hợp lệ, vui lòng chọn lại từ lịch!");
-            request.setAttribute("roomList", new java.util.ArrayList<>());
+            List<AvailableRoomDTO> roomList = roomService.searchRooms(checkIn, checkOut, guests, roomType);
+            request.setAttribute("roomList", roomList);
         } catch (IllegalArgumentException ex) {
             request.setAttribute("errorMessage", ex.getMessage());
             request.setAttribute("roomList", new java.util.ArrayList<>());
@@ -62,6 +50,6 @@ public class CustomerSearchRoomServlet extends HttpServlet {
         request.setAttribute("paramGuests", guests);
         request.setAttribute("paramRoomType", roomType);
 
-        request.getRequestDispatcher("/views/customer/room_list.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/room/room_list.jsp").forward(request, response);
     }
 }

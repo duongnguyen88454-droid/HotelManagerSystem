@@ -8,9 +8,9 @@ import com.mycompany.hotelmanagersystem.booking.dto.CartRoomItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.BookingDetailDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CustomerBookingHistoryDTO;
+import com.mycompany.hotelmanagersystem.booking.dto.SingleBookingRequestDTO;
 import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
 import com.mycompany.hotelmanagersystem.hotelservice.model.ServiceItem;
-
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -95,7 +95,7 @@ public class BookingService {
         Date checkInDate = Date.valueOf(checkInLocal);
         Date checkOutDate = Date.valueOf(checkOutLocal);
 
-        return bookingDAO.createOnlineBookingWithServices(
+        return bookingDAO.createOnlineBookingWithServices(new SingleBookingRequestDTO(
                 maKH.trim(),
                 maTaiKhoan != null ? maTaiKhoan.trim() : null,
                 maPhong.trim(),
@@ -104,7 +104,7 @@ public class BookingService {
                 donGiaPhong,
                 tongChiPhi,
                 selectedServices,
-                note);
+                note));
     }
 
     public String createBookingWithServices(String maKH, String maPhong, String checkInStr, String checkOutStr,

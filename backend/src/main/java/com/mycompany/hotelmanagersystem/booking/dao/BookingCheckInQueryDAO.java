@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * DAO chuyên trách các truy vấn đọc dữ liệu phục vụ Quầy Tiếp Đón Check-in (QT 2.1).
+ * DAO chuyên trách các truy vấn đọc dữ liệu phục vụ Quầy Tiếp Đón Check-in (QT
+ * 2.1).
  */
 public class BookingCheckInQueryDAO {
 
@@ -29,12 +30,12 @@ public class BookingCheckInQueryDAO {
     public List<CheckInArrivalItemDTO> getArrivalBookings(String hoTen, String cccd, String maBK) {
         List<CheckInArrivalItemDTO> list = new ArrayList<>();
         boolean hasHoTen = hoTen != null && !hoTen.trim().isEmpty();
-        boolean hasCccd  = cccd  != null && !cccd.trim().isEmpty();
-        boolean hasMaBK  = maBK  != null && !maBK.trim().isEmpty();
+        boolean hasCccd = cccd != null && !cccd.trim().isEmpty();
+        boolean hasMaBK = maBK != null && !maBK.trim().isEmpty();
         String sql = buildArrivalQuerySql(hasHoTen, hasCccd, hasMaBK);
 
         try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             int idx = 1;
             if (hasHoTen) {
@@ -60,26 +61,26 @@ public class BookingCheckInQueryDAO {
 
     private String buildArrivalQuerySql(boolean hasHoTen, boolean hasCccd, boolean hasMaBK) {
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT b.MaBooking, kh.HoTen, kh.SoDT, kh.CCCD, ");
-        sb.append("       MIN(bp.NgayNhanDuKien) AS NgayNhan, MAX(bp.NgayTraDuKien) AS NgayTra, ");
-        sb.append("       COUNT(bp.MaPhong) AS TongSoPhong, ");
-        sb.append("       COUNT(CASE WHEN bp.NgayCheckInThucTe IS NOT NULL THEN 1 END) AS SoPhongDaNhan ");
-        sb.append("FROM BOOKING b ");
-        sb.append("INNER JOIN KHACHHANG kh ON b.MaKH = kh.MaKH ");
-        sb.append("INNER JOIN BOOKING_PHONG bp ON b.MaBooking = bp.MaBooking ");
-        sb.append("WHERE b.TrangThai IN ('DaXacNhan', 'DaCheckIn') ");
+        sb.append("SELECT b.BookingId AS MaBooking, c.FullName AS HoTen, c.PhoneNumber AS SoDT, c.CCCD, ");
+        sb.append("       MIN(br.ExpectedCheckInDate) AS NgayNhan, MAX(br.ExpectedCheckOutDate) AS NgayTra, ");
+        sb.append("       COUNT(br.RoomId) AS TongSoPhong, ");
+        sb.append("       COUNT(CASE WHEN br.ActualCheckInDate IS NOT NULL THEN 1 END) AS SoPhongDaNhan ");
+        sb.append("FROM Booking b ");
+        sb.append("INNER JOIN Customer c ON b.CustomerId = c.CustomerId ");
+        sb.append("INNER JOIN Booking_Room br ON b.BookingId = br.BookingId ");
+        sb.append("WHERE br.BookingStatus IN ('Confirmed', 'CheckedIn') ");
         // Bộ lọc độc lập: HoTen (LIKE), CCCD (khớp chính xác), MaBooking (LIKE)
         if (hasHoTen) {
-            sb.append("AND kh.HoTen LIKE ? ");
+            sb.append("AND c.FullName LIKE ? ");
         }
         if (hasCccd) {
-            sb.append("AND kh.CCCD = ? ");
+            sb.append("AND c.CCCD = ? ");
         }
         if (hasMaBK) {
-            sb.append("AND b.MaBooking LIKE ? ");
+            sb.append("AND b.BookingId LIKE ? ");
         }
-        sb.append("GROUP BY b.MaBooking, kh.HoTen, kh.SoDT, kh.CCCD ");
-        sb.append("ORDER BY MIN(bp.NgayNhanDuKien) ASC, b.MaBooking ASC");
+        sb.append("GROUP BY b.BookingId, c.FullName, c.PhoneNumber, c.CCCD ");
+        sb.append("ORDER BY MIN(br.ExpectedCheckInDate) ASC, b.BookingId ASC");
         return sb.toString();
     }
 
@@ -97,12 +98,12 @@ public class BookingCheckInQueryDAO {
                 inDate,
                 outDate,
                 rs.getInt("TongSoPhong"),
-                rs.getInt("SoPhongDaNhan")
-        );
+                rs.getInt("SoPhongDaNhan"));
     }
 
     /**
-     * Lấy thông tin chi tiết một đơn đặt phòng kèm các phòng và dịch vụ đã đặt trước.
+     * Lấy thông tin chi tiết một đơn đặt phòng kèm các phòng và dịch vụ đã đặt
+     * trước.
      */
     public CheckInDetailDTO getBookingCheckInDetail(String maBooking) {
         if (maBooking == null || maBooking.trim().isEmpty()) {
@@ -132,13 +133,13 @@ public class BookingCheckInQueryDAO {
     }
 
     private CheckInDetailDTO fetchBookingHeader(Connection conn, String maBooking) throws SQLException {
-        String sql = "SELECT b.MaBooking, kh.HoTen, kh.SoDT, kh.CCCD, kh.Email, "
-                   + "       MIN(bp.NgayNhanDuKien) AS NgayNhan, MAX(bp.NgayTraDuKien) AS NgayTra "
-                   + "FROM BOOKING b "
-                   + "INNER JOIN KHACHHANG kh ON b.MaKH = kh.MaKH "
-                   + "INNER JOIN BOOKING_PHONG bp ON b.MaBooking = bp.MaBooking "
-                   + "WHERE b.MaBooking = ? "
-                   + "GROUP BY b.MaBooking, kh.HoTen, kh.SoDT, kh.CCCD, kh.Email";
+        String sql = "SELECT b.BookingId AS MaBooking, c.FullName AS HoTen, c.PhoneNumber AS SoDT, c.CCCD, c.Email, "
+                + "       MIN(br.ExpectedCheckInDate) AS NgayNhan, MAX(br.ExpectedCheckOutDate) AS NgayTra "
+                + "FROM Booking b "
+                + "INNER JOIN Customer c ON b.CustomerId = c.CustomerId "
+                + "INNER JOIN Booking_Room br ON b.BookingId = br.BookingId "
+                + "WHERE b.BookingId = ? "
+                + "GROUP BY b.BookingId, c.FullName, c.PhoneNumber, c.CCCD, c.Email";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maBooking);
@@ -153,8 +154,7 @@ public class BookingCheckInQueryDAO {
                             rs.getString("CCCD"),
                             rs.getString("Email"),
                             inSql != null ? inSql.toLocalDate() : null,
-                            outSql != null ? outSql.toLocalDate() : null
-                    );
+                            outSql != null ? outSql.toLocalDate() : null);
                 }
             }
         }
@@ -164,13 +164,13 @@ public class BookingCheckInQueryDAO {
     private List<CheckInRoomDetailDTO> fetchRoomsForBooking(Connection conn, String maBooking)
             throws SQLException {
         List<CheckInRoomDetailDTO> rooms = new ArrayList<>();
-        String sql = "SELECT bp.MaPhong, p.SoPhong, lp.TenLoaiPhong, p.TrangThai AS TrangThaiBuong, "
-                   + "       bp.NgayCheckInThucTe "
-                   + "FROM BOOKING_PHONG bp "
-                   + "INNER JOIN PHONG p ON bp.MaPhong = p.MaPhong "
-                   + "INNER JOIN LOAIPHONG lp ON p.MaLoaiPhong = lp.MaLoaiPhong "
-                   + "WHERE bp.MaBooking = ? "
-                   + "ORDER BY p.SoPhong ASC";
+        String sql = "SELECT br.RoomId AS MaPhong, r.RoomName AS SoPhong, rt.RoomTypeName AS TenLoaiPhong, "
+                + "       r.HousekeepingStatus AS TrangThaiBuong, br.ActualCheckInDate AS NgayCheckInThucTe "
+                + "FROM Booking_Room br "
+                + "INNER JOIN Room r ON br.RoomId = r.RoomId "
+                + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
+                + "WHERE br.BookingId = ? "
+                + "ORDER BY r.RoomName ASC";
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -185,8 +185,7 @@ public class BookingCheckInQueryDAO {
                             rs.getString("SoPhong"),
                             rs.getString("TenLoaiPhong"),
                             rs.getString("TrangThaiBuong"),
-                            actualInStr
-                    ));
+                            actualInStr));
                 }
             }
         }
@@ -196,11 +195,11 @@ public class BookingCheckInQueryDAO {
     private Map<String, List<String>> fetchServicesByRoom(Connection conn, String maBooking)
             throws SQLException {
         Map<String, List<String>> map = new HashMap<>();
-        String sql = "SELECT bdv.MaPhong, dv.TenDichVu, bdv.SoLuong "
-                   + "FROM BOOKING_DICHVU bdv "
-                   + "INNER JOIN DICHVU dv ON bdv.MaDichVu = dv.MaDichVu "
-                   + "WHERE bdv.MaBooking = ? "
-                   + "ORDER BY bdv.MaPhong ASC, dv.TenDichVu ASC";
+        String sql = "SELECT brs.RoomId AS MaPhong, s.ServiceName AS TenDichVu, brs.Quantity AS SoLuong "
+                + "FROM Booking_Room_Service brs "
+                + "INNER JOIN Service s ON brs.ServiceId = s.ServiceId "
+                + "WHERE brs.BookingId = ? "
+                + "ORDER BY brs.RoomId ASC, s.ServiceName ASC";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maBooking);

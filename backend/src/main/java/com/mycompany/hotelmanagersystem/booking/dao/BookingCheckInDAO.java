@@ -27,16 +27,17 @@ public class BookingCheckInDAO {
      */
     public List<BookingBarDTO> getBookingBarsInWeek(LocalDate startDate, LocalDate endDate) {
         List<BookingBarDTO> list = new ArrayList<>();
-        String sql = "SELECT bp.MaBooking, bp.MaPhong, kh.HoTen AS TenKhachHang, kh.SoDT AS SoDienThoai, kh.CCCD AS SoCCCD, "
-                + "       bp.NgayNhanDuKien, bp.NgayTraDuKien, b.TrangThai AS TrangThaiBooking, "
-                + "       bp.NgayCheckInThucTe, bp.NgayCheckOutThucTe "
-                + "FROM BOOKING_PHONG bp "
-                + "INNER JOIN BOOKING b ON bp.MaBooking = b.MaBooking "
-                + "INNER JOIN KHACHHANG kh ON b.MaKH = kh.MaKH "
-                + "WHERE b.TrangThai IN ('DaXacNhan', 'DaCheckIn') "
-                + "  AND bp.NgayNhanDuKien <= ? "
-                + "  AND bp.NgayTraDuKien >= ? "
-                + "ORDER BY bp.NgayNhanDuKien ASC";
+        String sql = "SELECT br.BookingId AS MaBooking, br.RoomId AS MaPhong, c.FullName AS TenKhachHang, "
+                + "       c.PhoneNumber AS SoDienThoai, c.CCCD AS SoCCCD, br.ExpectedCheckInDate AS NgayNhanDuKien, "
+                + "       br.ExpectedCheckOutDate AS NgayTraDuKien, br.BookingStatus AS TrangThaiBooking, "
+                + "       br.ActualCheckInDate AS NgayCheckInThucTe, br.ActualCheckOutDate AS NgayCheckOutThucTe "
+                + "FROM Booking_Room br "
+                + "INNER JOIN Booking b ON br.BookingId = b.BookingId "
+                + "INNER JOIN Customer c ON b.CustomerId = c.CustomerId "
+                + "WHERE br.BookingStatus IN ('Confirmed', 'CheckedIn') "
+                + "  AND br.ExpectedCheckInDate <= ? "
+                + "  AND br.ExpectedCheckOutDate >= ? "
+                + "ORDER BY br.ExpectedCheckInDate ASC";
 
         try (Connection conn = DBContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -70,7 +71,7 @@ public class BookingCheckInDAO {
         int colSpan = Math.max(1, Math.min(maxAllowedSpan, endCol - startCol + 1));
 
         String status = rs.getString("TrangThaiBooking");
-        String cssClass = "DaCheckIn".equalsIgnoreCase(status) ? "bar-occupied" : "bar-confirmed";
+        String cssClass = ("CheckedIn".equalsIgnoreCase(status) || "DaCheckIn".equalsIgnoreCase(status)) ? "bar-occupied" : "bar-confirmed";
 
         BookingBarDTO bar = new BookingBarDTO(
                 rs.getString("MaBooking"),
@@ -93,11 +94,10 @@ public class BookingCheckInDAO {
      * Kiểm tra điều kiện đơn đặt phòng và phòng có hợp lệ để Check-in.
      */
     public boolean isBookingEligibleForCheckIn(String maBooking, String maPhong) {
-        String sql = "SELECT 1 FROM BOOKING b "
-                + "INNER JOIN BOOKING_PHONG bp ON b.MaBooking = bp.MaBooking "
-                + "WHERE b.MaBooking = ? AND bp.MaPhong = ? "
-                + "  AND b.TrangThai IN ('DaXacNhan', 'DaCheckIn') "
-                + "  AND bp.NgayCheckInThucTe IS NULL";
+        String sql = "SELECT 1 FROM Booking_Room br "
+                + "WHERE br.BookingId = ? AND br.RoomId = ? "
+                + "  AND br.BookingStatus = 'Confirmed' "
+                + "  AND br.ActualCheckInDate IS NULL";
 
         try (Connection conn = DBContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -118,14 +118,13 @@ public class BookingCheckInDAO {
      * Thực hiện Check-in nhận phòng qua Stored Procedure sp_CheckInNhanPhong.
      */
     public boolean executeCheckIn(String maBooking, String maPhong, String maNV) {
-        String callSql = "{CALL sp_CheckInNhanPhong(?, ?, ?)}";
+        String callSql = "{CALL sp_CheckInNhanPhong(?, ?)}";
 
         try (Connection conn = DBContext.getConnection();
                 CallableStatement cs = conn.prepareCall(callSql)) {
 
             cs.setString(1, maBooking);
-            cs.setString(2, maNV);
-            cs.setString(3, maPhong);
+            cs.setString(2, maPhong);
 
             cs.execute();
             return true;
@@ -145,10 +144,9 @@ public class BookingCheckInDAO {
      * Fallback transaction nếu SP có vấn đề kết nối: đảm bảo cập nhật đồng bộ CSDL.
      */
     private boolean executeCheckInFallback(String maBooking, String maPhong, String maNV) {
-        String updateBp = "UPDATE BOOKING_PHONG SET NgayCheckInThucTe = GETDATE() "
-                + "WHERE MaBooking = ? AND MaPhong = ? AND NgayCheckInThucTe IS NULL";
-        String updateB = "UPDATE BOOKING SET TrangThai = 'DaCheckIn', MaNV = ? WHERE MaBooking = ?";
-        String updateP = "UPDATE PHONG SET TrangThai = 'Occupied' WHERE MaPhong = ?";
+        String updateBp = "UPDATE Booking_Room SET ActualCheckInDate = GETDATE(), BookingStatus = 'CheckedIn' "
+                + "WHERE BookingId = ? AND RoomId = ? AND ActualCheckInDate IS NULL";
+        String updateP = "UPDATE Room SET OccupancyStatus = 'Occupied' WHERE RoomId = ?";
 
         Connection conn = null;
         try {
@@ -156,7 +154,6 @@ public class BookingCheckInDAO {
             conn.setAutoCommit(false);
 
             try (PreparedStatement psBp = conn.prepareStatement(updateBp);
-                    PreparedStatement psB = conn.prepareStatement(updateB);
                     PreparedStatement psP = conn.prepareStatement(updateP)) {
 
                 psBp.setString(1, maBooking);
@@ -166,10 +163,6 @@ public class BookingCheckInDAO {
                     conn.rollback();
                     return false;
                 }
-
-                psB.setString(1, maNV);
-                psB.setString(2, maBooking);
-                psB.executeUpdate();
 
                 psP.setString(1, maPhong);
                 psP.executeUpdate();

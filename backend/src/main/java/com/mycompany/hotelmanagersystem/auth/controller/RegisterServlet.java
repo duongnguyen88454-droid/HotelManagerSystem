@@ -2,11 +2,11 @@ package com.mycompany.hotelmanagersystem.auth.controller;
 
 import com.mycompany.hotelmanagersystem.auth.service.AuthService;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet(name = "RegisterServlet", urlPatterns = {"/register"})
@@ -21,7 +21,7 @@ public class RegisterServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/views/common/register.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/auth/register.jsp").forward(request, response);
     }
 
     @Override
@@ -38,13 +38,13 @@ public class RegisterServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/login?msg=register_success");
             } else {
                 request.setAttribute("errorMessage", "Đăng ký không thành công. Vui lòng thử lại!");
-                request.getRequestDispatcher("/views/common/register.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/auth/register.jsp").forward(request, response);
             }
         } catch (Exception ex) {
             request.setAttribute("errorMessage", ex.getMessage());
             request.setAttribute("oldHoTen", hoTen);
             request.setAttribute("oldEmail", email);
-            request.getRequestDispatcher("/views/common/register.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/auth/register.jsp").forward(request, response);
         }
     }
 }

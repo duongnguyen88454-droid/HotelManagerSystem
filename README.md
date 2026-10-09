@@ -8,11 +8,12 @@
 
 ## 1. CÔNG NGHỆ SỬ DỤNG (TECH STACK)
 
-* **Backend:** Java 8, Jakarta EE 8 (Servlet 4.0, Filter, JSP, JSTL 1.2).
-* **Database:** Microsoft SQL Server 2019/2022 (14 bảng, Stored Procedure, Function, Trigger, Index).
+* **Backend:** Java 17, Jakarta EE 10 (Servlet 6.0, Filter, JSP, JSTL 3.0).
+* **Database:** Microsoft SQL Server 2019/2022 (16 bảng, Stored Procedure, Function, Trigger, Index).
 * **Database Access:** JDBC thuần (Driver `mssql-jdbc-9.4.1.jre8`) kết nối qua connection pool tùy biến trong `DBContext`.
 * **Frontend:** JSP, JSTL, CSS thuần Responsive (Zero-Icon-Font, Zero-Emoji trên giao diện nhân viên chuyên nghiệp).
 * **Build Tool:** Apache Maven (Packaging WAR).
+* **Web Server:** Apache Tomcat 10.1.x (khuyến nghị phiên bản 10.1.60+).
 
 ---
 
@@ -82,7 +83,7 @@ mvn clean package
 Tệp WAR đóng gói hoàn chỉnh sẽ được tạo tại: `target/HotelManagerSystem-1.0-SNAPSHOT.war`.
 
 ### 3.3. Triển khai & Chạy Ứng dụng
-* Triển khai tệp `.war` lên máy chủ Apache Tomcat (phiên bản 8.5 hoặc 9.0).
+* Triển khai tệp `.war` lên máy chủ Apache Tomcat (phiên bản 10.1.x, sao chép vào thư mục `webapps/`).
 * Mở trình duyệt và truy cập: `http://localhost:8080/HotelManagerSystem/`.
 
 ---

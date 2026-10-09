@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <nav class="navbar"
     style="background: #1a365d; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; color: white;">
@@ -62,7 +62,7 @@
                 <span style="color: #feebc8; font-weight: 600;">
                     ${sessionScope.CURRENT_USER.hoTen}
                     <span style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; margin-left: 4px;">
-                        ${sessionScope.CURRENT_USER.tenVaiTro}
+                        ${sessionScope.CURRENT_USER.role}
                     </span>
                 </span>
                 <a href="${pageContext.request.contextPath}/logout"

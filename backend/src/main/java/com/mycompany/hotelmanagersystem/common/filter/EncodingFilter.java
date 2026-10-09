@@ -1,13 +1,14 @@
 package com.mycompany.hotelmanagersystem.common.filter;
 
 import java.io.IOException;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * EncodingFilter - Tự động ép toàn bộ Request & Response sang UTF-8.
@@ -29,7 +30,15 @@ public class EncodingFilter implements Filter {
         // Ép mã hóa UTF-8 cho cả chiều gửi lên và chiều phản hồi về
         request.setCharacterEncoding(ENCODING);
         response.setCharacterEncoding(ENCODING);
-        response.setContentType("text/html;charset=UTF-8");
+
+        if (request instanceof HttpServletRequest) {
+            HttpServletRequest httpRequest = (HttpServletRequest) request;
+            String path = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
+            // Chỉ ép Content-Type text/html cho trang động, không đè lên tài nguyên tĩnh (/assets/)
+            if (!path.startsWith("/assets/")) {
+                response.setContentType("text/html;charset=UTF-8");
+            }
+        }
         
         // Chuyển tiếp request đến Servlet / JSP tiếp theo
         chain.doFilter(request, response);

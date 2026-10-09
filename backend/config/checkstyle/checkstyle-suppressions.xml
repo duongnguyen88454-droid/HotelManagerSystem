@@ -18,11 +18,7 @@
   <!-- Hằng số miễn trừ vĩnh viễn: lớp dữ liệu thuần (getter/setter, constructor đầy đủ) -->
   <suppress checks="MethodCount|ParameterNumber" files="[\\/](dto|model)[\\/]"/>
 
-  <!-- ===== NỢ 1: BookingDAO - "god class" (697 dòng, 30 method, 4 trách nhiệm). Kế hoạch tách: QT 2.3 ===== -->
-  <suppress checks="FileLength"       files="BookingDAO\.java"/>
-  <suppress checks="MethodCount"      files="BookingDAO\.java" lines="29"/>
-  <suppress checks="ParameterNumber"  files="BookingDAO\.java" lines="39"/>   <!-- createOnlineBookingWithServices: 9 tham số -->
-  <suppress checks="ParameterNumber"  files="BookingDAO\.java" lines="375"/>  <!-- insertSingleBookingService: 7 tham số -->
+  <!-- ===== NỢ 1 ĐÃ HOÀN TẤT: BookingDAO đã tách thành 4 lớp độc lập (BookingDAO, BookingDichVuDAO, BookingQueryDAO, InvoiceWriter) theo QT 2.3 ===== -->
 
   <!-- ===== NỢ 2: BookingService - quá lớn, quá nhiều overload, dùng java.sql.Date ===== -->
   <suppress checks="FileLength"           files="BookingService\.java"/>
@@ -31,7 +27,6 @@
   <suppress checks="MethodLength"         files="BookingService\.java" message="createBookingWithServices"/>
   <suppress checks="CyclomaticComplexity" files="BookingService\.java" lines="172"/>  <!-- getBookingDetail: độ phức tạp 17 -->
   <suppress checks="ImportControl"        files="BookingService\.java" message="java\.sql\.Date"/>
-  <suppress checks="ImportControl"        files="RoomService\.java"    message="java\.sql\.Date"/>
 
   <!-- ===== NỢ 3: Controller chứa nghiệp vụ (method quá dài/phức tạp) ===== -->
   <suppress checks="CyclomaticComplexity" files="CustomerBookingServlet\.java" lines="34"/>   <!-- doGet: 17 -->
@@ -41,8 +36,5 @@
   <!-- ===== NỢ 4: Controller gọi thẳng DAO (bỏ qua service) ===== -->
   <suppress checks="ImportControl" files="CustomerBookingServlet\.java"     message="CustomerDAO"/>
   <suppress checks="ImportControl" files="ReceptionistPortalServlet\.java"  message="RoomDAO"/>
-
-  <!-- ===== NỢ 5: DAO có method quá dài/phức tạp ===== -->
-  <suppress checks="MethodLength"         files="RoomDAO\.java"     message="searchAvailableRooms"/>
 
 </suppressions>

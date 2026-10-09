@@ -7,7 +7,7 @@ public class Account implements Serializable {
 
     private String maTaiKhoan;
     private String matKhau;
-    private String maVaiTro;
+    private String role; // 'Customer', 'Receptionist', 'Housekeeper', 'Manager'
     private String trangThai; // 'Active', 'Locked'
     private String hoTenTaiKhoan;
     private String email;
@@ -15,21 +15,21 @@ public class Account implements Serializable {
     public Account() {
     }
 
-    public Account(String maTaiKhoan, String matKhau, String maVaiTro, String trangThai, String hoTenTaiKhoan, String email) {
+    public Account(String maTaiKhoan, String matKhau, String role, String trangThai, String hoTenTaiKhoan, String email) {
         this.maTaiKhoan = maTaiKhoan;
         this.matKhau = matKhau;
-        this.maVaiTro = maVaiTro;
+        this.role = role;
         this.trangThai = trangThai;
         this.hoTenTaiKhoan = hoTenTaiKhoan;
         this.email = email;
     }
 
     // Constructor cũ tương thích ngược (nếu cần)
-    public Account(String maTaiKhoan, String email, String matKhau, String maVaiTro, String trangThai) {
+    public Account(String maTaiKhoan, String email, String matKhau, String role, String trangThai) {
         this.maTaiKhoan = maTaiKhoan;
         this.email = email;
         this.matKhau = matKhau;
-        this.maVaiTro = maVaiTro;
+        this.role = role;
         this.trangThai = trangThai;
     }
 
@@ -49,12 +49,12 @@ public class Account implements Serializable {
         this.matKhau = matKhau;
     }
 
-    public String getMaVaiTro() {
-        return maVaiTro;
+    public String getRole() {
+        return role;
     }
 
-    public void setMaVaiTro(String maVaiTro) {
-        this.maVaiTro = maVaiTro;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getTrangThai() {

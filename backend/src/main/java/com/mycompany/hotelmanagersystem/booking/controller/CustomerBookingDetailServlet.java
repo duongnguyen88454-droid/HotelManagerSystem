@@ -5,12 +5,12 @@ import com.mycompany.hotelmanagersystem.booking.dto.BookingDetailDTO;
 import com.mycompany.hotelmanagersystem.hotelservice.model.ServiceItem;
 import com.mycompany.hotelmanagersystem.booking.service.BookingService;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
@@ -53,7 +53,7 @@ public class CustomerBookingDetailServlet extends HttpServlet {
             request.setAttribute("bookingDetail", bookingDetail);
             request.setAttribute("activeServices", activeServices);
 
-            request.getRequestDispatcher("/views/customer/booking_detail.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/booking/booking_detail.jsp").forward(request, response);
         } catch (SecurityException ex) {
             response.sendRedirect(request.getContextPath() + "/customer/history?error=access_denied");
         }

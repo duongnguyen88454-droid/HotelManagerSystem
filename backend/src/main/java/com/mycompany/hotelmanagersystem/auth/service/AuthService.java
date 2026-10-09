@@ -43,18 +43,18 @@ public class AuthService {
     /**
      * Xác định URL đích theo vai trò sau khi đăng nhập thành công
      */
-    public String getRedirectUrlByRole(String contextPath, String maVaiTro) {
-        if (maVaiTro == null) {
+    public String getRedirectUrlByRole(String contextPath, String role) {
+        if (role == null) {
             return contextPath + "/index.jsp";
         }
-        switch (maVaiTro.toUpperCase()) {
-            case "VT01": // Khách hàng
+        switch (role.toUpperCase()) {
+            case "CUSTOMER":
                 return contextPath + "/customer/home";
-            case "VT02": // Lễ tân
+            case "RECEPTIONIST":
                 return contextPath + "/receptionist/room-map";
-            case "VT03": // Buồng phòng
+            case "HOUSEKEEPER":
                 return contextPath + "/housekeeper/tasks";
-            case "VT04": // Quản lý
+            case "MANAGER":
                 return contextPath + "/manager/dashboard";
             default:
                 return contextPath + "/index.jsp";
@@ -94,31 +94,10 @@ public class AuthService {
         // Băm mật khẩu bằng thuật toán SHA-256 trước khi lưu vào CSDL
         String hashedPassword = PasswordUtil.hashPassword(password);
 
-        // Lưu tài khoản chuẩn đúng 6 thuộc tính vào bảng TAIKHOAN:
-        // MaTaiKhoan, MatKhau, MaVaiTro, TrangThai, HoTenTaiKhoan, Email
-        Account tk = new Account(maTaiKhoan, hashedPassword, "VT01", "Active", hoTen.trim(), email.trim());
+        // Lưu tài khoản chuẩn đúng 6 thuộc tính vào bảng Account:
+        // AccountId, Password, Role, AccountStatus, UserName, Email
+        Account tk = new Account(maTaiKhoan, hashedPassword, "Customer", "Active", hoTen.trim(), email.trim());
 
         return accountDAO.registerAccount(tk);
-    }
-
-    /**
-     * Tương thích ngược: Đăng ký tài khoản (bỏ qua soDT vì TAIKHOAN chỉ lưu 6 thuộc
-     * tính chuẩn)
-     */
-    public boolean register(String hoTen, String email, String soDT, String password, String confirmPassword)
-            throws Exception {
-        return register(hoTen, email, password, confirmPassword);
-    }
-
-    /**
-     * Kiểm tra tính hợp lệ của số CCCD theo quy chuẩn Nhà nước Việt Nam:
-     * - Bắt buộc đúng 12 ký tự chữ số [0-9]
-     * - Được sử dụng khi khách hàng check-in tại quầy hoặc cập nhật hồ sơ cá nhân
-     */
-    public boolean validateCccd(String cccd) {
-        if (cccd == null || cccd.trim().isEmpty()) {
-            return false;
-        }
-        return cccd.trim().matches("^[0-9]{12}$");
     }
 }

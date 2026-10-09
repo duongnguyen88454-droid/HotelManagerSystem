@@ -11,13 +11,13 @@ import com.mycompany.hotelmanagersystem.customer.service.CustomerService;
 import com.mycompany.hotelmanagersystem.booking.service.BookingService;
 import com.mycompany.hotelmanagersystem.room.service.RoomService;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -86,7 +86,7 @@ public class CustomerBookingServlet extends HttpServlet {
         request.setAttribute("paramCheckIn", checkIn);
         request.setAttribute("paramCheckOut", checkOut);
 
-        request.getRequestDispatcher("/views/customer/booking_form.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/booking/booking_form.jsp").forward(request, response);
     }
 
     @Override

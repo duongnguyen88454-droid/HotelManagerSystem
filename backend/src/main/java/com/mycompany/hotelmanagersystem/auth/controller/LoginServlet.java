@@ -3,12 +3,12 @@ package com.mycompany.hotelmanagersystem.auth.controller;
 import com.mycompany.hotelmanagersystem.auth.dto.UserSessionDTO;
 import com.mycompany.hotelmanagersystem.auth.service.AuthService;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
@@ -26,12 +26,12 @@ public class LoginServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("CURRENT_USER") != null) {
             UserSessionDTO currentUser = (UserSessionDTO) session.getAttribute("CURRENT_USER");
-            String redirectUrl = authService.getRedirectUrlByRole(request.getContextPath(), currentUser.getMaVaiTro());
+            String redirectUrl = authService.getRedirectUrlByRole(request.getContextPath(), currentUser.getRole());
             response.sendRedirect(redirectUrl);
             return;
         }
 
-        request.getRequestDispatcher("/views/common/login.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
     }
 
     @Override
@@ -50,15 +50,19 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("CURRENT_USER", user);
 
             if (redirectTarget != null && !redirectTarget.trim().isEmpty() && !redirectTarget.contains("/login")) {
-                response.sendRedirect(redirectTarget);
+                String target = redirectTarget.trim();
+                String finalUrl = target.startsWith(request.getContextPath())
+                        ? target
+                        : request.getContextPath() + (target.startsWith("/") ? target : "/" + target);
+                response.sendRedirect(finalUrl);
             } else {
-                String redirectUrl = authService.getRedirectUrlByRole(request.getContextPath(), user.getMaVaiTro());
+                String redirectUrl = authService.getRedirectUrlByRole(request.getContextPath(), user.getRole());
                 response.sendRedirect(redirectUrl);
             }
         } catch (Exception ex) {
             request.setAttribute("errorMessage", ex.getMessage());
             request.setAttribute("oldIdentifier", loginIdentifier);
-            request.getRequestDispatcher("/views/common/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
         }
     }
 }

@@ -3,11 +3,11 @@ package com.mycompany.hotelmanagersystem.room.controller;
 import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
 import com.mycompany.hotelmanagersystem.room.service.RoomService;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -26,19 +26,12 @@ public class CustomerRoomDetailServlet extends HttpServlet {
         String checkIn = request.getParameter("checkIn");
         String checkOut = request.getParameter("checkOut");
 
-        if (checkIn == null || checkIn.trim().isEmpty()) {
-            checkIn = LocalDate.now().toString();
-        }
-        if (checkOut == null || checkOut.trim().isEmpty()) {
-            checkOut = LocalDate.now().plusDays(1).toString();
-        }
-
         try {
             AvailableRoomDTO room = roomService.getRoomBookingDetail(maPhong, checkIn, checkOut);
             request.setAttribute("room", room);
-            request.setAttribute("paramCheckIn", checkIn);
-            request.setAttribute("paramCheckOut", checkOut);
-            request.getRequestDispatcher("/views/customer/room_detail.jsp").forward(request, response);
+            request.setAttribute("paramCheckIn", (checkIn != null && !checkIn.trim().isEmpty()) ? checkIn.trim() : LocalDate.now().toString());
+            request.setAttribute("paramCheckOut", (checkOut != null && !checkOut.trim().isEmpty()) ? checkOut.trim() : LocalDate.now().plusDays(1).toString());
+            request.getRequestDispatcher("/views/room/room_detail.jsp").forward(request, response);
         } catch (IllegalArgumentException ex) {
             response.sendRedirect(request.getContextPath() + "/customer/search-rooms?error="
                     + java.net.URLEncoder.encode(ex.getMessage(), "UTF-8"));

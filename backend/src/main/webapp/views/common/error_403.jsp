@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" isErrorPage="true" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <jsp:include page="header.jsp">
     <jsp:param name="title" value="403 - Quyền Truy Cập Bị Từ Chối"/>
 </jsp:include>
@@ -14,7 +14,7 @@
             <code style="background: #edf2f7; padding: 4px 8px; border-radius: 4px; color: #e53e3e;">${deniedPath}</code>
         </p>
         <p style="color: #718096; font-size: 14px; margin-top: 8px;">
-            Vai trò hiện tại của bạn là: <strong>${sessionScope.CURRENT_USER.tenVaiTro}</strong> (${sessionScope.CURRENT_USER.maVaiTro}).
+            Vai trò hiện tại của bạn là: <strong>${sessionScope.CURRENT_USER.role}</strong>.
         </p>
         <div style="margin-top: 24px;">
             <a href="${pageContext.request.contextPath}/index.jsp" class="btn btn-primary" 

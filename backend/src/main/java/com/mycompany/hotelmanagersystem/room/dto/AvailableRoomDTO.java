@@ -163,4 +163,11 @@ public class AvailableRoomDTO implements Serializable {
     public void setHinhAnhMinhHoa(String hinhAnhMinhHoa) {
         this.hinhAnhMinhHoa = hinhAnhMinhHoa;
     }
+
+    public String[] getDanhSachTienNghi() {
+        if (moTaPhong == null || moTaPhong.trim().isEmpty()) {
+            return new String[0];
+        }
+        return moTaPhong.split(",\\s*");
+    }
 }

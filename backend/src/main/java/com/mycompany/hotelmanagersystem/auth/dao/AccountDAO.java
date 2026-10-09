@@ -2,7 +2,6 @@ package com.mycompany.hotelmanagersystem.auth.dao;
 
 import com.mycompany.hotelmanagersystem.auth.dto.UserSessionDTO;
 import com.mycompany.hotelmanagersystem.auth.model.Account;
-import com.mycompany.hotelmanagersystem.customer.model.Customer;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 import com.mycompany.hotelmanagersystem.auth.util.PasswordUtil;
 
@@ -13,51 +12,51 @@ import java.sql.SQLException;
 
 /**
  * Data Access Object phụ trách xác thực và quản lý tài khoản người dùng
+ * Đồng bộ chuẩn 3NF: Bảng Account, Employee và Function dbo.fn_SinhMaAccount()
  */
 public class AccountDAO {
-
-    /**
-     * Xác thực thông tin đăng nhập:
-     * - Đăng nhập bằng đúng EMAIL và MẬT KHẨU tồn tại trong bảng TAIKHOAN.
-     * - Đồng bộ với CSDL chuẩn 3NF: TAIKHOAN có 6 thuộc tính (HoTenTaiKhoan, Email trực tiếp).
-     * - Xác thực mật khẩu mã hóa SHA-256 (kèm Fallback cho mật khẩu seed '1234').
-     */
-    public UserSessionDTO checkLogin(String email, String password) {
-        if (email == null || email.trim().isEmpty() || password == null) {
+    public UserSessionDTO checkLogin(String identifier, String password) {
+        if (identifier == null || identifier.trim().isEmpty() || password == null) {
             return null;
         }
 
-        // Lưu ý: KHACHHANG không còn cột MaTaiKhoan sau khi chuẩn hóa 3NF.
-        // SoDT và MaDinhDanh của khách hàng được tra cứu riêng qua CustomerDAO khi cần.
-        String sql = "SELECT tk.MaTaiKhoan, tk.MatKhau, tk.MaVaiTro, vt.TenVaiTro, tk.TrangThai, "
-                + "COALESCE(tk.HoTenTaiKhoan, N'Người Dùng') AS HoTen, "
-                + "tk.Email, "
-                + "COALESCE(nv.SoDienThoai, '') AS SoDT, "
-                + "COALESCE(nv.MaNV, '') AS MaDinhDanh "
-                + "FROM TAIKHOAN tk "
-                + "JOIN VAITRO vt ON tk.MaVaiTro = vt.MaVaiTro "
-                + "LEFT JOIN NHANVIEN nv ON tk.MaTaiKhoan = nv.MaTaiKhoan "
-                + "WHERE tk.Email = ?";
+        String sql = "SELECT acc.AccountId, acc.Password, acc.Role, acc.AccountStatus, "
+                + "acc.Email, acc.UserName, "
+                + "emp.FullName AS EmpFullName, emp.Phone AS EmpPhone, emp.EmployeeId "
+                + "FROM Account acc "
+                + "LEFT JOIN Employee emp ON acc.AccountId = emp.AccountId "
+                + "WHERE acc.Email = ? OR acc.UserName = ?";
 
         try (Connection conn = DBContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, email.trim());
+            String cleanIdentifier = identifier.trim();
+            ps.setString(1, cleanIdentifier);
+            ps.setString(2, cleanIdentifier);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    String storedPassword = rs.getString("MatKhau");
-                    // Xác thực mật khẩu qua PasswordUtil (hỗ trợ hash SHA-256 và fallback seed)
+                    String storedPassword = rs.getString("Password");
                     if (PasswordUtil.verifyPassword(password, storedPassword)) {
+                        String role = rs.getString("Role");
+
+                        // Nếu là nhân viên thì lấy tên nhân viên, khách thì lấy UserName
+                        String empName = rs.getString("EmpFullName");
+                        String displayName = (empName != null && !empName.trim().isEmpty())
+                                ? empName
+                                : rs.getString("UserName");
+
+                        String phone = rs.getString("EmpPhone") != null ? rs.getString("EmpPhone") : "";
+                        String identifierCode = rs.getString("EmployeeId") != null ? rs.getString("EmployeeId") : "";
+
                         return new UserSessionDTO(
-                                rs.getString("MaTaiKhoan"),
+                                rs.getString("AccountId"),
                                 rs.getString("Email"),
-                                rs.getString("SoDT"),
-                                rs.getString("MaVaiTro"),
-                                rs.getString("TenVaiTro"),
-                                rs.getString("HoTen"),
-                                rs.getString("MaDinhDanh"),
-                                rs.getString("TrangThai"));
+                                phone,
+                                role,
+                                displayName,
+                                identifierCode,
+                                rs.getString("AccountStatus"));
                     }
                 }
             }
@@ -68,13 +67,16 @@ public class AccountDAO {
     }
 
     /**
-     * Kiểm tra Email đã tồn tại trong bảng TAIKHOAN chưa
+     * Kiểm tra Email đã tồn tại trong bảng Account chưa
      */
     public boolean checkEmailExists(String email) {
-        String sql = "SELECT 1 FROM TAIKHOAN WHERE Email = ?";
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+        String sql = "SELECT 1 FROM Account WHERE Email = ?";
         try (Connection conn = DBContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, email);
+            ps.setString(1, email.trim());
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
@@ -85,40 +87,25 @@ public class AccountDAO {
     }
 
     /**
-     * Kiểm tra Số điện thoại đã tồn tại trong CSDL chưa (bảng KHACHHANG hoặc NHANVIEN)
-     */
-    public boolean checkPhoneExists(String phone) {
-        String sql = "SELECT 1 FROM KHACHHANG WHERE SoDT = ? UNION SELECT 1 FROM NHANVIEN WHERE SoDienThoai = ?";
-        try (Connection conn = DBContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, phone);
-            ps.setString(2, phone);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    /**
-     * Đăng ký tài khoản Web mới (CHỈ ghi vào TAIKHOAN với đúng 6 thuộc tính chuẩn, 
-     * không can thiệp vào bảng KHACHHANG)
+     * Đăng ký tài khoản mới vào bảng Account (6 cột chuẩn)
      */
     public boolean registerAccount(Account tk) {
-        String sqlTaiKhoan = "INSERT INTO TAIKHOAN (MaTaiKhoan, MatKhau, MaVaiTro, TrangThai, HoTenTaiKhoan, Email) "
+        if (tk == null || tk.getEmail() == null || tk.getMatKhau() == null) {
+            return false;
+        }
+
+        String sqlAccount = "INSERT INTO Account (AccountId, Email, Role, UserName, Password, AccountStatus) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBContext.getConnection();
-                PreparedStatement psTK = conn.prepareStatement(sqlTaiKhoan)) {
-            psTK.setString(1, tk.getMaTaiKhoan());
-            psTK.setString(2, tk.getMatKhau());
-            psTK.setString(3, tk.getMaVaiTro() != null ? tk.getMaVaiTro() : "VT01");
-            psTK.setString(4, tk.getTrangThai() != null ? tk.getTrangThai() : "Active");
-            psTK.setString(5, tk.getHoTenTaiKhoan());
-            psTK.setString(6, tk.getEmail());
-            return psTK.executeUpdate() > 0;
+                PreparedStatement ps = conn.prepareStatement(sqlAccount)) {
+            ps.setString(1, tk.getMaTaiKhoan());
+            ps.setString(2, tk.getEmail());
+            ps.setString(3, tk.getRole() != null ? tk.getRole() : "Customer");
+            ps.setString(4, resolveUserName(tk));
+            ps.setString(5, tk.getMatKhau());
+            ps.setString(6, tk.getTrangThai() != null ? tk.getTrangThai() : "Active");
+            return ps.executeUpdate() > 0;
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;
@@ -126,28 +113,29 @@ public class AccountDAO {
     }
 
     /**
-     * Tương thích ngược: Đăng ký tài khoản (chuyển tiếp sang registerAccount)
+     * Lấy mã tài khoản kế tiếp qua UDF fn_SinhMaAccount trong CSDL
      */
-    public boolean registerCustomer(Account tk, Customer kh) {
-        if (tk.getHoTenTaiKhoan() == null && kh != null) {
-            tk.setHoTenTaiKhoan(kh.getHoTen());
-        }
-        if (tk.getEmail() == null && kh != null) {
-            tk.setEmail(kh.getEmail());
-        }
-        return registerAccount(tk);
-    }
-
     public String getNextAccountIdFromDB() {
         try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement("SELECT dbo.fn_SinhMaTaiKhoan()");
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement("SELECT dbo.fn_SinhMaAccount()");
+                ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getString(1);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "TK001";
+        return "ACC999";
+    }
+
+    private String resolveUserName(Account tk) {
+        if (tk.getTenDangNhap() != null && !tk.getTenDangNhap().trim().isEmpty()
+                && !tk.getTenDangNhap().contains("@")) {
+            return tk.getTenDangNhap().trim();
+        }
+        if (tk.getEmail() != null && tk.getEmail().contains("@")) {
+            return tk.getEmail().substring(0, tk.getEmail().indexOf('@')).trim();
+        }
+        return tk.getMaTaiKhoan();
     }
 }

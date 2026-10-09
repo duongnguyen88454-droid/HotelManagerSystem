@@ -8,22 +8,20 @@ public class UserSessionDTO implements Serializable {
     private String maTaiKhoan;
     private String email;
     private String soDT;
-    private String maVaiTro; // 'VT01', 'VT02', 'VT03', 'VT04'
-    private String tenVaiTro; // 'Customer', 'Receptionist', 'HouseKeeper', 'Manager'
-    private String hoTen; // Họ tên lấy từ KHACHHANG hoặc NHANVIEN
-    private String maDinhDanh; // Mã KH (nếu là khách) hoặc Mã NV (nếu là nhân viên)
+    private String role; // 'Customer', 'Receptionist', 'Housekeeper', 'Manager'
+    private String hoTen; // Họ tên lấy từ NHANVIEN hoặc UserName của Account
+    private String maDinhDanh; // Mã NV (nếu là nhân viên) hoặc Mã KH (khi liên kết)
     private String trangThai; // 'Active', 'Locked'
 
     public UserSessionDTO() {
     }
 
-    public UserSessionDTO(String maTaiKhoan, String email, String soDT, String maVaiTro,
-            String tenVaiTro, String hoTen, String maDinhDanh, String trangThai) {
+    public UserSessionDTO(String maTaiKhoan, String email, String soDT, String role,
+            String hoTen, String maDinhDanh, String trangThai) {
         this.maTaiKhoan = maTaiKhoan;
         this.email = email;
         this.soDT = soDT;
-        this.maVaiTro = maVaiTro;
-        this.tenVaiTro = tenVaiTro;
+        this.role = role;
         this.hoTen = hoTen;
         this.maDinhDanh = maDinhDanh;
         this.trangThai = trangThai;
@@ -31,19 +29,19 @@ public class UserSessionDTO implements Serializable {
 
     // Helper methods kiểm tra vai trò nhanh trong JSP EL hoặc Filter
     public boolean isCustomer() {
-        return "VT01".equalsIgnoreCase(this.maVaiTro);
+        return "Customer".equalsIgnoreCase(this.role);
     }
 
     public boolean isReceptionist() {
-        return "VT02".equalsIgnoreCase(this.maVaiTro);
+        return "Receptionist".equalsIgnoreCase(this.role);
     }
 
     public boolean isHousekeeper() {
-        return "VT03".equalsIgnoreCase(this.maVaiTro);
+        return "Housekeeper".equalsIgnoreCase(this.role);
     }
 
     public boolean isManager() {
-        return "VT04".equalsIgnoreCase(this.maVaiTro);
+        return "Manager".equalsIgnoreCase(this.role);
     }
 
     // Getters and Setters
@@ -79,20 +77,12 @@ public class UserSessionDTO implements Serializable {
         this.soDT = soDienThoai;
     }
 
-    public String getMaVaiTro() {
-        return maVaiTro;
+    public String getRole() {
+        return role;
     }
 
-    public void setMaVaiTro(String maVaiTro) {
-        this.maVaiTro = maVaiTro;
-    }
-
-    public String getTenVaiTro() {
-        return tenVaiTro;
-    }
-
-    public void setTenVaiTro(String tenVaiTro) {
-        this.tenVaiTro = tenVaiTro;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getHoTen() {

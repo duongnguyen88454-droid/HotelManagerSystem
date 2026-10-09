@@ -1,0 +1,569 @@
+/* ==========================================================================
+   GRAND HORIZON HOTEL & RESORT - LANDING PAGE STYLES
+   Thẩm mỹ: Tối giản sang trọng (Luxury Minimalist Editorial)
+   Tuyệt đối KHÔNG sử dụng icon font hay emoji. Thuần typography & layout chuẩn.
+   ========================================================================== */
+
+.landing-main {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* ==========================================================================
+   1. HERO SECTION
+   ========================================================================== */
+.hero-section {
+    position: relative;
+    background: linear-gradient(135deg, #0a192f 0%, #1a365d 50%, #2b4c7e 100%);
+    color: #ffffff;
+    padding: 90px 24px 130px 24px;
+    text-align: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(197, 168, 128, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    max-width: 860px;
+    margin: 0 auto;
+    z-index: 2;
+}
+
+.hero-badge {
+    display: inline-block;
+    padding: 6px 18px;
+    background: rgba(197, 168, 128, 0.15);
+    border: 1px solid rgba(197, 168, 128, 0.45);
+    color: #feebc8;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: 30px;
+    margin-bottom: 22px;
+}
+
+.hero-title {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 18px;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+}
+
+.hero-title .hero-highlight {
+    color: #fbd38d;
+    font-style: normal;
+    display: block;
+    margin-top: 6px;
+}
+
+.hero-subtitle {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #e2e8f0;
+    margin: 0 auto 32px auto;
+    max-width: 720px;
+}
+
+.hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.btn-hero-primary {
+    background: #c5a880;
+    color: #1a365d;
+    padding: 13px 30px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: all 0.25s ease;
+    border: 1px solid #c5a880;
+}
+
+.btn-hero-primary:hover {
+    background: #d4b892;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(197, 168, 128, 0.35);
+}
+
+.btn-hero-outline {
+    background: transparent;
+    color: #ffffff;
+    padding: 13px 30px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    transition: all 0.25s ease;
+}
+
+.btn-hero-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   2. QUICK BOOKING BAR (TÌM KIẾM PHÒNG NHANH)
+   ========================================================================== */
+.quick-booking-container {
+    max-width: 1160px;
+    margin: -70px auto 70px auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.booking-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 30px 32px;
+    box-shadow: 0 12px 36px rgba(10, 25, 47, 0.12);
+    border: 1px solid #e2e8f0;
+}
+
+.booking-card-header {
+    margin-bottom: 22px;
+    border-bottom: 1px solid #edf2f7;
+    padding-bottom: 14px;
+}
+
+.booking-card-header h3 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: #1a365d;
+    letter-spacing: 0.2px;
+}
+
+.booking-card-header p {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: #718096;
+}
+
+.booking-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+    align-items: flex-end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #4a5568;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #2d3748;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #1a365d;
+    box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.12);
+}
+
+.btn-search-room {
+    width: 100%;
+    background: #1a365d;
+    color: #ffffff;
+    border: none;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.btn-search-room:hover {
+    background: #2b4c7e;
+    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
+}
+
+/* ==========================================================================
+   3. DANH SÁCH CÁC HẠNG PHÒNG NGHỈ (ROOMS SECTION)
+   ========================================================================== */
+.featured-rooms-section {
+    max-width: 1200px;
+    margin: 0 auto 80px auto;
+    padding: 0 20px;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 45px;
+}
+
+.section-header .section-tag {
+    font-size: 11px;
+    font-weight: 800;
+    color: #c5a880;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.section-header h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1a365d;
+    margin: 0 0 10px 0;
+}
+
+.section-divider {
+    width: 60px;
+    height: 3px;
+    background: #c5a880;
+    margin: 10px auto 14px auto;
+    border-radius: 2px;
+}
+
+.section-header p {
+    font-size: 15px;
+    color: #718096;
+    max-width: 650px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 30px;
+}
+
+.room-card {
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.room-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
+}
+
+.room-visual-banner {
+    height: 170px;
+    background: linear-gradient(135deg, #1a365d 0%, #2b4c7e 100%);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+}
+
+.room-visual-tag {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(4px);
+    color: #feebc8;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.room-visual-title {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.3px;
+}
+
+.room-card-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.room-specs-table {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    background: #f8fafc;
+    border: 1px solid #edf2f7;
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+}
+
+.spec-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.spec-title {
+    font-size: 11px;
+    color: #a0aec0;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.spec-data {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.room-card-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid #edf2f7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.room-price-display {
+    display: flex;
+    flex-direction: column;
+}
+
+.room-price-label {
+    font-size: 11px;
+    color: #718096;
+    text-transform: uppercase;
+}
+
+.room-price-amount {
+    font-size: 18px;
+    font-weight: 800;
+    color: #c5a880;
+}
+
+.room-price-unit {
+    font-size: 11px;
+    font-weight: normal;
+    color: #718096;
+}
+
+.btn-book-action {
+    background: #1a365d;
+    color: #ffffff;
+    padding: 9px 18px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+    display: inline-block;
+    border: 1px solid #1a365d;
+}
+
+.btn-book-action:hover {
+    background: #2b4c7e;
+    transform: translateY(-1px);
+}
+
+.btn-book-action.auth-required {
+    background: #c5a880;
+    color: #1a365d;
+    border-color: #c5a880;
+}
+
+.btn-book-action.auth-required:hover {
+    background: #d4b892;
+}
+
+/* ==========================================================================
+   4. CHUỖI TIỆN ÍCH DỊCH VỤ 5 SAO (0 ICON, DÙNG SỐ ĐẾM THUẦN CHỮ)
+   ========================================================================== */
+.amenities-section {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 70px 20px;
+    margin-bottom: 70px;
+}
+
+.amenities-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+}
+
+.amenity-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 28px 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    transition: border-color 0.25s ease;
+}
+
+.amenity-card:hover {
+    border-color: #c5a880;
+}
+
+.amenity-index {
+    font-size: 14px;
+    font-weight: 800;
+    color: #c5a880;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+    display: inline-block;
+    border-bottom: 2px solid #c5a880;
+    padding-bottom: 2px;
+}
+
+.amenity-card h4 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a365d;
+    margin: 0 0 10px 0;
+}
+
+.amenity-card p {
+    font-size: 14px;
+    color: #718096;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ==========================================================================
+   5. CỔNG NGHIỆP VỤ NHÂN VIÊN VÀ QUẢN TRỊ (PORTAL STRIP)
+   ========================================================================== */
+.staff-portal-strip {
+    max-width: 1200px;
+    margin: 0 auto 60px auto;
+    padding: 0 20px;
+}
+
+.portal-strip-box {
+    background: #edf2f7;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    padding: 20px 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.portal-strip-text .badge-staff-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #2b6cb0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-bottom: 4px;
+}
+
+.portal-strip-text h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a365d;
+    margin: 0 0 4px 0;
+}
+
+.portal-strip-text p {
+    font-size: 13px;
+    color: #4a5568;
+    margin: 0;
+}
+
+.portal-strip-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-portal-entry {
+    background: #1a365d;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.btn-portal-entry:hover {
+    background: #2b4c7e;
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 28px;
+    }
+    
+    .quick-booking-container {
+        margin-top: -30px;
+    }
+
+    .booking-card {
+        padding: 20px 18px;
+    }
+
+    .rooms-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .portal-strip-box {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

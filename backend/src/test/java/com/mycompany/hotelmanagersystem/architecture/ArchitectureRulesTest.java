@@ -77,7 +77,7 @@ public class ArchitectureRulesTest {
 
     @ArchTest
     static final ArchRule servlet_phai_nam_trong_controller = FreezingArchRule.freeze(
-            classes().that().areAnnotatedWith("javax.servlet.annotation.WebServlet")
+            classes().that().areAnnotatedWith("jakarta.servlet.annotation.WebServlet")
                     .should().resideInAPackage(layer("controller"))
                     .because("Moi @WebServlet phai nam trong goi controller (QT 3.1)"));
 
