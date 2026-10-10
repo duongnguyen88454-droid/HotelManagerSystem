@@ -30,6 +30,7 @@ public class BookingDetailDTO implements Serializable {
     private double tongTienPhong;
     private double tongTienDichVu;
     private double tongChiPhiDuKien;
+    private double tongTienCoc;
 
     private boolean coTheHuy;
     private boolean coTheThemDichVu;
@@ -42,18 +43,27 @@ public class BookingDetailDTO implements Serializable {
         recalculateTotals();
     }
 
+    private void updateCapabilities() {
+        this.coTheHuy = "Confirmed".equalsIgnoreCase(this.trangThaiBooking);
+        boolean daCoc = "PartiallyPaid".equalsIgnoreCase(this.trangThaiHoaDon)
+                || "Paid".equalsIgnoreCase(this.trangThaiHoaDon);
+        this.coTheThemDichVu = !daCoc && ("Confirmed".equalsIgnoreCase(this.trangThaiBooking)
+                || "CheckedIn".equalsIgnoreCase(this.trangThaiBooking));
+    }
+
     public void recalculateTotals() {
         this.tongTienPhong = 0;
         this.tongTienDichVu = 0;
+        this.tongTienCoc = 0;
         if (danhSachPhong != null) {
             for (RoomBookingDetailDTO room : danhSachPhong) {
                 this.tongTienPhong += room.getTienPhong();
                 this.tongTienDichVu += room.getTongTienDichVuPhong();
+                this.tongTienCoc += room.getTienCoc();
             }
         }
         this.tongChiPhiDuKien = this.tongTienPhong + this.tongTienDichVu;
-        this.coTheHuy = "DaXacNhan".equalsIgnoreCase(this.trangThaiBooking);
-        this.coTheThemDichVu = "DaXacNhan".equalsIgnoreCase(this.trangThaiBooking) || "DaCheckIn".equalsIgnoreCase(this.trangThaiBooking);
+        updateCapabilities();
     }
 
     public String getMaBooking() {
@@ -78,8 +88,7 @@ public class BookingDetailDTO implements Serializable {
 
     public void setTrangThaiBooking(String trangThaiBooking) {
         this.trangThaiBooking = trangThaiBooking;
-        this.coTheHuy = "DaXacNhan".equalsIgnoreCase(this.trangThaiBooking);
-        this.coTheThemDichVu = "DaXacNhan".equalsIgnoreCase(this.trangThaiBooking) || "DaCheckIn".equalsIgnoreCase(this.trangThaiBooking);
+        updateCapabilities();
     }
 
     public String getGhiChu() {
@@ -136,6 +145,7 @@ public class BookingDetailDTO implements Serializable {
 
     public void setTrangThaiHoaDon(String trangThaiHoaDon) {
         this.trangThaiHoaDon = trangThaiHoaDon;
+        updateCapabilities();
     }
 
     public List<RoomBookingDetailDTO> getDanhSachPhong() {
@@ -201,5 +211,13 @@ public class BookingDetailDTO implements Serializable {
 
     public void setCccd(String cccd) {
         this.cccd = cccd;
+    }
+
+    public double getTongTienCoc() {
+        return tongTienCoc;
+    }
+
+    public void setTongTienCoc(double tongTienCoc) {
+        this.tongTienCoc = tongTienCoc;
     }
 }

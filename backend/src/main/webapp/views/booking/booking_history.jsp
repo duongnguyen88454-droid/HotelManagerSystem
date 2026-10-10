@@ -54,7 +54,6 @@
                                 <th style="padding: 14px 18px; font-weight: 700;">Kỳ Lưu Trú</th>
                                 <th style="padding: 14px 18px; font-weight: 700;">Chi Phí Dự Kiến</th>
                                 <th style="padding: 14px 18px; font-weight: 700; text-align: center;">Trạng Thái Đặt</th>
-                                <th style="padding: 14px 18px; font-weight: 700; text-align: center;">Hóa Đơn</th>
                                 <th style="padding: 14px 18px; font-weight: 700; text-align: center;">Hành Động</th>
                             </tr>
                         </thead>
@@ -66,7 +65,7 @@
                                     <!-- Mã Đơn & Thời điểm đặt -->
                                     <td style="padding: 16px 18px; vertical-align: middle;">
                                         <a href="${pageContext.request.contextPath}/customer/booking-detail?bookingId=${item.maBooking}" 
-                                           style="font-weight: 700; color: #2b6cb0; text-decoration: none; font-size: 15px;">
+                                            style="font-weight: 700; color: #2b6cb0; text-decoration: none; font-size: 15px;">
                                             ${item.maBooking}
                                         </a>
                                         <div style="font-size: 12px; color: #718096; margin-top: 3px;">
@@ -77,7 +76,7 @@
                                     <!-- Thông tin phòng -->
                                     <td style="padding: 16px 18px; vertical-align: middle;">
                                         <div style="font-weight: 700; color: #1a365d;">
-                                            Phòng ${item.soPhong}
+                                            ${item.soPhong}
                                         </div>
                                         <span style="font-size: 12px; color: #4a5568;">
                                             ${item.tenLoaiPhong}
@@ -106,22 +105,22 @@
                                     <!-- Trạng thái Booking -->
                                     <td style="padding: 16px 18px; vertical-align: middle; text-align: center;">
                                         <c:choose>
-                                            <c:when test="${item.trangThaiBooking == 'DaXacNhan'}">
+                                            <c:when test="${item.trangThaiBooking == 'Confirmed'}">
                                                 <span style="background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; display: inline-block;">
                                                     Đã Xác Nhận
                                                 </span>
                                             </c:when>
-                                            <c:when test="${item.trangThaiBooking == 'DaCheckIn'}">
+                                            <c:when test="${item.trangThaiBooking == 'CheckedIn'}">
                                                 <span style="background: #f0fff4; color: #276749; border: 1px solid #c6f6d5; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; display: inline-block;">
                                                     Đang Ở (Check-in)
                                                 </span>
                                             </c:when>
-                                            <c:when test="${item.trangThaiBooking == 'DaCheckOut'}">
+                                            <c:when test="${item.trangThaiBooking == 'CheckedOut'}">
                                                 <span style="background: #edf2f7; color: #4a5568; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; display: inline-block;">
                                                     Đã Trả Phòng
                                                 </span>
                                             </c:when>
-                                            <c:when test="${item.trangThaiBooking == 'DaHuy'}">
+                                            <c:when test="${item.trangThaiBooking == 'Cancelled'}">
                                                 <span style="background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; display: inline-block;">
                                                     Đã Hủy
                                                 </span>
@@ -130,29 +129,6 @@
                                                 <span style="background: #edf2f7; color: #4a5568; padding: 4px 10px; border-radius: 4px; font-size: 12px;">
                                                     ${item.trangThaiBooking}
                                                 </span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-
-                                    <!-- Hóa đơn -->
-                                    <td style="padding: 16px 18px; vertical-align: middle; text-align: center;">
-                                        <c:if test="${not empty item.maHoaDon}">
-                                            <code style="font-size: 11px; background: #edf2f7; padding: 2px 5px; border-radius: 3px; display: block; margin-bottom: 3px;">
-                                                ${item.maHoaDon}
-                                            </code>
-                                        </c:if>
-                                        <c:choose>
-                                            <c:when test="${item.trangThaiHoaDon == 'DaThanhToan'}">
-                                                <span style="color: #276749; font-weight: 700; font-size: 12px;">Đã Thanh Toán</span>
-                                            </c:when>
-                                            <c:when test="${item.trangThaiHoaDon == 'ChuaThanhToan'}">
-                                                <span style="color: #b7791f; font-weight: 600; font-size: 12px;">Chưa Thanh Toán</span>
-                                            </c:when>
-                                            <c:when test="${item.trangThaiHoaDon == 'DaHuy'}">
-                                                <span style="color: #e53e3e; font-size: 12px;">Đã Hủy</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span style="color: #718096; font-size: 12px;">-</span>
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
@@ -169,13 +145,13 @@
                                             <!-- Hủy phòng (chỉ khi có thể hủy) -->
                                             <c:if test="${item.coTheHuy}">
                                                 <form action="${pageContext.request.contextPath}/customer/history" method="POST" 
-                                                      onsubmit="return confirm('Quý khách có chắc chắn muốn hủy đơn đặt phòng [${item.maBooking}] không?');"
+                                                      onsubmit="return confirm('LƯU Ý: Thao tác này sẽ TIẾN HÀNH HỦY TOÀN BỘ các phòng trong đơn đặt [${item.maBooking}]!\nNếu chỉ muốn hủy một phần, vui lòng liên hệ hotline khách sạn 1900 6868.\nBạn có chắc chắn muốn tiếp tục hủy?');"
                                                       style="margin: 0;">
                                                     <input type="hidden" name="action" value="cancel">
                                                     <input type="hidden" name="bookingId" value="${item.maBooking}">
                                                     <button type="submit" 
                                                             style="background: white; border: 1px solid #feb2b2; color: #e53e3e; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;">
-                                                        Hủy Đặt
+                                                        Hủy Toàn Bộ Đơn
                                                     </button>
                                                 </form>
                                             </c:if>

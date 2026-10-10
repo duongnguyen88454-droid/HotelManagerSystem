@@ -25,7 +25,7 @@ public class CustomerDAO {
             return null;
         }
 
-        String sql = "SELECT MaKH, HoTen, Email, SoDT, CCCD FROM KHACHHANG WHERE CCCD = ?";
+        String sql = "SELECT CustomerId AS MaKH, FullName AS HoTen, Email, PhoneNumber AS SoDT, CCCD FROM Customer WHERE CCCD = ?";
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, cccd.trim());
@@ -54,7 +54,7 @@ public class CustomerDAO {
             return null;
         }
 
-        String sql = "SELECT MaKH, HoTen, Email, SoDT, CCCD FROM KHACHHANG WHERE MaKH = ?";
+        String sql = "SELECT CustomerId AS MaKH, FullName AS HoTen, Email, PhoneNumber AS SoDT, CCCD FROM Customer WHERE CustomerId = ?";
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maKH.trim());
@@ -119,7 +119,7 @@ public class CustomerDAO {
             return;
         }
 
-        String updateSql = "UPDATE KHACHHANG SET HoTen = ?, Email = ?, SoDT = ? WHERE CCCD = ?";
+        String updateSql = "UPDATE Customer SET FullName = ?, Email = ?, PhoneNumber = ? WHERE CCCD = ?";
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(updateSql)) {
             ps.setNString(1, name);
@@ -133,7 +133,7 @@ public class CustomerDAO {
     }
 
     private String insertNewGuestWithFallback(String hoTen, String email, String soDT, String cleanCCCD) throws Exception {
-        String insertSql = "INSERT INTO KHACHHANG (MaKH, HoTen, Email, SoDT, CCCD) VALUES (?, ?, ?, ?, ?)";
+        String insertSql = "INSERT INTO Customer (CustomerId, FullName, Email, PhoneNumber, CCCD) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBContext.getConnection()) {
             String newMaKH = getNextCustomerIdFromDB(conn);
             try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
@@ -155,7 +155,7 @@ public class CustomerDAO {
     }
 
     private String fallbackLinkByContact(String hoTen, String email, String soDT, String cleanCCCD) {
-        String fallbackSql = "SELECT MaKH FROM KHACHHANG WHERE SoDT = ? OR Email = ?";
+        String fallbackSql = "SELECT CustomerId AS MaKH FROM Customer WHERE PhoneNumber = ? OR Email = ?";
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(fallbackSql)) {
             ps.setString(1, soDT);
@@ -175,7 +175,7 @@ public class CustomerDAO {
 
     private void updateGuestProfileByMaKH(Connection conn, String maKH, String cccd, String hoTen, String email, String soDT)
             throws SQLException {
-        String sql = "UPDATE KHACHHANG SET CCCD = ?, HoTen = ?, Email = ?, SoDT = ? WHERE MaKH = ?";
+        String sql = "UPDATE Customer SET CCCD = ?, FullName = ?, Email = ?, PhoneNumber = ? WHERE CustomerId = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, cccd);
             ps.setNString(2, hoTen);
@@ -187,12 +187,12 @@ public class CustomerDAO {
     }
 
     public String getNextCustomerIdFromDB(Connection conn) {
-        try (PreparedStatement ps = conn.prepareStatement("SELECT dbo.fn_SinhMaKhachHang()");
+        try (PreparedStatement ps = conn.prepareStatement("SELECT dbo.fn_SinhMaCustomer()");
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getString(1);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "KH001";
+        return "CUS001";
     }
 }

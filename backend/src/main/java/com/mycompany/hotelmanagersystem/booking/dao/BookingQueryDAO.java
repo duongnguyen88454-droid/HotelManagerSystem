@@ -16,7 +16,8 @@ import java.util.List;
 
 /**
  * DAO chuyên trách các truy vấn chỉ đọc (Read-only / Query) cho Booking.
- * Áp dụng nguyên lý CQS (Command Query Separation) theo QT 2.1 và QT 2.3 trong ARCHITECTURE_RULES.md.
+ * Áp dụng nguyên lý CQS (Command Query Separation) theo QT 2.1 và QT 2.3 trong
+ * ARCHITECTURE_RULES.md.
  */
 public class BookingQueryDAO {
 
@@ -24,17 +25,17 @@ public class BookingQueryDAO {
      * Lấy danh sách lịch sử đặt phòng của một khách hàng (MaKH)
      */
     public List<CustomerBookingHistoryDTO> getBookingHistoryByCustomer(String maKH) {
-        String sql = "SELECT b.BookingId AS MaBooking, r.RoomName AS SoPhong, rt.RoomTypeName AS TenLoaiPhong, "
-                + "       b.CreateDate AS NgayDat, br.ExpectedCheckInDate AS NgayNhanDuKien, "
-                + "       br.ExpectedCheckOutDate AS NgayTraDuKien, inv.FinalTotalAmount AS ChiPhiDuKien, "
-                + "       br.BookingStatus AS TrangThaiBooking, inv.InvoiceId AS MaHoaDon, "
-                + "       inv.InvoiceStatus AS TrangThaiHoaDon "
+        String sql = "SELECT b.BookingId AS MaBooking, CAST(COUNT(br.RoomId) AS VARCHAR) + N' phòng' AS SoPhong, "
+                + "       N'' AS TenLoaiPhong, b.CreateDate AS NgayDat, "
+                + "       MIN(br.ExpectedCheckInDate) AS NgayNhanDuKien, MAX(br.ExpectedCheckOutDate) AS NgayTraDuKien, "
+                + "       ISNULL(inv.FinalTotalAmount, 0) AS ChiPhiDuKien, "
+                + "       ISNULL(MIN(br.BookingStatus), 'Confirmed') AS TrangThaiBooking, "
+                + "       inv.InvoiceId AS MaHoaDon, inv.InvoiceStatus AS TrangThaiHoaDon "
                 + "FROM Booking b "
-                + "INNER JOIN Booking_Room br ON b.BookingId = br.BookingId "
-                + "INNER JOIN Room r ON br.RoomId = r.RoomId "
-                + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
+                + "LEFT JOIN Booking_Room br ON b.BookingId = br.BookingId "
                 + "LEFT JOIN Invoice inv ON b.BookingId = inv.BookingId "
                 + "WHERE b.CustomerId = ? "
+                + "GROUP BY b.BookingId, b.CreateDate, inv.FinalTotalAmount, inv.InvoiceId, inv.InvoiceStatus "
                 + "ORDER BY b.CreateDate DESC";
         return executeBookingHistoryQuery(sql, maKH);
     }
@@ -46,17 +47,17 @@ public class BookingQueryDAO {
         if (maTaiKhoan == null || maTaiKhoan.trim().isEmpty()) {
             return new ArrayList<>();
         }
-        String sql = "SELECT b.BookingId AS MaBooking, r.RoomName AS SoPhong, rt.RoomTypeName AS TenLoaiPhong, "
-                + "       b.CreateDate AS NgayDat, br.ExpectedCheckInDate AS NgayNhanDuKien, "
-                + "       br.ExpectedCheckOutDate AS NgayTraDuKien, inv.FinalTotalAmount AS ChiPhiDuKien, "
-                + "       br.BookingStatus AS TrangThaiBooking, inv.InvoiceId AS MaHoaDon, "
-                + "       inv.InvoiceStatus AS TrangThaiHoaDon "
+        String sql = "SELECT b.BookingId AS MaBooking, CAST(COUNT(br.RoomId) AS VARCHAR) + N' phòng' AS SoPhong, "
+                + "       N'' AS TenLoaiPhong, b.CreateDate AS NgayDat, "
+                + "       MIN(br.ExpectedCheckInDate) AS NgayNhanDuKien, MAX(br.ExpectedCheckOutDate) AS NgayTraDuKien, "
+                + "       ISNULL(inv.FinalTotalAmount, 0) AS ChiPhiDuKien, "
+                + "       ISNULL(MIN(br.BookingStatus), 'Confirmed') AS TrangThaiBooking, "
+                + "       inv.InvoiceId AS MaHoaDon, inv.InvoiceStatus AS TrangThaiHoaDon "
                 + "FROM Booking b "
-                + "INNER JOIN Booking_Room br ON b.BookingId = br.BookingId "
-                + "INNER JOIN Room r ON br.RoomId = r.RoomId "
-                + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
+                + "LEFT JOIN Booking_Room br ON b.BookingId = br.BookingId "
                 + "LEFT JOIN Invoice inv ON b.BookingId = inv.BookingId "
                 + "WHERE b.CreateBy = ? "
+                + "GROUP BY b.BookingId, b.CreateDate, inv.FinalTotalAmount, inv.InvoiceId, inv.InvoiceStatus "
                 + "ORDER BY b.CreateDate DESC";
         return executeBookingHistoryQuery(sql, maTaiKhoan.trim());
     }
@@ -82,7 +83,8 @@ public class BookingQueryDAO {
     }
 
     /**
-     * Trách nhiệm: Thực thi truy vấn danh sách lịch sử đặt phòng và chuyển đổi dữ liệu
+     * Trách nhiệm: Thực thi truy vấn danh sách lịch sử đặt phòng và chuyển đổi dữ
+     * liệu
      */
     private List<CustomerBookingHistoryDTO> executeBookingHistoryQuery(String sql, String parameterValue) {
         List<CustomerBookingHistoryDTO> list = new ArrayList<>();
@@ -166,7 +168,7 @@ public class BookingQueryDAO {
      */
     private List<RoomBookingDetailDTO> fetchBookingRooms(Connection conn, String maBooking) throws SQLException {
         String roomsSql = "SELECT br.RoomId AS MaPhong, r.RoomName AS SoPhong, rt.RoomTypeId AS MaLoaiPhong, "
-                + "       rt.RoomTypeName AS TenLoaiPhong, br.Price AS DonGiaPhong, "
+                + "       rt.RoomTypeName AS TenLoaiPhong, br.Price AS DonGiaPhong, br.Deposit AS TienCoc, "
                 + "       br.ExpectedCheckInDate AS NgayNhanDuKien, br.ExpectedCheckOutDate AS NgayTraDuKien, "
                 + "       br.ActualCheckInDate AS NgayCheckInThucTe, br.ActualCheckOutDate AS NgayCheckOutThucTe "
                 + "FROM Booking_Room br "
@@ -194,6 +196,7 @@ public class BookingQueryDAO {
                             soDem);
                     r.setNgayCheckInThucTe(rs.getTimestamp("NgayCheckInThucTe"));
                     r.setNgayCheckOutThucTe(rs.getTimestamp("NgayCheckOutThucTe"));
+                    r.setTienCoc(rs.getDouble("TienCoc"));
                     rooms.add(r);
                 }
             }

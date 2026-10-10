@@ -191,12 +191,18 @@ BEGIN
     IF EXISTS (
         SELECT 1
         FROM Booking_Room br
+        JOIN Booking b ON br.BookingId = b.BookingId
+        JOIN Invoice inv ON b.BookingId = inv.BookingId
         WHERE br.RoomId = @RoomId
           AND (@IgnoreBookingId IS NULL OR br.BookingId <> @IgnoreBookingId)
           AND br.BookingStatus IN ('Confirmed', 'CheckedIn')
           AND NOT (
               br.ExpectedCheckOutDate <= @ExpectedCheckIn
               OR br.ExpectedCheckInDate >= @ExpectedCheckOut
+          )
+          AND (
+              inv.InvoiceStatus <> 'Unpaid' 
+              OR DATEDIFF(MINUTE, b.CreateDate, GETDATE()) < 10
           )
     )
         RETURN 0;

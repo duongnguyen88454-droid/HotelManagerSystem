@@ -27,7 +27,7 @@ public class RoomDAO {
                 + "       ISNULL((SELECT STRING_AGG(bt.BedTypeName, ', ') "
                 + "               FROM RoomType_BedType rtbt "
                 + "               JOIN BedType bt ON rtbt.BedTypeId = bt.BedTypeId "
-                + "               WHERE rtbt.RoomTypeId = rt.RoomTypeId), N'Tiêu chuẩn') AS LoaiGiuong "
+                + "               WHERE rtbt.RoomTypeId = rt.RoomTypeId AND bt.IsActive = 1), N'Tiêu chuẩn') AS LoaiGiuong "
                 + "FROM RoomType rt "
                 + "WHERE rt.IsActive = 1 "
                 + "ORDER BY rt.BasePrice ASC";
@@ -62,14 +62,15 @@ public class RoomDAO {
         List<AvailableRoomDTO> list = new ArrayList<>();
         String sql = "SELECT r.RoomId AS MaPhong, r.RoomName AS SoPhong, rt.RoomTypeId AS MaLoaiPhong, "
                 + "       rt.RoomTypeName AS TenLoaiPhong, rt.Capacity AS SoNguoiToiDa, rt.BasePrice AS GiaPhong, "
+                + "       rt.DepositPercent, "
                 + "       ISNULL((SELECT STRING_AGG(rs.RoomServiceName, ', ') "
                 + "               FROM RoomType_RoomService rtrs "
                 + "               JOIN RoomService rs ON rtrs.RoomServiceId = rs.RoomServiceId "
-                + "               WHERE rtrs.RoomTypeId = rt.RoomTypeId), N'Đầy đủ tiện nghi cơ bản') AS MoTaPhong, "
+                + "               WHERE rtrs.RoomTypeId = rt.RoomTypeId AND rs.IsActive = 1), N'Đầy đủ tiện nghi cơ bản') AS MoTaPhong, "
                 + "       ISNULL((SELECT STRING_AGG(CONCAT(rtbt.Quantity, ' ', bt.BedTypeName), ', ') "
                 + "               FROM RoomType_BedType rtbt "
                 + "               JOIN BedType bt ON rtbt.BedTypeId = bt.BedTypeId "
-                + "               WHERE rtbt.RoomTypeId = rt.RoomTypeId), N'Tiêu chuẩn') AS LoaiGiuong "
+                + "               WHERE rtbt.RoomTypeId = rt.RoomTypeId AND bt.IsActive = 1), N'Tiêu chuẩn') AS LoaiGiuong "
                 + "FROM Room r "
                 + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
                 + "WHERE rt.IsActive = 1 "
@@ -100,14 +101,15 @@ public class RoomDAO {
     public AvailableRoomDTO getRoomDetailById(String maPhong) {
         String sql = "SELECT r.RoomId AS MaPhong, r.RoomName AS SoPhong, rt.RoomTypeId AS MaLoaiPhong, "
                 + "       rt.RoomTypeName AS TenLoaiPhong, rt.Capacity AS SoNguoiToiDa, rt.BasePrice AS GiaPhong, "
+                + "       rt.DepositPercent, "
                 + "       ISNULL((SELECT STRING_AGG(rs.RoomServiceName, ', ') "
                 + "               FROM RoomType_RoomService rtrs "
                 + "               JOIN RoomService rs ON rtrs.RoomServiceId = rs.RoomServiceId "
-                + "               WHERE rtrs.RoomTypeId = rt.RoomTypeId), N'Đầy đủ tiện nghi cơ bản') AS MoTaPhong, "
+                + "               WHERE rtrs.RoomTypeId = rt.RoomTypeId AND rs.IsActive = 1), N'Đầy đủ tiện nghi cơ bản') AS MoTaPhong, "
                 + "       ISNULL((SELECT STRING_AGG(CONCAT(rtbt.Quantity, ' ', bt.BedTypeName), ', ') "
                 + "               FROM RoomType_BedType rtbt "
                 + "               JOIN BedType bt ON rtbt.BedTypeId = bt.BedTypeId "
-                + "               WHERE rtbt.RoomTypeId = rt.RoomTypeId), N'Tiêu chuẩn') AS LoaiGiuong "
+                + "               WHERE rtbt.RoomTypeId = rt.RoomTypeId AND bt.IsActive = 1), N'Tiêu chuẩn') AS LoaiGiuong "
                 + "FROM Room r "
                 + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
                 + "WHERE r.RoomId = ?";
@@ -152,7 +154,7 @@ public class RoomDAO {
     }
 
     private AvailableRoomDTO mapAvailableRoom(ResultSet rs) throws SQLException {
-        return new AvailableRoomDTO(
+        AvailableRoomDTO dto = new AvailableRoomDTO(
                 rs.getString("MaPhong"),
                 rs.getString("SoPhong"),
                 rs.getString("MaLoaiPhong"),
@@ -162,6 +164,8 @@ public class RoomDAO {
                 rs.getInt("SoNguoiToiDa"),
                 rs.getDouble("GiaPhong"),
                 rs.getNString("MoTaPhong"));
+        dto.setDepositPercent(rs.getDouble("DepositPercent"));
+        return dto;
     }
 
     /**

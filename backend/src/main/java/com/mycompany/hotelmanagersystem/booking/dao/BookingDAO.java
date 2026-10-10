@@ -3,8 +3,6 @@ package com.mycompany.hotelmanagersystem.booking.dao;
 import com.mycompany.hotelmanagersystem.booking.dto.BookingCartDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartRoomItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
-import com.mycompany.hotelmanagersystem.booking.dto.BookingDetailDTO;
-import com.mycompany.hotelmanagersystem.booking.dto.CustomerBookingHistoryDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.SingleBookingRequestDTO;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
@@ -17,17 +15,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Data Access Object quản lý điều phối tạo đơn đặt phòng (Booking) và giao dịch toàn vẹn.
- * Đã refactor tinh gọn theo QT 2.1, QT 2.2 và QT 2.3 trong ARCHITECTURE_RULES.md.
+ * Data Access Object quản lý điều phối tạo đơn đặt phòng (Booking) và giao dịch
+ * toàn vẹn.
+ * Đã refactor tinh gọn theo QT 2.1, QT 2.2 và QT 2.3 trong
+ * ARCHITECTURE_RULES.md.
  */
 public class BookingDAO {
 
     private final BookingDichVuDAO bookingDichVuDAO = new BookingDichVuDAO();
-    private final BookingQueryDAO bookingQueryDAO = new BookingQueryDAO();
     private final InvoiceWriter invoiceWriter = new InvoiceWriter();
 
     /**
-     * Điều phối tạo đơn đặt phòng trực tuyến 1 phòng kèm dịch vụ trong 1 Transaction
+     * Điều phối tạo đơn đặt phòng trực tuyến 1 phòng kèm dịch vụ trong 1
+     * Transaction
      */
     public String createOnlineBookingWithServices(SingleBookingRequestDTO req) throws Exception {
         Connection conn = null;
@@ -35,10 +35,12 @@ public class BookingDAO {
             conn = DBContext.getConnection();
             conn.setAutoCommit(false);
 
-            validateRoomAvailability(conn, req.getMaPhong(), req.getCheckIn(), req.getCheckOut());
+            Date checkInSql = req.getCheckIn() != null ? Date.valueOf(req.getCheckIn()) : null;
+            Date checkOutSql = req.getCheckOut() != null ? Date.valueOf(req.getCheckOut()) : null;
+            validateRoomAvailability(conn, req.getMaPhong(), checkInSql, checkOutSql);
             String maBooking = getNextBookingIdFromDB(conn);
             insertBookingHeader(conn, maBooking, req.getMaKH(), req.getMaTaiKhoan(), req.getTongChiPhi());
-            insertBookingRoom(conn, maBooking, req.getMaPhong(), req.getDonGiaPhong(), req.getCheckIn(), req.getCheckOut());
+            insertBookingRoom(conn, maBooking, req.getMaPhong(), req.getDonGiaPhong(), checkInSql, checkOutSql);
             bookingDichVuDAO.insertBookingServices(conn, maBooking, req.getMaPhong(), req.getSelectedServices());
             invoiceWriter.ensureInvoiceExists(conn, maBooking);
 
@@ -53,7 +55,8 @@ public class BookingDAO {
     }
 
     /**
-     * Điều phối tạo đơn đặt đa phòng kèm dịch vụ riêng cho từng phòng trong 1 Transaction
+     * Điều phối tạo đơn đặt đa phòng kèm dịch vụ riêng cho từng phòng trong 1
+     * Transaction
      */
     public String createMultiRoomBookingWithServices(String maKH, String maTaiKhoan, BookingCartDTO cart, String ghiChu)
             throws Exception {
@@ -65,6 +68,8 @@ public class BookingDAO {
         try {
             conn = DBContext.getConnection();
             conn.setAutoCommit(false);
+
+            cleanupExpiredPendingBookings(conn);
 
             for (CartRoomItemDTO roomItem : cart.getItems().values()) {
                 Date dIn = Date.valueOf(roomItem.getNgayNhan());
@@ -133,32 +138,7 @@ public class BookingDAO {
         }
     }
 
-    public boolean cancelBooking(String maBooking, String maKH) {
-        return cancelBooking(maBooking, maKH, null);
-    }
 
-    // --- CÁC PHƯƠNG THỨC ỦY QUYỀN (DELEGATION) TƯƠNG THÍCH NGƯỢC ---
-
-    public BookingDetailDTO getBookingDetailById(String maBooking) {
-        return bookingQueryDAO.getBookingDetailById(maBooking);
-    }
-
-    public List<CustomerBookingHistoryDTO> getBookingHistoryByCustomer(String maKH) {
-        return bookingQueryDAO.getBookingHistoryByCustomer(maKH);
-    }
-
-    public List<CustomerBookingHistoryDTO> getBookingHistoryByAccountId(String maTaiKhoan) {
-        return bookingQueryDAO.getBookingHistoryByAccountId(maTaiKhoan);
-    }
-
-    public boolean addServiceToBookingRoom(String maBooking, String maPhong, String maDichVu, int soLuong,
-            String nguoiThem) throws Exception {
-        return bookingDichVuDAO.addServiceToBookingRoom(maBooking, maPhong, maDichVu, soLuong, nguoiThem);
-    }
-
-    public boolean removeServiceFromBookingRoom(String maBookingDichVu, String maBooking) throws Exception {
-        return bookingDichVuDAO.removeServiceFromBookingRoom(maBookingDichVu, maBooking);
-    }
 
     // --- CÁC HÀM HELPER NỘI BỘ TRONG TRANSACTION ---
 
@@ -171,7 +151,8 @@ public class BookingDAO {
             psCheck.setDate(3, checkOut);
             try (ResultSet rsCheck = psCheck.executeQuery()) {
                 if (rsCheck.next() && rsCheck.getInt(1) == 0) {
-                    throw new SQLException("Phòng " + maPhong + " không khả dụng hoặc đã có người đặt trong khoảng thời gian này!");
+                    throw new SQLException(
+                            "Phòng " + maPhong + " không khả dụng hoặc đã có người đặt trong khoảng thời gian này!");
                 }
             }
         }
@@ -224,7 +205,7 @@ public class BookingDAO {
                 }
             }
         }
-        return 30.0;
+        return 0;
     }
 
     private String getNextBookingIdFromDB(Connection conn) throws SQLException {
@@ -235,6 +216,20 @@ public class BookingDAO {
             }
         }
         return "BK001";
+    }
+
+    private void cleanupExpiredPendingBookings(Connection conn) throws SQLException {
+        String sql = "UPDATE br "
+                + "SET br.BookingStatus = 'Cancelled' "
+                + "FROM Booking_Room br "
+                + "JOIN Booking b ON br.BookingId = b.BookingId "
+                + "LEFT JOIN Invoice inv ON b.BookingId = inv.BookingId "
+                + "WHERE br.BookingStatus = 'Confirmed' "
+                + "  AND (inv.InvoiceStatus = 'Unpaid' OR inv.InvoiceStatus IS NULL) "
+                + "  AND DATEDIFF(MINUTE, b.CreateDate, GETDATE()) >= 10";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.executeUpdate();
+        }
     }
 
     private void rollbackTransaction(Connection conn) {

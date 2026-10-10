@@ -87,4 +87,19 @@ public class RoomService {
         }
         return roomDAO.getRoomDetailById(maPhong.trim());
     }
+
+    /**
+     * Kiểm tra nhanh phòng có trống và khả dụng trong khoảng thời gian không
+     */
+    public boolean isRoomAvailable(String maPhong, String checkInStr, String checkOutStr) {
+        if (maPhong == null || maPhong.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            LocalDate[] dates = RoomUtil.parseAndValidateDates(checkInStr, checkOutStr);
+            return roomDAO.isRoomAvailable(maPhong.trim(), dates[0], dates[1]);
+        } catch (Exception ex) {
+            return false;
+        }
+    }
 }

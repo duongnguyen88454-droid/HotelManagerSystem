@@ -25,6 +25,7 @@ public class RoomBookingDetailDTO implements Serializable {
     private double tienPhong;
     private List<BookingDichVuItemDTO> danhSachDichVu = new ArrayList<>();
     private double tongTienDichVuPhong;
+    private double tienCoc;
 
     public RoomBookingDetailDTO() {
     }
@@ -157,5 +158,13 @@ public class RoomBookingDetailDTO implements Serializable {
 
     public void setTongTienDichVuPhong(double tongTienDichVuPhong) {
         this.tongTienDichVuPhong = tongTienDichVuPhong;
+    }
+
+    public double getTienCoc() {
+        return tienCoc;
+    }
+
+    public void setTienCoc(double tienCoc) {
+        this.tienCoc = tienCoc;
     }
 }

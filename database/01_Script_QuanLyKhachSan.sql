@@ -35,7 +35,7 @@ CREATE TABLE Account (
     AccountId     VARCHAR (10)  NOT NULL,
     Email         VARCHAR (100) NOT NULL,
     Role          VARCHAR (20)  NOT NULL,
-    UserName      VARCHAR (50)  NOT NULL,
+    UserName      NVARCHAR (50) NOT NULL,
     Password      VARCHAR (255) NOT NULL,
     AccountStatus VARCHAR (20)  CONSTRAINT DF_Account_Status DEFAULT 'Active' NOT NULL,
     CONSTRAINT PK_Account PRIMARY KEY (AccountId),
@@ -112,6 +112,7 @@ GO
 CREATE TABLE BedType (
     BedTypeId   VARCHAR (10)  NOT NULL,
     BedTypeName NVARCHAR (50) NOT NULL,
+    IsActive    BIT           CONSTRAINT DF_BedType_IsActive DEFAULT 1 NOT NULL,
     CONSTRAINT PK_BedType PRIMARY KEY (BedTypeId),
     CONSTRAINT UQ_BedType_Name UNIQUE (BedTypeName)
 );
@@ -134,6 +135,7 @@ GO
 CREATE TABLE RoomService (
     RoomServiceId   VARCHAR (10)   NOT NULL,
     RoomServiceName NVARCHAR (100) NOT NULL,
+    IsActive        BIT            CONSTRAINT DF_RoomService_IsActive DEFAULT 1 NOT NULL,
     CONSTRAINT PK_RoomService PRIMARY KEY (RoomServiceId),
     CONSTRAINT UQ_RoomService_Name UNIQUE (RoomServiceName)
 );
@@ -174,6 +176,7 @@ CREATE TABLE Service (
     ServiceId   VARCHAR (10)    NOT NULL,
     ServiceName NVARCHAR (100)  NOT NULL,
     BasePrice   DECIMAL (12, 2) NOT NULL,
+    IsActive    BIT             CONSTRAINT DF_Service_IsActive DEFAULT 1 NOT NULL,
     CONSTRAINT PK_Service PRIMARY KEY (ServiceId),
     CONSTRAINT UQ_Service_Name UNIQUE (ServiceName),
     CONSTRAINT CK_Service_BasePrice CHECK (BasePrice >= 0)
@@ -500,11 +503,12 @@ GO
 -- 5. BẢNG BEDTYPE (Loại giường)
 INSERT  INTO BedType (
     BedTypeId,
-    BedTypeName
+    BedTypeName,
+    IsActive
 )
-VALUES               ('BT01', 'Single Bed'),
-                     ('BT02', 'Double Bed'),
-                     ('BT03', 'King Bed');
+VALUES               ('BT01', 'Single Bed', 1),
+                     ('BT02', 'Double Bed', 1),
+                     ('BT03', 'King Bed', 1);
 
 
 GO
@@ -525,14 +529,15 @@ GO
 -- 7. BẢNG ROOMSERVICE (Tiện nghi phòng)
 INSERT  INTO RoomService (
     RoomServiceId,
-    RoomServiceName
+    RoomServiceName,
+    IsActive
 )
-VALUES                   ('RS01', N'Wifi Tốc Độ Cao'),
-                         ('RS02', N'Điều Hòa 2 Chiều'),
-                         ('RS03', N'Tivi Thông Minh 55 Inch'),
-                         ('RS04', N'Bồn Tắm Nằm'),
-                         ('RS05', N'Tủ Lạnh Mini & Minibar'),
-                         ('RS06', N'Ban Công Hướng Biển');
+VALUES                   ('RS01', N'Wifi Tốc Độ Cao', 1),
+                         ('RS02', N'Điều Hòa 2 Chiều', 1),
+                         ('RS03', N'Tivi Thông Minh 55 Inch', 1),
+                         ('RS04', N'Bồn Tắm Nằm', 1),
+                         ('RS05', N'Tủ Lạnh Mini & Minibar', 1),
+                         ('RS06', N'Ban Công Hướng Biển', 1);
 
 
 GO
@@ -587,14 +592,15 @@ GO
 INSERT  INTO Service (
     ServiceId,
     ServiceName,
-    BasePrice
+    BasePrice,
+    IsActive
 )
-VALUES               ('SRV001', N'Buffet Sáng Cao Cấp', 120000.00),
-                     ('SRV002', N'Giặt Là Lấy Ngay', 50000.00),
-                     ('SRV003', N'Đưa Đón Sân Bay Chu Đáo', 250000.00),
-                     ('SRV004', N'Gói Massage & Spa Thư Giãn', 350000.00),
-                     ('SRV005', N'Nước Khoáng Đóng Chai', 15000.00),
-                     ('SRV006', N'Nước Ngọt Lon Tiện Lợi', 20000.00);
+VALUES               ('SRV001', N'Buffet Sáng Cao Cấp', 120000.00, 1),
+                     ('SRV002', N'Giặt Là Lấy Ngay', 50000.00, 1),
+                     ('SRV003', N'Đưa Đón Sân Bay Chu Đáo', 250000.00, 1),
+                     ('SRV004', N'Gói Massage & Spa Thư Giãn', 350000.00, 1),
+                     ('SRV005', N'Nước Khoáng Đóng Chai', 15000.00, 1),
+                     ('SRV006', N'Nước Ngọt Lon Tiện Lợi', 20000.00, 1);
 
 
 GO

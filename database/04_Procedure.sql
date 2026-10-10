@@ -599,44 +599,7 @@ END
 
 GO
 -- ============================================================================
--- PROCEDURE 11: TẠO HỒ SƠ KHÁCH HÀNG MỚI (ÁP DỤNG fn_SinhMaCustomer)
--- ============================================================================
-CREATE OR ALTER PROCEDURE dbo.sp_ThemKhachHang
-@FullName NVARCHAR (100), @PhoneNumber VARCHAR (15), @CCCD VARCHAR (20), @Email VARCHAR (100), @NewCustomerId VARCHAR (10) OUTPUT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    BEGIN TRY
-        IF EXISTS (SELECT 1
-                   FROM   Customer
-                   WHERE  CCCD = @CCCD)
-            THROW 50051, N'Số CCCD này đã tồn tại trên hệ thống!', 1;
-        IF EXISTS (SELECT 1
-                   FROM   Customer
-                   WHERE  PhoneNumber = @PhoneNumber)
-            THROW 50052, N'Số điện thoại này đã tồn tại trên hệ thống!', 1;
-        SET @NewCustomerId = dbo.fn_SinhMaCustomer();
-        INSERT  INTO Customer (
-            CustomerId,
-            FullName,
-            PhoneNumber,
-            CCCD,
-            Email
-        )
-        VALUES                (@NewCustomerId, @FullName, @PhoneNumber, @CCCD, @Email);
-        RETURN 0;
-    END TRY
-    BEGIN CATCH
-        DECLARE @ErrMsg AS NVARCHAR (4000) = ERROR_MESSAGE();
-        RAISERROR (@ErrMsg, 16, 1);
-        RETURN -1;
-    END CATCH
-END
-
-
-GO
--- ============================================================================
--- PROCEDURE 12: TẠO TÀI KHOẢN ĐĂNG NHẬP MỚI (ÁP DỤNG fn_SinhMaAccount)
+-- PROCEDURE 11: TẠO TÀI KHOẢN ĐĂNG NHẬP MỚI (ÁP DỤNG fn_SinhMaAccount)
 -- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_ThemTaiKhoan
 @Email VARCHAR (100), @Role VARCHAR (20), @UserName VARCHAR (50), @Password VARCHAR (255), @NewAccountId VARCHAR (10) OUTPUT
@@ -674,7 +637,7 @@ END
 
 GO
 -- ============================================================================
--- PROCEDURE 13: TẠO HỒ SƠ NHÂN VIÊN MỚI (ÁP DỤNG fn_SinhMaEmployee)
+-- PROCEDURE 12: TẠO HỒ SƠ NHÂN VIÊN MỚI (ÁP DỤNG fn_SinhMaEmployee)
 -- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_ThemNhanVien
 @AccountId VARCHAR (10)=NULL, @FullName NVARCHAR (100), @Phone VARCHAR (15), @Email VARCHAR (100), @HireDate DATE=NULL, @NewEmployeeId VARCHAR (10) OUTPUT
@@ -709,7 +672,7 @@ END
 
 GO
 -- ============================================================================
--- PROCEDURE 14: TẠO PHÒNG VẬT LÝ MỚI (ÁP DỤNG fn_SinhMaRoom)
+-- PROCEDURE 13: TẠO PHÒNG VẬT LÝ MỚI (ÁP DỤNG fn_SinhMaRoom)
 -- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_ThemPhong
 @RoomTypeId VARCHAR (10), @RoomName NVARCHAR (50), @NewRoomId VARCHAR (10) OUTPUT
@@ -747,10 +710,10 @@ END
 
 GO
 -- ============================================================================
--- PROCEDURE 15: TẠO DỊCH VỤ PHÁT SINH MỚI (ÁP DỤNG fn_SinhMaService)
+-- PROCEDURE 14: TẠO DỊCH VỤ PHÁT SINH MỚI (ÁP DỤNG fn_SinhMaService)
 -- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_ThemDichVu
-@ServiceName NVARCHAR (100), @BasePrice DECIMAL (12, 2), @NewServiceId VARCHAR (10) OUTPUT
+@ServiceName NVARCHAR (100), @BasePrice DECIMAL (12, 2), @NewServiceId VARCHAR (10) OUTPUT, @IsActive BIT = 1
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -763,9 +726,10 @@ BEGIN
         INSERT  INTO Service (
             ServiceId,
             ServiceName,
-            BasePrice
+            BasePrice,
+            IsActive
         )
-        VALUES               (@NewServiceId, @ServiceName, @BasePrice);
+        VALUES               (@NewServiceId, @ServiceName, @BasePrice, @IsActive);
         RETURN 0;
     END TRY
     BEGIN CATCH
@@ -773,4 +737,111 @@ BEGIN
         RAISERROR (@ErrMsg, 16, 1);
         RETURN -1;
     END CATCH
-END
+END;
+GO
+
+-- ============================================================================
+-- PROCEDURE 15: XÁC NHẬN THANH TOÁN TIỀN CỌC TRONG THỜI HẠN 10 PHÚT
+-- ============================================================================
+CREATE OR ALTER PROCEDURE dbo.sp_XacNhanThanhToanCoc
+    @BookingId VARCHAR (10),
+    @PaymentMethod VARCHAR (20) = 'BankTransfer',
+    @Note NVARCHAR (300) = NULL,
+    @NewPaymentId VARCHAR (10) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        DECLARE @CreateDate DATETIME, @InvoiceId VARCHAR(10), @DepositTotal DECIMAL(12,2);
+
+        SELECT @CreateDate = b.CreateDate,
+               @InvoiceId = inv.InvoiceId
+        FROM Booking b
+        JOIN Invoice inv ON b.BookingId = inv.BookingId
+        WHERE b.BookingId = @BookingId;
+
+        IF @InvoiceId IS NULL
+        BEGIN
+            RAISERROR(N'Lỗi: Đơn đặt phòng hoặc hóa đơn không tồn tại!', 16, 1);
+            ROLLBACK;
+            RETURN -1;
+        END
+
+        -- Kiểm tra thời hạn 10 phút giữ chỗ
+        IF DATEDIFF(MINUTE, @CreateDate, GETDATE()) >= 10
+        BEGIN
+            RAISERROR(N'Đã hết thời gian giữ chỗ (10 phút)! Đơn đặt phòng không còn hiệu lực để thanh toán cọc.', 16, 1);
+            ROLLBACK;
+            RETURN -2;
+        END
+
+        -- Tính tổng tiền cọc của đơn
+        SELECT @DepositTotal = ISNULL(SUM(Deposit), 0)
+        FROM Booking_Room
+        WHERE BookingId = @BookingId AND BookingStatus = 'Confirmed';
+
+        IF @DepositTotal <= 0
+        BEGIN
+            RAISERROR(N'Đơn đặt phòng này không có khoản tiền cọc hợp lệ cần thanh toán!', 16, 1);
+            ROLLBACK;
+            RETURN -3;
+        END
+
+        -- Ghi nhận giao dịch vào bảng Payment (ProcessBy = NULL nếu khách tự thanh toán online)
+        SET @NewPaymentId = dbo.fn_SinhMaPayment();
+        INSERT INTO Payment (PaymentId, ProcessBy, InvoiceId, PaymentDate, PaymentMethod, TotalAmount, Note)
+        VALUES (@NewPaymentId, NULL, @InvoiceId, GETDATE(), @PaymentMethod, @DepositTotal, ISNULL(@Note, N'Thanh toán tiền đặt cọc giữ chỗ'));
+
+        -- Trigger trg_Payment_DongBoTrangThaiHoaDon sẽ tự động đổi InvoiceStatus sang 'PartiallyPaid'
+        COMMIT TRANSACTION;
+        RETURN 0;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK;
+        DECLARE @ErrMsg NVARCHAR(4000) = ERROR_MESSAGE();
+        RAISERROR(@ErrMsg, 16, 1);
+        RETURN -99;
+    END CATCH
+END;
+GO
+
+-- ============================================================================
+-- PROCEDURE 16: TỰ ĐỘNG DỌN DẸP ĐƠN HẾT HẠN GIỮ CHỖ (CÓ GRACE PERIOD 12 PHÚT)
+-- ============================================================================
+CREATE OR ALTER PROCEDURE dbo.sp_DonDepDonHetHanGiuCho
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        DECLARE @ExpiredBookings TABLE (BookingId VARCHAR(10) PRIMARY KEY);
+
+        -- Quét các đơn Unpaid đã quá 12 phút (2 phút ân hạn chống Race Condition sát nút)
+        INSERT INTO @ExpiredBookings (BookingId)
+        SELECT b.BookingId
+        FROM Booking b
+        JOIN Invoice inv ON b.BookingId = inv.BookingId
+        WHERE inv.InvoiceStatus = 'Unpaid'
+          AND NOT EXISTS (SELECT 1 FROM Payment p WHERE p.InvoiceId = inv.InvoiceId)
+          AND DATEDIFF(MINUTE, b.CreateDate, GETDATE()) >= 12;
+
+        -- Xóa an toàn từ bảng con lên bảng cha theo Foreign Key:
+        DELETE brs FROM Booking_Room_Service brs JOIN @ExpiredBookings eb ON brs.BookingId = eb.BookingId;
+        DELETE br FROM Booking_Room br JOIN @ExpiredBookings eb ON br.BookingId = eb.BookingId;
+        DELETE inv FROM Invoice inv JOIN @ExpiredBookings eb ON inv.BookingId = eb.BookingId;
+        DELETE b FROM Booking b JOIN @ExpiredBookings eb ON b.BookingId = eb.BookingId;
+
+        COMMIT TRANSACTION;
+        RETURN 0;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK;
+        DECLARE @ErrMsg2 NVARCHAR(4000) = ERROR_MESSAGE();
+        RAISERROR(@ErrMsg2, 16, 1);
+        RETURN -99;
+    END CATCH
+END;
+GO

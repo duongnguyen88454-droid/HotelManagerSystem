@@ -117,7 +117,7 @@ function handleFormSubmit(event) {
 
             if (data.success) {
                 // Cập nhật dữ liệu vào popup modal
-                document.getElementById("modalRoomName").textContent = "Phòng " + data.soPhong + " (" + data.tenLoaiPhong + ")";
+                document.getElementById("modalRoomName").textContent = data.soPhong + " (" + data.tenLoaiPhong + ")";
                 document.getElementById("modalPeriod").textContent = data.checkIn + " đến " + data.checkOut + " (" + data.soDem + " đêm)";
                 document.getElementById("modalRoomPrice").textContent = formatVND(data.roomPrice);
                 document.getElementById("modalServicePrice").textContent = formatVND(data.serviceTotal);

@@ -20,21 +20,10 @@
 
   <!-- ===== NỢ 1 ĐÃ HOÀN TẤT: BookingDAO đã tách thành 4 lớp độc lập (BookingDAO, BookingDichVuDAO, BookingQueryDAO, InvoiceWriter) theo QT 2.3 ===== -->
 
-  <!-- ===== NỢ 2: BookingService - quá lớn, quá nhiều overload, dùng java.sql.Date ===== -->
-  <suppress checks="FileLength"           files="BookingService\.java"/>
-  <suppress checks="MethodCount"          files="BookingService\.java" lines="20"/>
-  <suppress checks="ParameterNumber"      files="BookingService\.java" lines="48"/>
-  <suppress checks="MethodLength"         files="BookingService\.java" message="createBookingWithServices"/>
-  <suppress checks="CyclomaticComplexity" files="BookingService\.java" lines="172"/>  <!-- getBookingDetail: độ phức tạp 17 -->
-  <suppress checks="ImportControl"        files="BookingService\.java" message="java\.sql\.Date"/>
+  <!-- ===== NỢ 2 ĐÃ HOÀN TẤT: BookingService đã tái cấu trúc sạch sẽ theo QT 1.1-1.5, QT 2.5, QT 3.2 ===== -->
 
-  <!-- ===== NỢ 3: Controller chứa nghiệp vụ (method quá dài/phức tạp) ===== -->
-  <suppress checks="CyclomaticComplexity" files="CustomerBookingServlet\.java" lines="34"/>   <!-- doGet: 17 -->
-  <suppress checks="MethodLength"         files="CustomerCartServlet\.java"    message="handleAddRoom"/>
-  <suppress checks="CyclomaticComplexity" files="CustomerCartServlet\.java"    lines="76"/>   <!-- handleAddRoom: 23 -->
+  <!-- ===== NỢ 3 ĐÃ HOÀN TẤT: CustomerBookingServlet & CustomerCartServlet đã tinh gọn theo QT 1.2, QT 1.3, QT 3.1 ===== -->
 
-  <!-- ===== NỢ 4: Controller gọi thẳng DAO (bỏ qua service) ===== -->
-  <suppress checks="ImportControl" files="CustomerBookingServlet\.java"     message="CustomerDAO"/>
-  <suppress checks="ImportControl" files="ReceptionistPortalServlet\.java"  message="RoomDAO"/>
+  <!-- ===== NỢ 4 ĐÃ HOÀN TẤT: Toàn bộ Controller không còn gọi thẳng DAO theo QT 3.1 ===== -->
 
 </suppressions>

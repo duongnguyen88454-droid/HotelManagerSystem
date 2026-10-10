@@ -28,7 +28,9 @@ public class CustomerRoomDetailServlet extends HttpServlet {
 
         try {
             AvailableRoomDTO room = roomService.getRoomBookingDetail(maPhong, checkIn, checkOut);
+            boolean isAvailable = roomService.isRoomAvailable(maPhong, checkIn, checkOut);
             request.setAttribute("room", room);
+            request.setAttribute("isAvailable", isAvailable);
             request.setAttribute("paramCheckIn", (checkIn != null && !checkIn.trim().isEmpty()) ? checkIn.trim() : LocalDate.now().toString());
             request.setAttribute("paramCheckOut", (checkOut != null && !checkOut.trim().isEmpty()) ? checkOut.trim() : LocalDate.now().plusDays(1).toString());
             request.getRequestDispatcher("/views/room/room_detail.jsp").forward(request, response);

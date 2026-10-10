@@ -19,6 +19,7 @@ public class CartRoomItemDTO implements Serializable {
     private String ngayTra;  // yyyy-MM-dd
     private long soDem;
     private double tienPhong;
+    private double tienCoc;
 
     private List<CartServiceItemDTO> selectedServices = new ArrayList<>();
 
@@ -187,5 +188,13 @@ public class CartRoomItemDTO implements Serializable {
 
     public double getTotalPrice() {
         return getTongTienPhongVaDichVu();
+    }
+
+    public double getTienCoc() {
+        return tienCoc;
+    }
+
+    public void setTienCoc(double tienCoc) {
+        this.tienCoc = tienCoc;
     }
 }

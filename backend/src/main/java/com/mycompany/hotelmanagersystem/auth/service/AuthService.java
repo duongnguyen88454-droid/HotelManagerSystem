@@ -94,10 +94,21 @@ public class AuthService {
         // Băm mật khẩu bằng thuật toán SHA-256 trước khi lưu vào CSDL
         String hashedPassword = PasswordUtil.hashPassword(password);
 
-        // Lưu tài khoản chuẩn đúng 6 thuộc tính vào bảng Account:
-        // AccountId, Password, Role, AccountStatus, UserName, Email
+        // Lưu tài khoản
         Account tk = new Account(maTaiKhoan, hashedPassword, "Customer", "Active", hoTen.trim(), email.trim());
 
         return accountDAO.registerAccount(tk);
+    }
+
+    public boolean register(String hoTen, String email, String soDT, String password, String confirmPassword)
+            throws Exception {
+        return register(hoTen, email, password, confirmPassword);
+    }
+
+    public boolean validateCccd(String cccd) {
+        if (cccd == null || cccd.trim().isEmpty()) {
+            return false;
+        }
+        return cccd.trim().matches("^[0-9]{12}$");
     }
 }

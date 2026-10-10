@@ -200,12 +200,21 @@
                     </div>
                 </div>
 
-                <!-- Nút Đặt Phòng Này dẫn sang Bước 4 (Trang Điền Thông Tin) -->
-                <a href="${pageContext.request.contextPath}/customer/booking?action=prepare&maPhong=${room.maPhong}&checkIn=${paramCheckIn}&checkOut=${paramCheckOut}"
-                   style="display: block; width: 100%; box-sizing: border-box; background: #dd6b20; color: white; text-align: center; text-decoration: none; padding: 12px 16px; border-radius: 5px; font-size: 15px; font-weight: 700; transition: background 0.2s; margin-bottom: 10px;"
-                   onmouseover="this.style.background='#c05621'" onmouseout="this.style.background='#dd6b20'">
-                    Đặt Phòng Này
-                </a>
+                <!-- Nút Đặt Phòng Này hoặc cảnh báo đã có khách -->
+                <c:choose>
+                    <c:when test="${isAvailable}">
+                        <a href="${pageContext.request.contextPath}/customer/booking?action=prepare&maPhong=${room.maPhong}&checkIn=${paramCheckIn}&checkOut=${paramCheckOut}"
+                           style="display: block; width: 100%; box-sizing: border-box; background: #dd6b20; color: white; text-align: center; text-decoration: none; padding: 12px 16px; border-radius: 5px; font-size: 15px; font-weight: 700; transition: background 0.2s; margin-bottom: 10px;"
+                           onmouseover="this.style.background='#c05621'" onmouseout="this.style.background='#dd6b20'">
+                            Đặt Phòng Này
+                        </a>
+                    </c:when>
+                    <c:otherwise>
+                        <div style="background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 12px; border-radius: 5px; font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 10px;">
+                            Phòng đã có khách đặt trong khoảng thời gian này
+                        </div>
+                    </c:otherwise>
+                </c:choose>
 
                 <!-- Nút Quay lại danh sách tìm kiếm -->
                 <a href="${pageContext.request.contextPath}/customer/search-rooms?checkIn=${paramCheckIn}&checkOut=${paramCheckOut}"

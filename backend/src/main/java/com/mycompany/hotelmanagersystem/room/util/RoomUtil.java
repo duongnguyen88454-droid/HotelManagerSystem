@@ -55,7 +55,9 @@ public final class RoomUtil {
         room.setNgayNhan(checkIn.format(DATE_FMT));
         room.setNgayTra(checkOut.format(DATE_FMT));
         room.setSoDem(soDem);
-        room.setTongTienDuKien(room.getGiaPhong() * soDem);
+        double tongTien = room.getGiaPhong() * soDem;
+        room.setTongTienDuKien(tongTien);
+        room.setTienCoc((tongTien * room.getDepositPercent()) / 100.0);
     }
 
     public static int calculateFloor(String soPhong) {

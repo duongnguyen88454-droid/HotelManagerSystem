@@ -129,6 +129,9 @@ public class AccountDAO {
     }
 
     private String resolveUserName(Account tk) {
+        if (tk.getHoTen() != null && !tk.getHoTen().trim().isEmpty()) {
+            return tk.getHoTen().trim();
+        }
         if (tk.getTenDangNhap() != null && !tk.getTenDangNhap().trim().isEmpty()
                 && !tk.getTenDangNhap().contains("@")) {
             return tk.getTenDangNhap().trim();

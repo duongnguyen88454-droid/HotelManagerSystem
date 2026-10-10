@@ -75,103 +75,160 @@ public class CustomerCartServlet extends HttpServlet {
 
     private void handleAddRoom(HttpServletRequest request, HttpServletResponse response, BookingCartDTO cart)
             throws IOException {
-        String roomId = request.getParameter("roomId");
-        if (roomId == null) roomId = request.getParameter("maPhong");
+        String roomId = resolveRoomId(request);
         String checkIn = request.getParameter("checkIn");
         String checkOut = request.getParameter("checkOut");
-        String action = request.getParameter("action"); // "checkout", "continue", "ajax"
-        String isAjax = request.getParameter("isAjax");
+        String action = request.getParameter("action");
+        boolean ajaxRequested = isAjaxRequest(request, action);
 
-        boolean ajaxRequested = "true".equalsIgnoreCase(isAjax) || "ajax".equalsIgnoreCase(action)
-                || "XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"));
-
-        if (roomId == null || roomId.trim().isEmpty() || checkIn == null || checkOut == null) {
-            if (ajaxRequested) {
-                sendJsonResponse(response, false, "Thiếu thông tin phòng hoặc ngày đặt!", null);
-            } else {
-                response.sendRedirect(request.getContextPath() + "/customer/search-rooms");
-            }
+        if (roomId == null || checkIn == null || checkOut == null) {
+            handleMissingRoomParams(request, response, ajaxRequested);
             return;
         }
 
         try {
+            if (!roomService.isRoomAvailable(roomId.trim(), checkIn.trim(), checkOut.trim())) {
+                handleRoomAddError(request, response, ajaxRequested,
+                        "Phòng này hiện đã có khách đặt trong khoảng thời gian yêu cầu, vui lòng chọn phòng khác!",
+                        checkIn, checkOut);
+                return;
+            }
+
             AvailableRoomDTO roomDetail = roomService.getRoomBookingDetail(roomId.trim(), checkIn.trim(), checkOut.trim());
             if (roomDetail != null) {
-                CartRoomItemDTO roomItem = new CartRoomItemDTO(
-                        roomDetail.getMaPhong(),
-                        roomDetail.getSoPhong(),
-                        roomDetail.getMaLoaiPhong(),
-                        roomDetail.getTenLoaiPhong(),
-                        roomDetail.getGiaPhong(),
-                        checkIn.trim(),
-                        checkOut.trim()
-                );
-
-                // Kiểm tra nếu có dịch vụ gửi kèm
-                List<ServiceItem> activeServices = bookingService.getActiveServices();
-                if (activeServices != null) {
-                    List<CartServiceItemDTO> selectedSvcs = new ArrayList<>();
-                    for (ServiceItem svc : activeServices) {
-                        String sId = svc.getMaDichVu();
-                        String paramSvc = request.getParameter("service_" + sId);
-                        if (paramSvc == null) {
-                            paramSvc = request.getParameter("service_" + roomId + "_" + sId);
-                        }
-                        if (paramSvc != null) {
-                            int qty = 1;
-                            String qtyVal = request.getParameter("qty_" + sId);
-                            if (qtyVal == null) {
-                                qtyVal = request.getParameter("qty_" + roomId + "_" + sId);
-                            }
-                            if (qtyVal != null && !qtyVal.trim().isEmpty()) {
-                                try {
-                                    qty = Math.max(1, Integer.parseInt(qtyVal.trim()));
-                                } catch (NumberFormatException ignored) {
-                                    qty = 1;
-                                }
-                            }
-                            selectedSvcs.add(new CartServiceItemDTO(sId, svc.getTenDichVu(), svc.getDonGia(), qty));
-                        }
-                    }
-                    if (!selectedSvcs.isEmpty()) {
-                        roomItem.setSelectedServices(selectedSvcs);
-                    }
-                }
-
+                CartRoomItemDTO roomItem = buildCartRoomItem(request, roomDetail, checkIn.trim(), checkOut.trim());
                 cart.addOrUpdateRoom(roomItem);
 
                 if (ajaxRequested) {
-                    String json = String.format(
-                        "{\"success\":true,\"soPhong\":\"%s\",\"tenLoaiPhong\":\"%s\",\"soDem\":%d,\"roomPrice\":%.0f,\"serviceTotal\":%.0f,\"roomTotal\":%.0f,\"cartTotalRooms\":%d,\"cartGrandTotal\":%.0f,\"checkIn\":\"%s\",\"checkOut\":\"%s\"}",
-                        roomItem.getSoPhong(),
-                        roomItem.getTenLoaiPhong(),
-                        roomItem.getSoDem(),
-                        roomItem.getTienPhong(),
-                        roomItem.getTongTienDichVu(),
-                        roomItem.getTongTienPhongVaDichVu(),
-                        cart.getTotalRoomCount(),
-                        cart.getGrandTotal(),
-                        checkIn.trim(),
-                        checkOut.trim()
-                    );
-                    sendRawJsonResponse(response, json);
+                    sendRoomAddedJsonResponse(response, roomItem, cart, checkIn.trim(), checkOut.trim());
                     return;
                 }
             }
         } catch (Exception ex) {
-            if (ajaxRequested) {
-                sendJsonResponse(response, false, ex.getMessage(), null);
-                return;
-            }
-            String error = URLEncoder.encode("Không thể thêm phòng vào giỏ: " + ex.getMessage(), StandardCharsets.UTF_8.name());
-            response.sendRedirect(request.getContextPath() + "/customer/search-rooms?checkIn=" + checkIn + "&checkOut=" + checkOut + "&error=" + error);
+            handleRoomAddError(request, response, ajaxRequested, ex.getMessage(), checkIn, checkOut);
             return;
         }
 
+        redirectAfterAddRoom(request, response, action, checkIn, checkOut, roomId);
+    }
+
+    private String resolveRoomId(HttpServletRequest request) {
+        String roomId = request.getParameter("roomId");
+        if (roomId == null || roomId.trim().isEmpty()) {
+            roomId = request.getParameter("maPhong");
+        }
+        return (roomId != null && !roomId.trim().isEmpty()) ? roomId.trim() : null;
+    }
+
+    private boolean isAjaxRequest(HttpServletRequest request, String action) {
+        return "true".equalsIgnoreCase(request.getParameter("isAjax"))
+                || "ajax".equalsIgnoreCase(action)
+                || "XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"));
+    }
+
+    private CartRoomItemDTO buildCartRoomItem(HttpServletRequest request, AvailableRoomDTO roomDetail,
+                                              String checkIn, String checkOut) {
+        CartRoomItemDTO roomItem = new CartRoomItemDTO(
+                roomDetail.getMaPhong(),
+                roomDetail.getSoPhong(),
+                roomDetail.getMaLoaiPhong(),
+                roomDetail.getTenLoaiPhong(),
+                roomDetail.getGiaPhong(),
+                checkIn,
+                checkOut
+        );
+        List<CartServiceItemDTO> selectedSvcs = extractSelectedServices(request, roomDetail.getMaPhong());
+        if (!selectedSvcs.isEmpty()) {
+            roomItem.setSelectedServices(selectedSvcs);
+        }
+        roomItem.setTienCoc(roomDetail.getTienCoc());
+        return roomItem;
+    }
+
+    private List<CartServiceItemDTO> extractSelectedServices(HttpServletRequest request, String roomId) {
+        List<ServiceItem> activeServices = bookingService.getActiveServices();
+        if (activeServices == null || activeServices.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<CartServiceItemDTO> selectedSvcs = new ArrayList<>();
+        for (ServiceItem svc : activeServices) {
+            String sId = svc.getMaDichVu();
+            String paramSvc = request.getParameter("service_" + sId);
+            if (paramSvc == null) {
+                paramSvc = request.getParameter("service_" + roomId + "_" + sId);
+            }
+            if (paramSvc != null) {
+                int qty = parseServiceQty(request, sId, roomId);
+                selectedSvcs.add(new CartServiceItemDTO(sId, svc.getTenDichVu(), svc.getDonGia(), qty));
+            }
+        }
+        return selectedSvcs;
+    }
+
+    private int parseServiceQty(HttpServletRequest request, String sId, String roomId) {
+        String qtyVal = request.getParameter("qty_" + sId);
+        if (qtyVal == null) {
+            qtyVal = request.getParameter("qty_" + roomId + "_" + sId);
+        }
+        if (qtyVal != null && !qtyVal.trim().isEmpty()) {
+            try {
+                return Math.max(1, Integer.parseInt(qtyVal.trim()));
+            } catch (NumberFormatException ignored) {
+                return 1;
+            }
+        }
+        return 1;
+    }
+
+    private void sendRoomAddedJsonResponse(HttpServletResponse response, CartRoomItemDTO roomItem,
+                                           BookingCartDTO cart, String checkIn, String checkOut) throws IOException {
+        String json = String.format(
+                "{\"success\":true,\"soPhong\":\"%s\",\"tenLoaiPhong\":\"%s\",\"soDem\":%d,"
+                + "\"roomPrice\":%.0f,\"serviceTotal\":%.0f,\"roomTotal\":%.0f,"
+                + "\"cartTotalRooms\":%d,\"cartGrandTotal\":%.0f,\"checkIn\":\"%s\",\"checkOut\":\"%s\"}",
+                roomItem.getSoPhong(),
+                roomItem.getTenLoaiPhong(),
+                roomItem.getSoDem(),
+                roomItem.getTienPhong(),
+                roomItem.getTongTienDichVu(),
+                roomItem.getTongTienPhongVaDichVu(),
+                cart.getTotalRoomCount(),
+                cart.getGrandTotal(),
+                checkIn,
+                checkOut
+        );
+        sendRawJsonResponse(response, json);
+    }
+
+    private void handleMissingRoomParams(HttpServletRequest request, HttpServletResponse response,
+                                        boolean ajaxRequested) throws IOException {
+        if (ajaxRequested) {
+            sendJsonResponse(response, false, "Thiếu thông tin phòng hoặc ngày đặt!", null);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/customer/search-rooms");
+        }
+    }
+
+    private void handleRoomAddError(HttpServletRequest request, HttpServletResponse response,
+                                    boolean ajaxRequested, String errorMsg, String checkIn, String checkOut)
+            throws IOException {
+        if (ajaxRequested) {
+            sendJsonResponse(response, false, errorMsg, null);
+            return;
+        }
+        String error = URLEncoder.encode("Không thể thêm phòng vào giỏ: " + errorMsg, StandardCharsets.UTF_8.name());
+        response.sendRedirect(request.getContextPath() + "/customer/search-rooms?checkIn=" + checkIn
+                + "&checkOut=" + checkOut + "&error=" + error);
+    }
+
+    private void redirectAfterAddRoom(HttpServletRequest request, HttpServletResponse response,
+                                     String action, String checkIn, String checkOut, String roomId)
+            throws IOException {
         if ("checkout".equalsIgnoreCase(action)) {
             response.sendRedirect(request.getContextPath() + "/customer/booking");
         } else {
-            response.sendRedirect(request.getContextPath() + "/customer/search-rooms?checkIn=" + checkIn + "&checkOut=" + checkOut + "&addedRoom=" + roomId);
+            response.sendRedirect(request.getContextPath() + "/customer/search-rooms?checkIn=" + checkIn
+                    + "&checkOut=" + checkOut + "&addedRoom=" + roomId);
         }
     }
 
@@ -184,11 +241,7 @@ public class CustomerCartServlet extends HttpServlet {
             cart.removeRoom(roomId.trim());
         }
 
-        if (cart.getTotalRoomCount() == 0) {
-            response.sendRedirect(request.getContextPath() + "/customer/search-rooms");
-        } else {
-            response.sendRedirect(request.getContextPath() + "/customer/booking");
-        }
+        response.sendRedirect(request.getContextPath() + "/customer/booking");
     }
 
     private void handleClearCart(HttpServletRequest request, HttpServletResponse response, BookingCartDTO cart)

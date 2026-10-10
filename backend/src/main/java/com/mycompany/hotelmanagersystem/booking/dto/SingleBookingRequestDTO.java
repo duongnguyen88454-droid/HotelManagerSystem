@@ -1,7 +1,7 @@
 package com.mycompany.hotelmanagersystem.booking.dto;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Map;
 
 /**
@@ -14,8 +14,8 @@ public class SingleBookingRequestDTO implements Serializable {
     private String maKH;
     private String maTaiKhoan;
     private String maPhong;
-    private Date checkIn;
-    private Date checkOut;
+    private LocalDate checkIn;
+    private LocalDate checkOut;
     private double donGiaPhong;
     private double tongChiPhi;
     private Map<String, Integer> selectedServices;
@@ -24,8 +24,13 @@ public class SingleBookingRequestDTO implements Serializable {
     public SingleBookingRequestDTO() {
     }
 
-    public SingleBookingRequestDTO(String maKH, String maTaiKhoan, String maPhong, Date checkIn,
-                                  Date checkOut, double donGiaPhong, double tongChiPhi,
+    public SingleBookingRequestDTO(String maKH, String maTaiKhoan, String maPhong, LocalDate checkIn,
+                                  LocalDate checkOut, Map<String, Integer> selectedServices, String ghiChu) {
+        this(maKH, maTaiKhoan, maPhong, checkIn, checkOut, 0.0, 0.0, selectedServices, ghiChu);
+    }
+
+    public SingleBookingRequestDTO(String maKH, String maTaiKhoan, String maPhong, LocalDate checkIn,
+                                  LocalDate checkOut, double donGiaPhong, double tongChiPhi,
                                   Map<String, Integer> selectedServices, String ghiChu) {
         this.maKH = maKH;
         this.maTaiKhoan = maTaiKhoan;
@@ -62,19 +67,19 @@ public class SingleBookingRequestDTO implements Serializable {
         this.maPhong = maPhong;
     }
 
-    public Date getCheckIn() {
+    public LocalDate getCheckIn() {
         return checkIn;
     }
 
-    public void setCheckIn(Date checkIn) {
+    public void setCheckIn(LocalDate checkIn) {
         this.checkIn = checkIn;
     }
 
-    public Date getCheckOut() {
+    public LocalDate getCheckOut() {
         return checkOut;
     }
 
-    public void setCheckOut(Date checkOut) {
+    public void setCheckOut(LocalDate checkOut) {
         this.checkOut = checkOut;
     }
 

@@ -16,6 +16,17 @@
         <c:choose>
             <%-- Trường hợp 1: Chưa đăng nhập --%>
             <c:when test="${empty sessionScope.CURRENT_USER}">
+                <a href="${pageContext.request.contextPath}/customer/search-rooms"
+                    style="color: #edf2f7; text-decoration: none;">Tìm Phòng</a>
+                <a href="${pageContext.request.contextPath}/customer/booking"
+                    style="color: #edf2f7; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                    Rà Soát Đơn
+                    <c:if test="${not empty sessionScope.BOOKING_CART and sessionScope.BOOKING_CART.totalRoomCount > 0}">
+                        <span style="background: #dd6b20; color: #ffffff; padding: 1px 6px; border-radius: 10px; font-weight: 700; font-size: 11px;">
+                            ${sessionScope.BOOKING_CART.totalRoomCount}
+                        </span>
+                    </c:if>
+                </a>
                 <a href="${pageContext.request.contextPath}/login"
                     style="color: #edf2f7; text-decoration: none;">Đăng Nhập</a>
                 <a href="${pageContext.request.contextPath}/register"
@@ -32,12 +43,15 @@
                         style="color: #edf2f7; text-decoration: none;">Đặt Phòng</a>
                     <a href="${pageContext.request.contextPath}/customer/history"
                         style="color: #edf2f7; text-decoration: none;">Lịch Sử Đặt</a>
-                    <c:if test="${not empty sessionScope.BOOKING_CART and sessionScope.BOOKING_CART.totalRoomCount > 0}">
-                        <a href="${pageContext.request.contextPath}/customer/booking"
-                            style="background: #2b6cb0; color: #ffffff; padding: 5px 12px; border-radius: 14px; text-decoration: none; font-weight: 600; font-size: 13px;">
-                            Giỏ phòng (${sessionScope.BOOKING_CART.totalRoomCount})
-                        </a>
-                    </c:if>
+                    <a href="${pageContext.request.contextPath}/customer/booking"
+                        style="color: #edf2f7; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                        Rà Soát Đơn Đặt
+                        <c:if test="${not empty sessionScope.BOOKING_CART and sessionScope.BOOKING_CART.totalRoomCount > 0}">
+                            <span style="background: #dd6b20; color: #ffffff; padding: 1px 6px; border-radius: 10px; font-weight: 700; font-size: 11px;">
+                                ${sessionScope.BOOKING_CART.totalRoomCount}
+                            </span>
+                        </c:if>
+                    </a>
                 </c:if>
                 <c:if test="${sessionScope.CURRENT_USER.receptionist}">
                     <a href="${pageContext.request.contextPath}/receptionist/room-map"

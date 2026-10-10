@@ -21,6 +21,8 @@ public class AvailableRoomDTO implements Serializable {
     private String ngayTra;
     private int soDem;
     private double tongTienDuKien;
+    private double depositPercent;
+    private double tienCoc;
     private String hinhAnhMinhHoa;
 
     public AvailableRoomDTO() {
@@ -162,6 +164,22 @@ public class AvailableRoomDTO implements Serializable {
 
     public void setHinhAnhMinhHoa(String hinhAnhMinhHoa) {
         this.hinhAnhMinhHoa = hinhAnhMinhHoa;
+    }
+
+    public double getDepositPercent() {
+        return depositPercent;
+    }
+
+    public void setDepositPercent(double depositPercent) {
+        this.depositPercent = depositPercent;
+    }
+
+    public double getTienCoc() {
+        return tienCoc;
+    }
+
+    public void setTienCoc(double tienCoc) {
+        this.tienCoc = tienCoc;
     }
 
     public String[] getDanhSachTienNghi() {

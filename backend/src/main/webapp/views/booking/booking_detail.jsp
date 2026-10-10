@@ -33,6 +33,12 @@
     </div>
 
     <!-- Thông báo kết quả -->
+    <c:if test="${param.depositSuccess == 'true'}">
+        <div class="no-print" style="background: #f0fff4; border: 1px solid #9ae6b4; color: #22543d; padding: 14px 18px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; font-weight: 600;">
+            Xác nhận nộp cọc thành công! Khách sạn đã ghi nhận tiền đặt cọc và kích hoạt bảo đảm giữ chỗ cho đơn đặt ${bookingDetail.maBooking}.
+        </div>
+    </c:if>
+
     <c:if test="${param.bookingSuccess == 'true'}">
         <div class="no-print" style="background: #f0fff4; border: 1px solid #9ae6b4; color: #22543d; padding: 14px 18px; border-radius: 6px; margin-bottom: 20px; font-size: 14px;">
             <strong>Đặt phòng thành công!</strong> Đơn đặt của bạn đã được ghi nhận vào hệ thống. Mã đơn: <strong>${bookingDetail.maBooking}</strong>. Quý khách có thể bổ sung thêm dịch vụ tiện ích bên dưới bất kỳ lúc nào trước khi trả phòng.
@@ -75,22 +81,22 @@
             <!-- Badges trạng thái không dùng icon -->
             <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
                 <c:choose>
-                    <c:when test="${bookingDetail.trangThaiBooking == 'DaXacNhan'}">
+                    <c:when test="${bookingDetail.trangThaiBooking == 'Confirmed'}">
                         <span style="background: #c5a880; color: #1a365d; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 4px;">
                             Đã Xác Nhận
                         </span>
                     </c:when>
-                    <c:when test="${bookingDetail.trangThaiBooking == 'DaCheckIn'}">
+                    <c:when test="${bookingDetail.trangThaiBooking == 'CheckedIn'}">
                         <span style="background: #2f855a; color: white; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 4px;">
                             Đang Lưu Trú (Check-in)
                         </span>
                     </c:when>
-                    <c:when test="${bookingDetail.trangThaiBooking == 'DaCheckOut'}">
+                    <c:when test="${bookingDetail.trangThaiBooking == 'CheckedOut'}">
                         <span style="background: #718096; color: white; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 4px;">
                             Đã Trả Phòng (Check-out)
                         </span>
                     </c:when>
-                    <c:when test="${bookingDetail.trangThaiBooking == 'DaHuy'}">
+                    <c:when test="${bookingDetail.trangThaiBooking == 'Cancelled'}">
                         <span style="background: #e53e3e; color: white; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 4px;">
                             Đã Hủy
                         </span>
@@ -100,13 +106,16 @@
                 <div style="font-size: 12px; color: #e2e8f0;">
                     Hóa đơn: <strong>${bookingDetail.maHoaDon}</strong>
                     <c:choose>
-                        <c:when test="${bookingDetail.trangThaiHoaDon == 'DaThanhToan'}">
-                            <span style="background: #276749; color: white; padding: 2px 6px; border-radius: 3px; margin-left: 5px;">Đã Thanh Toán</span>
+                        <c:when test="${bookingDetail.trangThaiHoaDon == 'Paid'}">
+                            <span style="background: #276749; color: white; padding: 2px 6px; border-radius: 3px; margin-left: 5px;">Đã Quyết Toán Đủ</span>
                         </c:when>
-                        <c:when test="${bookingDetail.trangThaiHoaDon == 'ChuaThanhToan'}">
-                            <span style="background: #b7791f; color: white; padding: 2px 6px; border-radius: 3px; margin-left: 5px;">Chưa Thanh Toán</span>
+                        <c:when test="${bookingDetail.trangThaiHoaDon == 'PartiallyPaid'}">
+                            <span style="background: #2b6cb0; color: white; padding: 2px 6px; border-radius: 3px; margin-left: 5px;">Đã Nộp Cọc (Giữ Chỗ)</span>
                         </c:when>
-                        <c:when test="${bookingDetail.trangThaiHoaDon == 'DaHuy'}">
+                        <c:when test="${bookingDetail.trangThaiHoaDon == 'Unpaid'}">
+                            <span style="background: #b7791f; color: white; padding: 2px 6px; border-radius: 3px; margin-left: 5px;">Chưa Nộp Cọc / Chưa Thanh Toán</span>
+                        </c:when>
+                        <c:when test="${bookingDetail.trangThaiHoaDon == 'Cancelled'}">
                             <span style="background: #9b2c2c; color: white; padding: 2px 6px; border-radius: 3px; margin-left: 5px;">Hóa Đơn Hủy</span>
                         </c:when>
                     </c:choose>
@@ -163,7 +172,7 @@
                             ${room.tenLoaiPhong}
                         </span>
                         <h4 style="color: #1a365d; margin: 4px 0 0 0; font-size: 17px; font-weight: 700;">
-                            Phòng ${room.soPhong}
+                            ${room.soPhong}
                         </h4>
                     </div>
 
@@ -178,6 +187,11 @@
                             <strong style="color: #1a365d; font-size: 15px;">
                                 <fmt:formatNumber value="${room.tienPhong}" type="number" groupingUsed="true" maxFractionDigits="0"/> đ
                             </strong>
+                            <c:if test="${room.tienCoc > 0}">
+                                <span style="color: #2b6cb0; font-size: 11px; display: block; margin-top: 2px;">
+                                    Tiền cọc: <fmt:formatNumber value="${room.tienCoc}" type="number" groupingUsed="true" maxFractionDigits="0"/> đ
+                                </span>
+                            </c:if>
                         </div>
                     </div>
                 </div>
@@ -186,7 +200,7 @@
                 <div style="padding: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                         <h5 style="color: #2d3748; margin: 0; font-size: 14px; font-weight: 700;">
-                            Dịch Vụ Đi Kèm Của Phòng ${room.soPhong}
+                            Dịch Vụ Đi Kèm Của ${room.soPhong}
                         </h5>
 
                         <c:if test="${bookingDetail.coTheThemDichVu}">
@@ -247,7 +261,7 @@
                                                 <c:if test="${bookingDetail.coTheThemDichVu}">
                                                     <td style="padding: 12px 14px; text-align: center;" class="no-print">
                                                         <form action="${pageContext.request.contextPath}/customer/booking-detail/add-service" method="POST"
-                                                              onsubmit="return confirm('Bạn có chắc muốn hủy dịch vụ [${dv.tenDichVu}] khỏi phòng ${room.soPhong}?');"
+                                                              onsubmit="return confirm('Bạn có chắc muốn hủy dịch vụ [${dv.tenDichVu}] khỏi ${room.soPhong}?');"
                                                               style="margin: 0;">
                                                             <input type="hidden" name="action" value="remove">
                                                             <input type="hidden" name="bookingId" value="${bookingDetail.maBooking}">
@@ -267,14 +281,21 @@
                         </c:when>
                         <c:otherwise>
                             <div style="background: #f7fafc; border: 1px dashed #cbd5e0; border-radius: 5px; padding: 14px; text-align: center; color: #718096; font-size: 13px;">
-                                Phòng này chưa đăng ký dịch vụ bổ sung nào. Quý khách có thể bấm <strong>"Thêm Dịch Vụ Cho Phòng Này"</strong> để gọi dịch vụ bất kỳ lúc nào trước khi trả phòng.
+                                <c:choose>
+                                    <c:when test="${bookingDetail.coTheThemDichVu}">
+                                        Phòng này chưa đăng ký dịch vụ bổ sung nào. Quý khách có thể bấm <strong>"Thêm Dịch Vụ Cho Phòng Này"</strong> để gọi dịch vụ.
+                                    </c:when>
+                                    <c:otherwise>
+                                        Phòng này không đăng ký dịch vụ bổ sung trước. Đơn đặt phòng đã được xác nhận và đặt cọc, quý khách có nhu cầu sử dụng thêm dịch vụ vui lòng liên hệ quầy lễ tân khi làm thủ tục nhận phòng.
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                         </c:otherwise>
                     </c:choose>
 
                     <c:if test="${room.tongTienDichVuPhong > 0}">
                         <div style="text-align: right; margin-top: 10px; font-size: 13px; color: #4a5568;">
-                            Tổng tiền dịch vụ phòng ${room.soPhong}: 
+                            Tổng tiền dịch vụ ${room.soPhong}: 
                             <strong style="color: #1a365d; font-size: 14px;">
                                 <fmt:formatNumber value="${room.tongTienDichVuPhong}" type="number" groupingUsed="true" maxFractionDigits="0"/> đ
                             </strong>
@@ -300,8 +321,11 @@
                     Mã số hóa đơn: <strong>${bookingDetail.maHoaDon}</strong> &nbsp;|&nbsp; 
                     Trạng thái: 
                     <c:choose>
-                        <c:when test="${bookingDetail.trangThaiHoaDon == 'DaThanhToan'}">
+                        <c:when test="${bookingDetail.trangThaiHoaDon == 'DaThanhToan' || bookingDetail.trangThaiHoaDon == 'Paid'}">
                             <span style="color: #276749; font-weight: 700;">Đã Thanh Toán Toàn Bộ</span>
+                        </c:when>
+                        <c:when test="${bookingDetail.trangThaiHoaDon == 'PartiallyPaid' || bookingDetail.trangThaiHoaDon == 'ThanhToanMotPhan'}">
+                            <span style="color: #2b6cb0; font-weight: 700;">Đã Nộp Tiền Cọc (Số còn lại quyết toán tại quầy)</span>
                         </c:when>
                         <c:otherwise>
                             <span style="color: #b7791f; font-weight: 700;">Chưa Quyết Toán (Thanh toán tại quầy lễ tân)</span>
@@ -326,6 +350,15 @@
                     </strong>
                 </div>
 
+                <c:if test="${bookingDetail.tongTienCoc > 0}">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; color: #2b6cb0;">
+                        <span>Tiền cọc cần thanh toán:</span>
+                        <strong style="color: #2b6cb0;">
+                            <fmt:formatNumber value="${bookingDetail.tongTienCoc}" type="number" groupingUsed="true" maxFractionDigits="0"/> đ
+                        </strong>
+                    </div>
+                </c:if>
+
                 <div style="border-top: 1px solid #cbd5e0; padding-top: 10px; display: flex; justify-content: space-between; align-items: baseline;">
                     <span style="font-size: 14px; font-weight: 700; color: #1a365d;">Tổng Chi Phí:</span>
                     <div style="font-size: 20px; font-weight: 800; color: #c53030;">
@@ -343,20 +376,37 @@
             Quay Lại Lịch Sử Đặt Phòng
         </a>
 
-        <!-- Nút hủy đơn nếu đủ điều kiện -->
-        <c:if test="${bookingDetail.coTheHuy}">
-            <form action="${pageContext.request.contextPath}/customer/history" method="POST"
-                  onsubmit="return confirm('Quý khách có chắc chắn muốn hủy đơn đặt phòng [${bookingDetail.maBooking}] không? Sau khi hủy không thể hoàn tác.');"
-                  style="margin: 0;">
-                <input type="hidden" name="action" value="cancel">
-                <input type="hidden" name="bookingId" value="${bookingDetail.maBooking}">
-                <button type="submit" 
-                        style="background: white; border: 1px solid #feb2b2; color: #e53e3e; padding: 10px 18px; border-radius: 5px; font-size: 14px; font-weight: 600; cursor: pointer;">
-                    Hủy Toàn Bộ Đơn Đặt Phòng Này
-                </button>
-            </form>
-        </c:if>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <!-- Nút Nộp Cọc nếu đơn chưa nộp cọc -->
+            <c:if test="${(bookingDetail.trangThaiHoaDon == 'ChuaThanhToan' || bookingDetail.trangThaiHoaDon == 'Unpaid') && bookingDetail.trangThaiBooking != 'DaHuy' && bookingDetail.trangThaiBooking != 'Cancelled'}">
+                <a href="${pageContext.request.contextPath}/customer/deposit?bookingId=${bookingDetail.maBooking}"
+                   style="background: #2b6cb0; color: white; padding: 10px 18px; border-radius: 5px; text-decoration: none; font-size: 14px; font-weight: 600;">
+                    Thanh Toán Tiền Cọc Ngay
+                </a>
+            </c:if>
+
+            <!-- Nút hủy đơn nếu đủ điều kiện -->
+            <c:if test="${bookingDetail.coTheHuy}">
+                <form action="${pageContext.request.contextPath}/customer/history" method="POST"
+                      onsubmit="return confirm('LƯU Ý QUAN TRỌNG:\nThao tác này sẽ TIẾN HÀNH HỦY TOÀN BỘ các phòng trong đơn đặt [${bookingDetail.maBooking}]!\n\nNếu quý khách chỉ muốn hủy một phần (hủy riêng từng phòng) hoặc thay đổi ngày ở, vui lòng gọi trực tiếp hotline khách sạn 1900 6868 để được hỗ trợ.\n\nQuý khách có chắc chắn muốn hủy toàn bộ đơn đặt phòng này không?');"
+                      style="margin: 0;">
+                    <input type="hidden" name="action" value="cancel">
+                    <input type="hidden" name="bookingId" value="${bookingDetail.maBooking}">
+                    <button type="submit" 
+                            style="background: white; border: 1px solid #feb2b2; color: #e53e3e; padding: 10px 18px; border-radius: 5px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                        Hủy Toàn Bộ Đơn Đặt Phòng Này
+                    </button>
+                </form>
+            </c:if>
+        </div>
     </div>
+
+    <!-- Banner chính sách hủy đơn trực tuyến -->
+    <c:if test="${bookingDetail.coTheHuy}">
+        <div class="no-print" style="margin-top: 15px; background: #fffaf0; border: 1px solid #feebc8; border-radius: 6px; padding: 12px 18px; font-size: 13px; color: #744210; line-height: 1.5;">
+            <strong>Lưu ý về chính sách hủy đơn:</strong> Thao tác hủy trực tuyến trên website sẽ tiến hành <strong>hủy toàn bộ</strong> đơn đặt phòng này. Nếu quý khách chỉ có nhu cầu <strong>hủy một phần</strong> (hủy riêng từng phòng) hoặc bảo lưu tiền cọc, vui lòng liên hệ trực tiếp hotline khách sạn <strong>1900 6868</strong> để được nhân viên lễ tân hỗ trợ xử lý linh hoạt.
+        </div>
+    </c:if>
 
 </div>
 

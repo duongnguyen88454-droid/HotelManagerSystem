@@ -17,10 +17,11 @@ public class ServiceDAO {
      */
     public List<ServiceItem> getAllActiveServices() {
         List<ServiceItem> list = new ArrayList<>();
-        String sql = "SELECT MaDichVu, TenDichVu, DonGia, TrangThai "
-                   + "FROM DICHVU "
-                   + "WHERE TrangThai = 'ApDung' "
-                   + "ORDER BY DonGia ASC";
+        String sql = "SELECT ServiceId AS MaDichVu, ServiceName AS TenDichVu, BasePrice AS DonGia, "
+                   + "       CASE WHEN IsActive = 1 THEN 'ApDung' ELSE 'NgungApDung' END AS TrangThai "
+                   + "FROM Service "
+                   + "WHERE IsActive = 1 "
+                   + "ORDER BY BasePrice ASC";
 
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -45,9 +46,10 @@ public class ServiceDAO {
      * Lấy chi tiết một dịch vụ theo mã
      */
     public ServiceItem getServiceById(String maDichVu) {
-        String sql = "SELECT MaDichVu, TenDichVu, DonGia, TrangThai "
-                   + "FROM DICHVU "
-                   + "WHERE MaDichVu = ?";
+        String sql = "SELECT ServiceId AS MaDichVu, ServiceName AS TenDichVu, BasePrice AS DonGia, "
+                   + "       CASE WHEN IsActive = 1 THEN 'ApDung' ELSE 'NgungApDung' END AS TrangThai "
+                   + "FROM Service "
+                   + "WHERE ServiceId = ? AND IsActive = 1";
 
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

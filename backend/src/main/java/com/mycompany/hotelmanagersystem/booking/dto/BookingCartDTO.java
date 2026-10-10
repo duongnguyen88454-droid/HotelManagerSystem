@@ -69,6 +69,14 @@ public class BookingCartDTO implements Serializable {
         return getTotalRoomCost() + getTotalServiceCost();
     }
 
+    public double getTotalDeposit() {
+        double total = 0.0;
+        for (CartRoomItemDTO room : getItems().values()) {
+            total += room.getTienCoc();
+        }
+        return total;
+    }
+
     public String getGhiChuChung() {
         return ghiChuChung;
     }

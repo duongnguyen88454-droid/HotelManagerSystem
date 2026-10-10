@@ -1,6 +1,6 @@
 function openAddServiceModal(roomId, roomNumber) {
     document.getElementById('modalRoomId').value = roomId;
-    document.getElementById('modalTitle').innerText = 'Thêm Dịch Vụ Cho Phòng ' + roomNumber;
+    document.getElementById('modalTitle').innerText = 'Thêm Dịch Vụ Cho ' + roomNumber;
     document.getElementById('modalServiceSelect').selectedIndex = 0;
     document.getElementById('modalQuantity').value = 1;
     document.getElementById('modalPricePreview').innerText = '0 đ';

@@ -37,15 +37,22 @@ BEGIN
         END;
 
         -- 2. Chống Overbooking: Kiểm tra giao thoa thời gian với các đơn đặt đang có hiệu lực
+        -- Bỏ qua các đơn giữ chỗ đã hết hạn 10 phút chưa thanh toán cọc
         IF EXISTS (
             SELECT 1
             FROM inserted i
             JOIN Booking_Room br_old ON i.RoomId = br_old.RoomId
                 AND NOT (i.BookingId = br_old.BookingId AND i.RoomId = br_old.RoomId)
+            JOIN Booking b_old ON br_old.BookingId = b_old.BookingId
+            LEFT JOIN Invoice inv_old ON b_old.BookingId = inv_old.BookingId
             WHERE i.BookingStatus IN ('Confirmed', 'CheckedIn')
               AND br_old.BookingStatus IN ('Confirmed', 'CheckedIn')
               AND NOT (i.ExpectedCheckOutDate <= br_old.ExpectedCheckInDate 
                        OR i.ExpectedCheckInDate >= br_old.ExpectedCheckOutDate)
+              AND (
+                  inv_old.InvoiceStatus <> 'Unpaid'
+                  OR DATEDIFF(MINUTE, b_old.CreateDate, GETDATE()) < 10
+              )
         )
         BEGIN
             RAISERROR(N'Lỗi nghiệp vụ: Phòng này đã có khách đặt trong khoảng thời gian yêu cầu!', 16, 1);

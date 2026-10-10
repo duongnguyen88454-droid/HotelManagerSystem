@@ -43,7 +43,7 @@
                                         </span>
                                         <h1
                                             style="color: #1a365d; margin: 8px 0 4px 0; font-size: 24px; font-weight: 700;">
-                                            Cấu Hình Phòng ${currentRoom.soPhong} & Dịch Vụ Kèm Theo
+                                            Cấu Hình ${currentRoom.soPhong} & Dịch Vụ Kèm Theo
                                         </h1>
                                         <p style="color: #718096; margin: 0; font-size: 14px;">
                                             Thời gian lưu trú: từ <strong>${currentRoom.ngayNhan}</strong> đến
@@ -61,6 +61,11 @@
                                             <fmt:formatNumber value="${currentRoom.donGia}" type="number"
                                                 maxFractionDigits="0" /> đ x ${currentRoom.soDem} đêm)
                                         </div>
+                                        <c:if test="${currentRoom.tienCoc > 0}">
+                                            <div style="font-size: 12px; color: #2b6cb0; margin-top: 6px; font-weight: 600;">
+                                                Tiền cọc cần thanh toán: <fmt:formatNumber value="${currentRoom.tienCoc}" type="number" maxFractionDigits="0" /> đ
+                                            </div>
+                                        </c:if>
                                     </div>
                                 </div>
                             </div>
@@ -82,7 +87,7 @@
                                     <div
                                         style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2f7; padding-bottom: 10px; margin-bottom: 18px;">
                                         <h3 style="color: #1a365d; font-size: 17px; margin: 0; font-weight: 700;">
-                                            Thêm Dịch Vụ Kèm Theo Cho Phòng ${currentRoom.soPhong}
+                                            Thêm Dịch Vụ Kèm Theo Cho ${currentRoom.soPhong}
                                         </h3>
                                         <span style="font-size: 12px; color: #718096;">
                                             Tùy chọn - Có thể bỏ qua nếu bạn chỉ muốn thuê phòng
@@ -204,188 +209,232 @@
                         <%-- TRƯỜNG HỢP 2: MÀN HÌNH XEM LẠI TOÀN BỘ GIỎ HÀNG & CHỐT ĐẶT ĐƠN (CHECKOUT) --%>
                             <c:otherwise>
 
-                                <div
-                                    style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 22px 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); margin-bottom: 25px;">
-                                    <h1 style="color: #1a365d; margin: 0 0 6px 0; font-size: 24px; font-weight: 700;">
-                                        Rà Soát Đơn Đặt Phòng & Xác Nhận Chốt Đơn
-                                    </h1>
-                                    <p style="color: #718096; margin: 0; font-size: 14px;">
-                                        Dưới đây là toàn bộ danh sách phòng và các dịch vụ bạn đã chọn. Vui lòng kiểm
-                                        tra kỹ trước khi bấm hoàn tất.
-                                    </p>
-                                </div>
+                                <c:choose>
+                                    <%-- 2.1: Giỏ hàng trống --%>
+                                    <c:when test="${empty bookingCart || bookingCart.totalRoomCount == 0}">
+                                        <div style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 50px 24px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.05); margin-bottom: 25px;">
+                                            <div style="font-size: 50px; margin-bottom: 16px;">🏨</div>
+                                            <h2 style="color: #1a365d; font-size: 22px; font-weight: 700; margin: 0 0 10px 0;">
+                                                Giỏ Đặt Phòng Của Bạn Hiện Đang Trống
+                                            </h2>
+                                            <p style="color: #718096; font-size: 14px; max-width: 520px; margin: 0 auto 24px auto; line-height: 1.6;">
+                                                Bạn chưa thêm phòng nào vào đơn đặt hoặc đã xóa hết phòng khỏi giỏ.
+                                                Vui lòng tìm kiếm phòng theo ngày nhận và trả phòng phù hợp để bắt đầu kỳ nghỉ!
+                                            </p>
+                                            <a href="${pageContext.request.contextPath}/customer/search-rooms"
+                                                style="display: inline-block; background: #1a365d; color: white; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 700; transition: background 0.2s;"
+                                                onmouseover="this.style.background='#2b6cb0'"
+                                                onmouseout="this.style.background='#1a365d'">
+                                                Tìm Kiếm & Đặt Phòng Ngay
+                                            </a>
+                                        </div>
+                                    </c:when>
 
-                                <!-- Bảng chi tiết toàn bộ các phòng trong giỏ hàng -->
-                                <div
-                                    style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 25px;">
-                                    <h3
-                                        style="color: #1a365d; font-size: 17px; margin: 0 0 16px 0; font-weight: 700; border-bottom: 1px solid #edf2f7; padding-bottom: 10px;">
-                                        Danh Sách Các Phòng Đã Chọn (${bookingCart.totalRoomCount} phòng)
-                                    </h3>
+                                    <%-- 2.2: Giỏ hàng có phòng cần rà soát --%>
+                                    <c:otherwise>
 
-                                    <c:forEach var="entry" items="${bookingCart.items}">
-                                        <c:set var="item" value="${entry.value}" />
                                         <div
-                                            style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 18px; margin-bottom: 16px;">
+                                            style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 22px 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); margin-bottom: 25px;">
+                                            <h1 style="color: #1a365d; margin: 0 0 6px 0; font-size: 24px; font-weight: 700;">
+                                                Rà Soát Đơn Đặt Phòng & Xác Nhận Chốt Đơn
+                                            </h1>
+                                            <p style="color: #718096; margin: 0; font-size: 14px;">
+                                                Dưới đây là thông tin người đại diện nhận phòng và danh sách các phòng kèm dịch vụ bạn đã chọn. Vui lòng kiểm tra kỹ trước khi bấm hoàn tất.
+                                            </p>
+                                        </div>
+
+                                        <!-- Form xác nhận chốt đơn -->
+                                        <form id="checkoutBookingForm" action="${pageContext.request.contextPath}/customer/booking" method="POST">
+                                            <!-- 1. KHỐI THÔNG TIN KHÁCH HÀNG LƯU TRÚ ĐẠI DIỆN (NẰM TRÊN) -->
                                             <div
-                                                style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
-                                                <div>
-                                                    <div style="font-size: 16px; font-weight: 700; color: #1a365d;">
-                                                        Phòng ${item.soPhong} - ${item.tenLoaiPhong}
-                                                    </div>
-                                                    <div style="font-size: 13px; color: #718096; margin-top: 4px;">
-                                                        Kỳ lưu trú: <strong>${item.ngayNhan}</strong> đến
-                                                        <strong>${item.ngayTra}</strong> (${item.soDem} đêm)
-                                                    </div>
-                                                    <div style="font-size: 13px; color: #4a5568; margin-top: 4px;">
-                                                        Tiền phòng:
-                                                        <fmt:formatNumber value="${item.tienPhong}" type="number"
-                                                            maxFractionDigits="0" /> đ
-                                                        &bull; Tiền dịch vụ:
-                                                        <fmt:formatNumber value="${item.tongTienDichVu}" type="number"
-                                                            maxFractionDigits="0" /> đ
+                                                style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 25px;">
+                                                <div
+                                                    style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2f7; padding-bottom: 10px; margin-bottom: 18px;">
+                                                    <h3 style="color: #1a365d; font-size: 17px; margin: 0; font-weight: 700;">
+                                                        Thông Tin Khách Hàng Lưu Trú (Đại Diện Nhận Phòng)
+                                                    </h3>
+                                                    <c:choose>
+                                                        <c:when test="${not empty savedGuest.cccd || not empty sessionScope.SAVED_CCCD}">
+                                                            <span
+                                                                style="font-size: 12px; color: #276749; background: #f0fff4; border: 1px solid #9ae6b4; padding: 3px 10px; border-radius: 4px; font-weight: 600;">
+                                                                ✓ Đã tự động điền từ hồ sơ lưu trú
+                                                            </span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span
+                                                                style="font-size: 12px; color: #718096; background: #edf2f7; border: 1px solid #cbd5e0; padding: 3px 10px; border-radius: 4px;">
+                                                                Nhập 1 lần duy nhất - Hệ thống sẽ tự động lưu lại
+                                                            </span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+
+                                                <div
+                                                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px;">
+                                                    <div>
+                                                        <label
+                                                            style="display: block; font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 6px;">
+                                                            Họ và Tên Khách Hàng: <span style="color: #e53e3e;">*</span>
+                                                        </label>
+                                                        <input type="text" name="customerName"
+                                                            value="${not empty savedGuest.hoTen ? savedGuest.hoTen : (not empty sessionScope.CURRENT_USER.hoTen ? sessionScope.CURRENT_USER.hoTen : sessionScope.CURRENT_USER.hoTenTaiKhoan)}" required
+                                                            style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 14px; box-sizing: border-box;">
                                                     </div>
 
-                                                    <c:if test="${not empty item.selectedServices}">
-                                                        <div style="margin-top: 8px; font-size: 12px; color: #2b6cb0;">
-                                                            <strong>Dịch vụ kèm:</strong>
-                                                            <c:forEach var="s" items="${item.selectedServices}"
-                                                                varStatus="loop">
-                                                                ${s.tenDichVu} (x${s.soLuong})<c:if
-                                                                    test="${!loop.last}">, </c:if>
-                                                            </c:forEach>
+                                                    <div>
+                                                        <label
+                                                            style="display: block; font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 6px;">
+                                                            Số Điện Thoại Liên Hệ: <span style="color: #e53e3e;">*</span>
+                                                        </label>
+                                                        <input type="text" name="customerPhone"
+                                                            value="${not empty savedGuest.soDT ? savedGuest.soDT : sessionScope.CURRENT_USER.soDT}" required
+                                                            placeholder="Ví dụ: 0901234567"
+                                                            style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 14px; box-sizing: border-box;">
+                                                    </div>
+
+                                                    <div>
+                                                        <label
+                                                            style="display: block; font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 6px;">
+                                                            Địa Chỉ Email: <span style="color: #e53e3e;">*</span>
+                                                        </label>
+                                                        <input type="email" name="customerEmail"
+                                                            value="${not empty savedGuest.email ? savedGuest.email : sessionScope.CURRENT_USER.email}" required
+                                                            style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 14px; box-sizing: border-box;">
+                                                    </div>
+
+                                                    <div>
+                                                        <label
+                                                            style="display: block; font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 6px;">
+                                                            Số CCCD Người Lưu Trú (12 chữ số): <span style="color: #e53e3e;">*</span>
+                                                        </label>
+                                                        <input type="text" name="customerCccd" required pattern="[0-9]{12}" maxlength="12"
+                                                            value="${not empty savedGuest.cccd ? savedGuest.cccd : sessionScope.SAVED_CCCD}"
+                                                            placeholder="Ví dụ: 001202001234 (12 số)"
+                                                            style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 14px; box-sizing: border-box;">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 2. KHỐI DANH SÁCH CÁC PHÒNG ĐÃ CHỌN (NẰM DƯỚI THÔNG TIN ĐẠI DIỆN) -->
+                                            <div
+                                                style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 25px;">
+                                                <h3
+                                                    style="color: #1a365d; font-size: 17px; margin: 0 0 16px 0; font-weight: 700; border-bottom: 1px solid #edf2f7; padding-bottom: 10px;">
+                                                    Danh Sách Các Phòng Đã Chọn (${bookingCart.totalRoomCount} phòng)
+                                                </h3>
+
+                                                <c:forEach var="entry" items="${bookingCart.items}">
+                                                    <c:set var="item" value="${entry.value}" />
+                                                    <div
+                                                        style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 18px; margin-bottom: 16px;">
+                                                        <div
+                                                            style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                                                            <div>
+                                                                <div style="font-size: 16px; font-weight: 700; color: #1a365d;">
+                                                                    ${item.soPhong} - ${item.tenLoaiPhong}
+                                                                </div>
+                                                                <div style="font-size: 13px; color: #718096; margin-top: 4px;">
+                                                                    Kỳ lưu trú: <strong>${item.ngayNhan}</strong> đến
+                                                                    <strong>${item.ngayTra}</strong> (${item.soDem} đêm)
+                                                                </div>
+                                                                <div style="font-size: 13px; color: #4a5568; margin-top: 4px;">
+                                                                    Tiền phòng:
+                                                                    <fmt:formatNumber value="${item.tienPhong}" type="number"
+                                                                        maxFractionDigits="0" /> đ
+                                                                    &bull; Tiền dịch vụ:
+                                                                    <fmt:formatNumber value="${item.tongTienDichVu}" type="number"
+                                                                        maxFractionDigits="0" /> đ
+                                                                    <c:if test="${item.tienCoc > 0}">
+                                                                        &bull; Cọc: <fmt:formatNumber value="${item.tienCoc}" type="number" maxFractionDigits="0" /> đ
+                                                                    </c:if>
+                                                                </div>
+
+                                                                <c:if test="${not empty item.selectedServices}">
+                                                                    <div style="margin-top: 8px; font-size: 12px; color: #2b6cb0;">
+                                                                        <strong>Dịch vụ kèm:</strong>
+                                                                        <c:forEach var="s" items="${item.selectedServices}"
+                                                                            varStatus="loop">
+                                                                            ${s.tenDichVu} (x${s.soLuong})<c:if
+                                                                                test="${!loop.last}">, </c:if>
+                                                                        </c:forEach>
+                                                                    </div>
+                                                                </c:if>
+                                                            </div>
+
+                                                            <div style="text-align: right;">
+                                                                <div style="font-size: 18px; font-weight: 700; color: #dd6b20;">
+                                                                    <fmt:formatNumber value="${item.tongTienPhongVaDichVu}"
+                                                                        type="number" maxFractionDigits="0" /> đ
+                                                                </div>
+                                                                <button type="button" onclick="removeRoomFromCart('${item.maPhong}')"
+                                                                    style="margin-top: 8px; background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                                                                    Xóa Khỏi Giỏ
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </c:forEach>
+
+                                                <div
+                                                    style="text-align: right; border-top: 1px dashed #cbd5e0; padding-top: 16px; margin-top: 10px;">
+                                                    <div style="font-size: 15px; color: #718096;">Tổng Cộng Toàn Bộ Đơn Hàng:</div>
+                                                    <div
+                                                        style="font-size: 28px; font-weight: 700; color: #dd6b20; margin-top: 2px;">
+                                                        <fmt:formatNumber value="${bookingCart.grandTotal}" type="number"
+                                                            maxFractionDigits="0" /> đ
+                                                    </div>
+                                                    <c:if test="${bookingCart.totalDeposit > 0}">
+                                                        <div style="font-size: 15px; font-weight: 600; color: #2b6cb0; margin-top: 6px;">
+                                                            Tiền cọc cần thanh toán: <fmt:formatNumber value="${bookingCart.totalDeposit}" type="number" maxFractionDigits="0" /> đ
                                                         </div>
                                                     </c:if>
                                                 </div>
-
-                                                <div style="text-align: right;">
-                                                    <div style="font-size: 18px; font-weight: 700; color: #dd6b20;">
-                                                        <fmt:formatNumber value="${item.tongTienPhongVaDichVu}"
-                                                            type="number" maxFractionDigits="0" /> đ
-                                                    </div>
-                                                    <form
-                                                        action="${pageContext.request.contextPath}/customer/cart/remove"
-                                                        method="POST" style="margin-top: 8px;">
-                                                        <input type="hidden" name="roomId" value="${item.maPhong}">
-                                                        <button type="submit"
-                                                            style="background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">
-                                                            Xóa Khỏi Giỏ
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </c:forEach>
-
-                                    <div
-                                        style="text-align: right; border-top: 1px dashed #cbd5e0; padding-top: 16px; margin-top: 10px;">
-                                        <div style="font-size: 15px; color: #718096;">Tổng Cộng Toàn Bộ Đơn Hàng:</div>
-                                        <div
-                                            style="font-size: 28px; font-weight: 700; color: #dd6b20; margin-top: 2px;">
-                                            <fmt:formatNumber value="${bookingCart.grandTotal}" type="number"
-                                                maxFractionDigits="0" /> đ
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Form xác nhận chốt đơn -->
-                                <form action="${pageContext.request.contextPath}/customer/booking" method="POST">
-                                    <!-- Khối thông tin khách hàng lưu trú đại diện (Xác minh hồ sơ theo CCCD) -->
-                                    <div
-                                        style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 25px;">
-                                        <div
-                                            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2f7; padding-bottom: 10px; margin-bottom: 18px;">
-                                            <h3 style="color: #1a365d; font-size: 17px; margin: 0; font-weight: 700;">
-                                                Thông Tin Khách Hàng Lưu Trú (Đại Diện Nhận Phòng)
-                                            </h3>
-                                            <c:choose>
-                                                <c:when test="${not empty savedGuest.cccd || not empty sessionScope.SAVED_CCCD}">
-                                                    <span
-                                                        style="font-size: 12px; color: #276749; background: #f0fff4; border: 1px solid #9ae6b4; padding: 3px 10px; border-radius: 4px; font-weight: 600;">
-                                                        ✓ Đã tự động điền từ hồ sơ lưu trú
-                                                    </span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span
-                                                        style="font-size: 12px; color: #718096; background: #edf2f7; border: 1px solid #cbd5e0; padding: 3px 10px; border-radius: 4px;">
-                                                        Nhập 1 lần duy nhất - Hệ thống sẽ tự động lưu lại
-                                                    </span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </div>
-
-                                        <div
-                                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px;">
-                                            <div>
-                                                <label
-                                                    style="display: block; font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 6px;">
-                                                    Họ và Tên Khách Hàng: <span style="color: #e53e3e;">*</span>
-                                                </label>
-                                                <input type="text" name="customerName"
-                                                    value="${not empty savedGuest.hoTen ? savedGuest.hoTen : (not empty sessionScope.CURRENT_USER.hoTen ? sessionScope.CURRENT_USER.hoTen : sessionScope.CURRENT_USER.hoTenTaiKhoan)}" required
-                                                    style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 14px; box-sizing: border-box;">
                                             </div>
 
-                                            <div>
-                                                <label
-                                                    style="display: block; font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 6px;">
-                                                    Số Điện Thoại Liên Hệ: <span style="color: #e53e3e;">*</span>
-                                                </label>
-                                                <input type="text" name="customerPhone"
-                                                    value="${not empty savedGuest.soDT ? savedGuest.soDT : sessionScope.CURRENT_USER.soDT}" required
-                                                    placeholder="Ví dụ: 0901234567"
-                                                    style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 14px; box-sizing: border-box;">
+                                            <!-- 3. KHỐI GHI CHÚ CHUNG -->
+                                            <div
+                                                style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 25px;">
+                                                <h3
+                                                    style="color: #1a365d; font-size: 17px; margin: 0 0 14px 0; font-weight: 700; border-bottom: 1px solid #edf2f7; padding-bottom: 10px;">
+                                                    Ghi Chú Chung Cho Đơn Đặt Phòng
+                                                </h3>
+                                                <textarea name="note" rows="3"
+                                                    placeholder="Nhập ghi chú chung cho toàn bộ chuyến đi nếu có..."
+                                                    style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 13px; box-sizing: border-box;"></textarea>
                                             </div>
 
-                                            <div>
-                                                <label
-                                                    style="display: block; font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 6px;">
-                                                    Địa Chỉ Email: <span style="color: #e53e3e;">*</span>
-                                                </label>
-                                                <input type="email" name="customerEmail"
-                                                    value="${not empty savedGuest.email ? savedGuest.email : sessionScope.CURRENT_USER.email}" required
-                                                    style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 14px; box-sizing: border-box;">
+                                            <!-- 4. HÀNG NÚT THAO TÁC -->
+                                            <div
+                                                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                                                <a href="${pageContext.request.contextPath}/customer/search-rooms"
+                                                    style="background: #edf2f7; color: #4a5568; padding: 12px 20px; border-radius: 5px; text-decoration: none; font-size: 14px; font-weight: 600;">
+                                                    + Đặt Thêm Phòng Khác
+                                                </a>
+
+                                                <button type="submit"
+                                                    style="background: #dd6b20; color: white; border: none; padding: 14px 28px; border-radius: 5px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s;"
+                                                    onmouseover="this.style.background='#c05621'"
+                                                    onmouseout="this.style.background='#dd6b20'">
+                                                    Xác Nhận Đặt Toàn Bộ Đơn Phòng
+                                                </button>
                                             </div>
+                                        </form>
 
-                                            <div>
-                                                <label
-                                                    style="display: block; font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 6px;">
-                                                    Số CCCD Người Lưu Trú (12 chữ số): <span style="color: #e53e3e;">*</span>
-                                                </label>
-                                                <input type="text" name="customerCccd" required pattern="[0-9]{12}" maxlength="12"
-                                                    value="${not empty savedGuest.cccd ? savedGuest.cccd : sessionScope.SAVED_CCCD}"
-                                                    placeholder="Ví dụ: 001202001234 (12 số)"
-                                                    style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 14px; box-sizing: border-box;">
-                                            </div>
-                                        </div>
-                                    </div>
+                                        <!-- Form ẩn xử lý xóa phòng khỏi giỏ an toàn -->
+                                        <form id="hiddenRemoveForm" action="${pageContext.request.contextPath}/customer/cart/remove" method="POST" style="display: none;">
+                                            <input type="hidden" name="roomId" id="removeRoomIdInput">
+                                        </form>
+                                        <script>
+                                            function removeRoomFromCart(roomId) {
+                                                if (confirm('Bạn có chắc chắn muốn xóa phòng này khỏi giỏ hàng?')) {
+                                                    document.getElementById('removeRoomIdInput').value = roomId;
+                                                    document.getElementById('hiddenRemoveForm').submit();
+                                                }
+                                            }
+                                        </script>
 
-                                    <div
-                                        style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 25px;">
-                                        <h3
-                                            style="color: #1a365d; font-size: 17px; margin: 0 0 14px 0; font-weight: 700; border-bottom: 1px solid #edf2f7; padding-bottom: 10px;">
-                                            Ghi Chú Chung Cho Đơn Đặt Phòng
-                                        </h3>
-                                        <textarea name="note" rows="3"
-                                            placeholder="Nhập ghi chú chung cho toàn bộ chuyến đi nếu có..."
-                                            style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 13px; box-sizing: border-box;"></textarea>
-                                    </div>
-
-                                    <div
-                                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                                        <a href="${pageContext.request.contextPath}/customer/search-rooms"
-                                            style="background: #edf2f7; color: #4a5568; padding: 12px 20px; border-radius: 5px; text-decoration: none; font-size: 14px; font-weight: 600;">
-                                            + Đặt Thêm Phòng Khác
-                                        </a>
-
-                                        <button type="submit"
-                                            style="background: #dd6b20; color: white; border: none; padding: 14px 28px; border-radius: 5px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s;"
-                                            onmouseover="this.style.background='#c05621'"
-                                            onmouseout="this.style.background='#dd6b20'">
-                                            Xác Nhận Đặt Toàn Bộ Đơn Phòng
-                                        </button>
-                                    </div>
-                                </form>
+                                    </c:otherwise>
+                                </c:choose>
 
                             </c:otherwise>
                 </c:choose>
@@ -421,7 +470,7 @@
                             style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 16px; margin-bottom: 18px; font-size: 13px; line-height: 1.8;">
                             <div style="display: flex; justify-content: space-between;">
                                 <span style="color: #718096;">Phòng đã chọn:</span>
-                                <strong id="modalRoomName" style="color: #1a365d;">Phòng ...</strong>
+                                <strong id="modalRoomName" style="color: #1a365d;">...</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
                                 <span style="color: #718096;">Thời gian ở:</span>

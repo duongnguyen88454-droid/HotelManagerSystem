@@ -19,14 +19,16 @@
                     </div>
                 </c:if>
 
-                <form action="${pageContext.request.contextPath}/register" method="POST">
+                <form action="${pageContext.request.contextPath}/register" method="POST"
+                    oninput='confirmPassword.setCustomValidity(confirmPassword.value !== password.value ? "Mật khẩu xác nhận không khớp!" : "")'>
                     <div class="form-group" style="margin-bottom: 14px;">
                         <label for="hoTen"
                             style="display: block; font-weight: 600; margin-bottom: 4px; color: #2d3748;">
                             Họ và Tên: <span style="color: red;">*</span>
                         </label>
                         <input type="text" id="hoTen" name="hoTen" value="${oldHoTen}" required
-                            placeholder="VD: Trần Văn Nam"
+                            pattern=".*\S+.*" title="Họ và tên không được để trống hoặc chỉ chứa khoảng trắng"
+                            placeholder="VD: Phạm Lê Phát Đạt"
                             style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px;" />
                     </div>
 
@@ -43,9 +45,10 @@
                     <div class="form-group" style="margin-bottom: 14px;">
                         <label for="password"
                             style="display: block; font-weight: 600; margin-bottom: 4px; color: #2d3748;">
-                            Mật khẩu: <span style="color: red;">*</span>
+                            Mật khẩu (Tối thiểu 6 ký tự): <span style="color: red;">*</span>
                         </label>
-                        <input type="password" id="password" name="password" required placeholder="Nhập mật khẩu bảo vệ"
+                        <input type="password" id="password" name="password" required minlength="6"
+                            placeholder="Nhập mật khẩu bảo vệ"
                             style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px;" />
                     </div>
 
@@ -54,7 +57,7 @@
                             style="display: block; font-weight: 600; margin-bottom: 4px; color: #2d3748;">
                             Xác nhận lại Mật khẩu: <span style="color: red;">*</span>
                         </label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" required
+                        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6"
                             placeholder="Nhập lại mật khẩu"
                             style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px;" />
                     </div>

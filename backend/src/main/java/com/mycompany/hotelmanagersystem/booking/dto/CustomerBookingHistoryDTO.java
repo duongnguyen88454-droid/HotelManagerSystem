@@ -41,7 +41,7 @@ public class CustomerBookingHistoryDTO implements Serializable {
         this.trangThaiBooking = trangThaiBooking;
         this.maHoaDon = maHoaDon;
         this.trangThaiHoaDon = trangThaiHoaDon;
-        this.coTheHuy = "DaXacNhan".equalsIgnoreCase(trangThaiBooking);
+        this.coTheHuy = "Confirmed".equalsIgnoreCase(trangThaiBooking);
     }
 
     public String getMaBooking() {
@@ -114,7 +114,7 @@ public class CustomerBookingHistoryDTO implements Serializable {
 
     public void setTrangThaiBooking(String trangThaiBooking) {
         this.trangThaiBooking = trangThaiBooking;
-        this.coTheHuy = "DaXacNhan".equalsIgnoreCase(trangThaiBooking);
+        this.coTheHuy = "Confirmed".equalsIgnoreCase(trangThaiBooking);
     }
 
     public String getMaHoaDon() {
