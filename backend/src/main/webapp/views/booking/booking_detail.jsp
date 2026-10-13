@@ -156,6 +156,24 @@
         </div>
     </div>
 
+    <!-- THÔNG TIN HỦY ĐƠN & HOÀN CỌC NẾU ĐƠN BỊ HỦY -->
+    <c:if test="${bookingDetail.trangThaiBooking == 'Cancelled'}">
+        <div style="background: #fff5f5; border: 1px solid #feb2b2; border-radius: 8px; padding: 20px 24px; margin-bottom: 25px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                <span style="font-size: 20px;">ℹ️</span>
+                <h4 style="margin: 0; color: #c53030; font-size: 16px; font-weight: 700;">
+                    Thông Tin Hủy Đơn &amp; Hoàn Trả Tiền Cọc (Cancellation History)
+                </h4>
+            </div>
+            <p style="color: #4a5568; font-size: 13px; line-height: 1.6; margin: 0 0 12px 0;">
+                Đơn đặt phòng này đã được ghi nhận hủy trong hệ thống theo chính sách khách sạn. Nếu đơn có tiền cọc trước đó, tiền hoàn trả sẽ được đối soát theo công thức <code>Tiền Cọc - Phí Hủy Phòng</code> (Function: fn_TinhTienHoanTraHuyPhong).
+            </p>
+            <div style="font-size: 13px; color: #742a2a; background: #fffaf0; padding: 10px 14px; border-radius: 5px; border-left: 3px solid #dd6b20;">
+                Mọi thắc mắc về tiến độ hoàn tiền qua ngân hàng hoặc bảo lưu cọc, quý khách vui lòng liên hệ lễ tân hotline <strong>1900 6868</strong> để được hỗ trợ tức thì.
+            </div>
+        </div>
+    </c:if>
+
     <!-- DANH SÁCH CÁC PHÒNG TRONG ĐƠN ĐẶT KÈM DỊCH VỤ GẮN THEO PHÒNG -->
     <h3 style="color: #1a365d; font-size: 18px; font-weight: 700; margin: 0 0 15px 0;">
         Danh Sách Phòng & Dịch Vụ Tiện Ích Đã Đăng Ký
@@ -321,10 +339,10 @@
                     Mã số hóa đơn: <strong>${bookingDetail.maHoaDon}</strong> &nbsp;|&nbsp; 
                     Trạng thái: 
                     <c:choose>
-                        <c:when test="${bookingDetail.trangThaiHoaDon == 'DaThanhToan' || bookingDetail.trangThaiHoaDon == 'Paid'}">
+                        <c:when test="${bookingDetail.trangThaiHoaDon == 'Paid'}">
                             <span style="color: #276749; font-weight: 700;">Đã Thanh Toán Toàn Bộ</span>
                         </c:when>
-                        <c:when test="${bookingDetail.trangThaiHoaDon == 'PartiallyPaid' || bookingDetail.trangThaiHoaDon == 'ThanhToanMotPhan'}">
+                        <c:when test="${bookingDetail.trangThaiHoaDon == 'PartiallyPaid' || bookingDetail.trangThaiHoaDon == 'Partial'}">
                             <span style="color: #2b6cb0; font-weight: 700;">Đã Nộp Tiền Cọc (Số còn lại quyết toán tại quầy)</span>
                         </c:when>
                         <c:otherwise>
@@ -378,7 +396,7 @@
 
         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
             <!-- Nút Nộp Cọc nếu đơn chưa nộp cọc -->
-            <c:if test="${(bookingDetail.trangThaiHoaDon == 'ChuaThanhToan' || bookingDetail.trangThaiHoaDon == 'Unpaid') && bookingDetail.trangThaiBooking != 'DaHuy' && bookingDetail.trangThaiBooking != 'Cancelled'}">
+            <c:if test="${bookingDetail.trangThaiHoaDon == 'Unpaid' && bookingDetail.trangThaiBooking != 'Cancelled'}">
                 <a href="${pageContext.request.contextPath}/customer/deposit?bookingId=${bookingDetail.maBooking}"
                    style="background: #2b6cb0; color: white; padding: 10px 18px; border-radius: 5px; text-decoration: none; font-size: 14px; font-weight: 600;">
                     Thanh Toán Tiền Cọc Ngay

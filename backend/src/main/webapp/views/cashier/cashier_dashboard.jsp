@@ -94,10 +94,10 @@
                                 </td>
                                 <td>
                                     <c:choose>
-                                        <c:when test="${item.trangThaiHoaDon == 'DaThanhToanDu'}">
+                                        <c:when test="${item.trangThaiHoaDon == 'Paid'}">
                                             <span class="badge badge-paid">Đã thanh toán đủ</span>
                                         </c:when>
-                                        <c:when test="${item.trangThaiHoaDon == 'MotPhan' || (item.daThanhToan != null && item.daThanhToan > 0)}">
+                                        <c:when test="${item.trangThaiHoaDon == 'PartiallyPaid' || item.trangThaiHoaDon == 'Partial' || (item.daThanhToan != null && item.daThanhToan > 0)}">
                                             <span class="badge badge-partial">Thanh toán một phần</span>
                                         </c:when>
                                         <c:otherwise>
@@ -106,10 +106,26 @@
                                     </c:choose>
                                 </td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/cashier/booking-detail?maBooking=${item.maBooking}"
-                                       class="btn-action">
-                                        Chi Tiết &amp; Trả Phòng
-                                    </a>
+                                    <c:choose>
+                                        <c:when test="${item.soPhongChuaTra > 0}">
+                                            <a href="${pageContext.request.contextPath}/cashier/booking-detail?maBooking=${item.maBooking}"
+                                               class="btn-action">
+                                                Chi Tiết &amp; Trả Phòng
+                                            </a>
+                                        </c:when>
+                                        <c:when test="${item.trangThaiHoaDon == 'Paid' || (item.soTienConNo != null && item.soTienConNo le 0)}">
+                                            <a href="${pageContext.request.contextPath}/cashier/booking-detail?maBooking=${item.maBooking}"
+                                               class="btn-action" style="background-color: #059669;">
+                                                Xem Chi Tiết &amp; Hóa Đơn
+                                            </a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="${pageContext.request.contextPath}/cashier/booking-detail?maBooking=${item.maBooking}"
+                                               class="btn-action" style="background-color: #ea580c;">
+                                                Quyết Toán Công Nợ
+                                            </a>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
                             </tr>
                         </c:forEach>

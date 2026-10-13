@@ -41,15 +41,24 @@ public class ReceptionistCheckInServlet extends HttpServlet {
             return;
         }
 
+        String keyword     = request.getParameter("keyword");
         String filterHoTen = request.getParameter("filterHoTen");
         String filterCccd  = request.getParameter("filterCccd");
         String filterMaBK  = request.getParameter("filterMaBK");
-        List<CheckInArrivalItemDTO> arrivalList = checkInService.getArrivalBookings(filterHoTen, filterCccd, filterMaBK);
+
+        List<CheckInArrivalItemDTO> arrivalList = checkInService.getArrivalBookings(
+                filterHoTen, filterCccd, filterMaBK, keyword);
         request.setAttribute("arrivalList", arrivalList);
+        request.setAttribute("keyword", keyword != null ? keyword.trim() : "");
         request.setAttribute("filterHoTen", filterHoTen != null ? filterHoTen.trim() : "");
         request.setAttribute("filterCccd",  filterCccd  != null ? filterCccd.trim()  : "");
         request.setAttribute("filterMaBK",  filterMaBK  != null ? filterMaBK.trim()  : "");
-        request.setAttribute("autoSelectBooking", request.getParameter("maBooking"));
+
+        String autoBooking = request.getParameter("maBooking");
+        if (autoBooking == null || autoBooking.trim().isEmpty()) {
+            autoBooking = request.getParameter("autoModal");
+        }
+        request.setAttribute("autoSelectBooking", autoBooking);
 
         request.getRequestDispatcher("/views/receptionist/checkin.jsp").forward(request, response);
     }
@@ -83,17 +92,8 @@ public class ReceptionistCheckInServlet extends HttpServlet {
         }
 
         List<String> roomIds = (maPhongArr != null) ? Arrays.asList(maPhongArr) : new ArrayList<>();
-        String maNV = resolveEmployeeId(request.getSession(false));
-
-        CheckInResultDTO result = checkInService.executeCheckInMultipleRooms(maBooking, roomIds, maNV);
+        CheckInResultDTO result = checkInService.executeCheckInMultipleRooms(maBooking, roomIds);
         response.getWriter().write(buildJsonResponse(result));
-    }
-
-    private String resolveEmployeeId(HttpSession session) {
-        if (session != null && session.getAttribute("maNV") != null) {
-            return (String) session.getAttribute("maNV");
-        }
-        return "NV001";
     }
 
     private String buildJsonResponse(CheckInResultDTO result) {

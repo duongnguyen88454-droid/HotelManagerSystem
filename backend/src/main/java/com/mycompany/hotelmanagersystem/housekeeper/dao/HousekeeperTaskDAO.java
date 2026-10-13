@@ -17,20 +17,23 @@ import java.util.List;
 public class HousekeeperTaskDAO extends DBContext {
 
     private static final String SELECT_TASKS_SQL =
-            "SELECT nvdp.MaNhiemVu, p.MaPhong, p.SoPhong, lp.TenLoaiPhong, "
-            + "p.TrangThai AS TrangThaiPhong, nvdp.TrangThai AS TrangThaiNhiemVu, "
-            + "nv.MaNV AS MaNhanVienDon, nv.HoTen AS TenNhanVienDon, "
-            + "nvdp.ThoiGianNhan, nvdp.ThoiGianBatDau, nvdp.ThoiGianKetThuc, nvdp.KetQua "
-            + "FROM NHIEMVUDOPHONG nvdp "
-            + "INNER JOIN PHONG p ON nvdp.MaPhong = p.MaPhong "
-            + "INNER JOIN LOAIPHONG lp ON p.MaLoaiPhong = lp.MaLoaiPhong "
-            + "LEFT JOIN NHANVIEN nv ON nvdp.MaNV = nv.MaNV "
-            + "WHERE p.TrangThai IN ('Dirty', 'Cleaning') "
-            + "AND (? IS NULL OR nvdp.TrangThai = ?) "
-            + "ORDER BY CASE p.TrangThai "
-            + "WHEN 'Cleaning' THEN 1 "
-            + "WHEN 'Dirty' THEN 2 "
-            + "ELSE 3 END, nvdp.ThoiGianNhan DESC";
+            "SELECT rct.RoomCleaningTaskId AS MaNhiemVu, r.RoomId AS MaPhong, r.RoomName AS SoPhong, "
+            + "rt.RoomTypeName AS TenLoaiPhong, r.HousekeepingStatus AS TrangThaiPhong, "
+            + "rct.RoomCleaningTaskStatus AS TrangThaiNhiemVu, "
+            + "ISNULL(rct.ReceivedBy, '') AS MaNhanVienDon, "
+            + "ISNULL(emp.FullName, acc.UserName) AS TenNhanVienDon, "
+            + "rct.StartTime AS ThoiGianNhan, rct.StartTime AS ThoiGianBatDau, "
+            + "rct.EndTime AS ThoiGianKetThuc, rct.Result AS KetQua "
+            + "FROM RoomCleaningTask rct "
+            + "INNER JOIN Room r ON rct.RoomId = r.RoomId "
+            + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
+            + "LEFT JOIN Account acc ON rct.ReceivedBy = acc.AccountId "
+            + "LEFT JOIN Employee emp ON acc.AccountId = emp.AccountId "
+            + "WHERE (? IS NULL OR rct.RoomCleaningTaskStatus = ?) "
+            + "ORDER BY CASE rct.RoomCleaningTaskStatus "
+            + "WHEN 'InProgress' THEN 1 "
+            + "WHEN 'Pending' THEN 2 "
+            + "ELSE 3 END, rct.RoomCleaningTaskId DESC";
 
     public List<HousekeeperTaskDTO> getTasks(String statusFilter) {
         List<HousekeeperTaskDTO> list = new ArrayList<>();
@@ -53,36 +56,91 @@ public class HousekeeperTaskDAO extends DBContext {
     }
 
     private String resolveFilterValue(String statusFilter) {
-        if (statusFilter != null && !statusFilter.trim().isEmpty()
-                && !"TatCa".equalsIgnoreCase(statusFilter.trim())) {
-            return statusFilter.trim();
+        if (statusFilter == null || statusFilter.trim().isEmpty()
+                || "TatCa".equalsIgnoreCase(statusFilter.trim())) {
+            return null;
         }
-        return null;
+        String s = statusFilter.trim();
+        if ("ChoXuLy".equalsIgnoreCase(s) || "Pending".equalsIgnoreCase(s)) {
+            return "Pending";
+        }
+        if ("DangDon".equalsIgnoreCase(s) || "InProgress".equalsIgnoreCase(s)) {
+            return "InProgress";
+        }
+        if ("DaHoanThanh".equalsIgnoreCase(s) || "Completed".equalsIgnoreCase(s)) {
+            return "Completed";
+        }
+        return s;
     }
 
     public void updateTaskProgress(String maNhiemVu, String maNV, String hanhDong, String ketQua)
             throws SQLException, ClassNotFoundException {
-        String callSql = "{call sp_CapNhatTienDoDonPhong(?, ?, ?, ?)}";
-        try (Connection conn = getConnection();
-             CallableStatement cs = conn.prepareCall(callSql)) {
-            cs.setString(1, maNhiemVu);
-            cs.setString(2, maNV);
-            cs.setString(3, hanhDong);
-            cs.setString(4, ketQua);
-            cs.execute();
+        String callSql = "{call dbo.sp_CapNhatTienDoDonPhong(?, ?, ?, ?)}";
+        String normalizedAction = normalizeAction(hanhDong);
+        try (Connection conn = getConnection()) {
+            String validAccountId = resolveAccountId(conn, maNV);
+            try (CallableStatement cs = conn.prepareCall(callSql)) {
+                cs.setString(1, maNhiemVu);
+                cs.setString(2, validAccountId);
+                cs.setString(3, normalizedAction);
+                cs.setString(4, ketQua);
+                cs.execute();
+            }
         }
     }
 
+    private String normalizeAction(String action) {
+        if (action == null) {
+            return "AcceptTask";
+        }
+        String a = action.trim();
+        if ("start".equalsIgnoreCase(a) || "NhanViec".equalsIgnoreCase(a) || "AcceptTask".equalsIgnoreCase(a)) {
+            return "AcceptTask";
+        }
+        if ("complete".equalsIgnoreCase(a) || "HoanThanh".equalsIgnoreCase(a) || "CompleteTask".equalsIgnoreCase(a)) {
+            return "CompleteTask";
+        }
+        return a;
+    }
+
+    private String resolveAccountId(Connection conn, String id) {
+        if (id == null || id.trim().isEmpty()) {
+            return "ACC004";
+        }
+        String clean = id.trim();
+        String sqlAcc = "SELECT AccountId FROM Account WHERE AccountId = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sqlAcc)) {
+            ps.setString(1, clean);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return clean;
+            }
+        } catch (SQLException ignored) {
+        }
+        String sqlEmp = "SELECT AccountId FROM Employee WHERE EmployeeId = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sqlEmp)) {
+            ps.setString(1, clean);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getString("AccountId");
+            }
+        } catch (SQLException ignored) {
+        }
+        return "ACC004";
+    }
+
     public HousekeeperTaskDTO getTaskById(String maNhiemVu) {
-        String sql = "SELECT nvdp.MaNhiemVu, p.MaPhong, p.SoPhong, lp.TenLoaiPhong, "
-                + "p.TrangThai AS TrangThaiPhong, nvdp.TrangThai AS TrangThaiNhiemVu, "
-                + "nv.MaNV AS MaNhanVienDon, nv.HoTen AS TenNhanVienDon, "
-                + "nvdp.ThoiGianNhan, nvdp.ThoiGianBatDau, nvdp.ThoiGianKetThuc, nvdp.KetQua "
-                + "FROM NHIEMVUDOPHONG nvdp "
-                + "INNER JOIN PHONG p ON nvdp.MaPhong = p.MaPhong "
-                + "INNER JOIN LOAIPHONG lp ON p.MaLoaiPhong = lp.MaLoaiPhong "
-                + "LEFT JOIN NHANVIEN nv ON nvdp.MaNV = nv.MaNV "
-                + "WHERE nvdp.MaNhiemVu = ?";
+        String sql = "SELECT rct.RoomCleaningTaskId AS MaNhiemVu, r.RoomId AS MaPhong, r.RoomName AS SoPhong, "
+                + "rt.RoomTypeName AS TenLoaiPhong, r.HousekeepingStatus AS TrangThaiPhong, "
+                + "rct.RoomCleaningTaskStatus AS TrangThaiNhiemVu, "
+                + "ISNULL(rct.ReceivedBy, '') AS MaNhanVienDon, "
+                + "ISNULL(emp.FullName, acc.UserName) AS TenNhanVienDon, "
+                + "rct.StartTime AS ThoiGianNhan, rct.StartTime AS ThoiGianBatDau, "
+                + "rct.EndTime AS ThoiGianKetThuc, rct.Result AS KetQua "
+                + "FROM RoomCleaningTask rct "
+                + "INNER JOIN Room r ON rct.RoomId = r.RoomId "
+                + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
+                + "LEFT JOIN Account acc ON rct.ReceivedBy = acc.AccountId "
+                + "LEFT JOIN Employee emp ON acc.AccountId = emp.AccountId "
+                + "WHERE rct.RoomCleaningTaskId = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maNhiemVu);

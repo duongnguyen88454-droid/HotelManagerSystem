@@ -16,6 +16,9 @@ public class RoomType implements Serializable {
     private int soNguoiToiDa;
     private double giaPhong;
     private String trangThai; // 'ApDung', 'NgungApDung'
+    private double earlyCheckInFee;
+    private double lateCheckOutFee;
+    private double depositPercent;
 
     public RoomType() {
     }
@@ -84,5 +87,29 @@ public class RoomType implements Serializable {
 
     public void setTrangThai(String trangThai) {
         this.trangThai = trangThai;
+    }
+
+    public double getEarlyCheckInFee() {
+        return earlyCheckInFee;
+    }
+
+    public void setEarlyCheckInFee(double earlyCheckInFee) {
+        this.earlyCheckInFee = earlyCheckInFee;
+    }
+
+    public double getLateCheckOutFee() {
+        return lateCheckOutFee;
+    }
+
+    public void setLateCheckOutFee(double lateCheckOutFee) {
+        this.lateCheckOutFee = lateCheckOutFee;
+    }
+
+    public double getDepositPercent() {
+        return depositPercent;
+    }
+
+    public void setDepositPercent(double depositPercent) {
+        this.depositPercent = depositPercent;
     }
 }

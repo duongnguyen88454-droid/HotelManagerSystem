@@ -20,32 +20,36 @@ import java.util.List;
 public class InvoiceDAO {
 
     /**
-     * Gọi sp_TaoHoaDon để tạo mới hoặc cập nhật hóa đơn quyết toán/tạm tính.
+     * Lấy mã hóa đơn tương ứng với đơn đặt phòng.
      */
     public String createOrUpdateInvoice(String maBooking, String maNV) throws SQLException, ClassNotFoundException {
-        String sql = "{call sp_TaoHoaDon(?, ?, ?)}";
+        String findSql = "SELECT InvoiceId FROM Invoice WHERE BookingId = ?";
         try (Connection conn = DBContext.getConnection();
-             CallableStatement cs = conn.prepareCall(sql)) {
-            cs.setString(1, maBooking);
-            cs.setString(2, maNV);
-            cs.registerOutParameter(3, Types.VARCHAR);
-            cs.execute();
-            return cs.getString(3);
+             PreparedStatement ps = conn.prepareStatement(findSql)) {
+            ps.setString(1, maBooking);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("InvoiceId");
+                }
+            }
         }
+        return null;
     }
 
     /**
      * Truy vấn thông tin tiêu đề hóa đơn theo mã hóa đơn.
      */
     public InvoiceDetailDTO getInvoiceHeader(String maHoaDon) throws SQLException, ClassNotFoundException {
-        String sql = "SELECT hd.MaHoaDon, hd.MaBooking, hd.NgayLap, hd.TongTienCuoiCung, " +
-                     "       hd.TrangThai AS TrangThaiHoaDon, b.MaKH, kh.HoTen AS TenKhachHang, " +
-                     "       kh.SoDT, kh.CCCD, nv.HoTen AS TenNVLap " +
-                     "FROM HOADON hd " +
-                     "INNER JOIN BOOKING b ON hd.MaBooking = b.MaBooking " +
-                     "INNER JOIN KHACHHANG kh ON b.MaKH = kh.MaKH " +
-                     "LEFT JOIN NHANVIEN nv ON hd.MaNV = nv.MaNV " +
-                     "WHERE hd.MaHoaDon = ?";
+        String sql = "SELECT inv.InvoiceId AS MaHoaDon, inv.BookingId AS MaBooking, inv.CreateDate AS NgayLap, " +
+                     "       inv.TotalRoomCharge, inv.TotalServiceCharge, inv.EarlyCheckInFee, inv.LateCheckOutFee, " +
+                     "       inv.FinalTotalAmount AS TongTienCuoiCung, inv.InvoiceStatus AS TrangThaiHoaDon, " +
+                     "       b.CustomerId AS MaKH, c.FullName AS TenKhachHang, " +
+                     "       c.PhoneNumber AS SoDT, c.CCCD, ISNULL(acc.Username, N'Hệ Thống') AS TenNVLap " +
+                     "FROM Invoice inv " +
+                     "INNER JOIN Booking b ON inv.BookingId = b.BookingId " +
+                     "INNER JOIN Customer c ON b.CustomerId = c.CustomerId " +
+                     "LEFT JOIN Account acc ON b.CreateBy = acc.AccountId " +
+                     "WHERE inv.InvoiceId = ?";
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maHoaDon);
@@ -63,14 +67,15 @@ public class InvoiceDAO {
      */
     public List<InvoiceRoomItemDTO> getInvoiceRooms(String maBooking) throws SQLException, ClassNotFoundException {
         List<InvoiceRoomItemDTO> list = new ArrayList<>();
-        String sql = "SELECT bp.MaPhong, lp.TenLoaiPhong, bp.DonGiaPhong, " +
-                     "       bp.NgayNhanDuKien, bp.NgayTraDuKien, bp.NgayCheckInThucTe, bp.NgayCheckOutThucTe, " +
-                     "       DATEDIFF(DAY, bp.NgayNhanDuKien, " +
-                     "                ISNULL(CAST(bp.NgayCheckOutThucTe AS DATE), bp.NgayTraDuKien)) AS SoDem " +
-                     "FROM BOOKING_PHONG bp " +
-                     "INNER JOIN PHONG p ON bp.MaPhong = p.MaPhong " +
-                     "INNER JOIN LOAIPHONG lp ON p.MaLoaiPhong = lp.MaLoaiPhong " +
-                     "WHERE bp.MaBooking = ?";
+        String sql = "SELECT br.RoomId AS MaPhong, rt.RoomTypeName AS TenLoaiPhong, br.Price AS DonGiaPhong, " +
+                     "       br.ExpectedCheckInDate AS NgayNhanDuKien, br.ExpectedCheckOutDate AS NgayTraDuKien, " +
+                     "       br.ActualCheckInDate AS NgayCheckInThucTe, br.ActualCheckOutDate AS NgayCheckOutThucTe, " +
+                     "       DATEDIFF(DAY, br.ExpectedCheckInDate, " +
+                     "                ISNULL(CAST(br.ActualCheckOutDate AS DATE), br.ExpectedCheckOutDate)) AS SoDem " +
+                     "FROM Booking_Room br " +
+                     "INNER JOIN Room r ON br.RoomId = r.RoomId " +
+                     "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId " +
+                     "WHERE br.BookingId = ?";
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maBooking);
@@ -89,12 +94,13 @@ public class InvoiceDAO {
     public List<InvoiceServiceItemDTO> getInvoiceServices(String maBooking)
             throws SQLException, ClassNotFoundException {
         List<InvoiceServiceItemDTO> list = new ArrayList<>();
-        String sql = "SELECT bdv.MaBookingDichVu, bdv.MaPhong, dv.TenDichVu, bdv.DonGia, bdv.SoLuong, " +
-                     "       (bdv.DonGia * bdv.SoLuong) AS ThanhTien, bdv.ThoiDiemThem " +
-                     "FROM BOOKING_DICHVU bdv " +
-                     "INNER JOIN DICHVU dv ON bdv.MaDichVu = dv.MaDichVu " +
-                     "WHERE bdv.MaBooking = ? " +
-                     "ORDER BY bdv.ThoiDiemThem ASC";
+        String sql = "SELECT (brs.BookingId + '_' + brs.RoomId + '_' + brs.ServiceId) AS MaBookingDichVu, " +
+                     "       brs.RoomId AS MaPhong, s.ServiceName AS TenDichVu, " +
+                     "       brs.UnitPrice AS DonGia, brs.Quantity AS SoLuong, " +
+                     "       (brs.UnitPrice * brs.Quantity) AS ThanhTien, GETDATE() AS ThoiDiemThem " +
+                     "FROM Booking_Room_Service brs " +
+                     "INNER JOIN Service s ON brs.ServiceId = s.ServiceId " +
+                     "WHERE brs.BookingId = ?";
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maBooking);
@@ -111,7 +117,7 @@ public class InvoiceDAO {
      * Tìm mã hóa đơn tương ứng với đơn đặt phòng (nếu đã được sinh).
      */
     public String findInvoiceIdByBooking(String maBooking) throws SQLException, ClassNotFoundException {
-        String sql = "SELECT MaHoaDon FROM HOADON WHERE MaBooking = ?";
+        String sql = "SELECT InvoiceId AS MaHoaDon FROM Invoice WHERE BookingId = ?";
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maBooking);
@@ -131,6 +137,14 @@ public class InvoiceDAO {
         dto.setNgayLap(rs.getTimestamp("NgayLap"));
         dto.setTongTienCuoiCung(rs.getObject("TongTienCuoiCung") != null
                 ? rs.getDouble("TongTienCuoiCung") : null);
+        dto.setTotalRoomCharge(rs.getObject("TotalRoomCharge") != null
+                ? rs.getDouble("TotalRoomCharge") : 0.0);
+        dto.setTotalServiceCharge(rs.getObject("TotalServiceCharge") != null
+                ? rs.getDouble("TotalServiceCharge") : 0.0);
+        dto.setEarlyCheckInFee(rs.getObject("EarlyCheckInFee") != null
+                ? rs.getDouble("EarlyCheckInFee") : 0.0);
+        dto.setLateCheckOutFee(rs.getObject("LateCheckOutFee") != null
+                ? rs.getDouble("LateCheckOutFee") : 0.0);
         dto.setTrangThaiHoaDon(rs.getString("TrangThaiHoaDon"));
         dto.setMaKH(rs.getString("MaKH"));
         dto.setTenKhachHang(rs.getString("TenKhachHang"));

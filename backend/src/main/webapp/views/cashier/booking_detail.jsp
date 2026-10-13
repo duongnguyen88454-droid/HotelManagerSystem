@@ -28,10 +28,10 @@
         </div>
         <div>
             <c:choose>
-                <c:when test="${invoice.trangThaiHoaDon == 'DaThanhToanDu'}">
+                <c:when test="${invoice.trangThaiHoaDon == 'Paid'}">
                     <span class="badge badge-paid">Đã thanh toán đủ</span>
                 </c:when>
-                <c:when test="${invoice.trangThaiHoaDon == 'MotPhan' || invoice.daThanhToan > 0}">
+                <c:when test="${invoice.trangThaiHoaDon == 'PartiallyPaid' || invoice.trangThaiHoaDon == 'Partial' || invoice.daThanhToan > 0}">
                     <span class="badge badge-partial">Thanh toán một phần</span>
                 </c:when>
                 <c:otherwise>
@@ -86,6 +86,13 @@
         </div>
     </div>
 
+    <c:set var="hasUncheckedRooms" value="false" />
+    <c:forEach var="r" items="${invoice.rooms}">
+        <c:if test="${r.ngayCheckOutThucTe == null}">
+            <c:set var="hasUncheckedRooms" value="true" />
+        </c:if>
+    </c:forEach>
+
     <!-- Form Chọn Phòng để Chuyển sang Bước Thanh Toán (Chưa Check-out sớm trong DB) -->
     <form action="${pageContext.request.contextPath}/cashier/payment" method="GET" id="checkoutForm">
         <input type="hidden" name="maBooking" value="${invoice.maBooking}" />
@@ -94,10 +101,17 @@
         <div class="table-card">
             <div class="table-title-bar">
                 <h2 class="table-title">Danh Sách Phòng Trong Đơn (Tích chọn phòng cần trả)</h2>
-                <label style="font-size: 13px; font-weight: 500; cursor: pointer;">
-                    <input type="checkbox" id="selectAllRooms" onchange="toggleSelectAllRooms(this)" />
-                    Chọn tất cả phòng đang ở
-                </label>
+                <c:choose>
+                    <c:when test="${hasUncheckedRooms}">
+                        <label style="font-size: 13px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="selectAllRooms" onchange="toggleSelectAllRooms(this)" />
+                            Chọn tất cả phòng đang ở
+                        </label>
+                    </c:when>
+                    <c:otherwise>
+                        <span style="font-size: 13px; color: #059669; font-weight: 600;">✓ Tất cả phòng đã trả</span>
+                    </c:otherwise>
+                </c:choose>
             </div>
 
             <table class="data-table">
@@ -215,9 +229,29 @@
                 </a>
             </div>
             <div>
-                <button type="submit" class="btn-checkout-submit">
-                    Tiếp Tục Chọn Phương Thức Thanh Toán &amp; Trả Phòng &rarr;
-                </button>
+                <c:choose>
+                    <c:when test="${!hasUncheckedRooms && (invoice.conThieu == null || invoice.conThieu le 0)}">
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <span style="color: #059669; font-weight: 600; font-size: 14px;">
+                                ✓ Đơn đã trả hết phòng và thanh toán đủ
+                            </span>
+                            <a href="${pageContext.request.contextPath}/cashier/invoice?maHoaDon=${invoice.maHoaDon}"
+                               class="btn-checkout-submit" style="text-decoration: none; display: inline-block;">
+                                In / Xem Hóa Đơn &rarr;
+                            </a>
+                        </div>
+                    </c:when>
+                    <c:when test="${!hasUncheckedRooms && invoice.conThieu gt 0}">
+                        <button type="submit" class="btn-checkout-submit" style="background-color: #ea580c;">
+                            Quyết Toán Công Nợ Còn Thiếu (<fmt:formatNumber value="${invoice.conThieu}" pattern="#,##0" /> đ) &rarr;
+                        </button>
+                    </c:when>
+                    <c:otherwise>
+                        <button type="submit" class="btn-checkout-submit">
+                            Tiếp Tục Chọn Phương Thức Thanh Toán &amp; Trả Phòng &rarr;
+                        </button>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
     </form>

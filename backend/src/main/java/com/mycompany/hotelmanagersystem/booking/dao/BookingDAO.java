@@ -6,6 +6,7 @@ import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.SingleBookingRequestDTO;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -113,31 +114,6 @@ public class BookingDAO {
         return createMultiRoomBookingWithServices(maKH, null, cart, ghiChu);
     }
 
-    /**
-     * Hủy đơn đặt phòng theo MaKH HOẶC MaTaiKhoan khi chưa Check-in
-     */
-    public boolean cancelBooking(String maBooking, String maKH, String maTaiKhoan) {
-        String sql = "UPDATE br "
-                + "SET br.BookingStatus = 'Cancelled' "
-                + "FROM Booking_Room br "
-                + "INNER JOIN Booking b ON br.BookingId = b.BookingId "
-                + "WHERE br.BookingId = ? "
-                + "  AND br.BookingStatus = 'Confirmed' "
-                + "  AND (b.CustomerId = ? OR (? IS NOT NULL AND b.CreateBy = ?))";
-
-        try (Connection conn = DBContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, maBooking);
-            ps.setString(2, maKH);
-            ps.setString(3, maTaiKhoan);
-            ps.setString(4, maTaiKhoan);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
 
 
     // --- CÁC HÀM HELPER NỘI BỘ TRONG TRANSACTION ---
@@ -219,16 +195,8 @@ public class BookingDAO {
     }
 
     private void cleanupExpiredPendingBookings(Connection conn) throws SQLException {
-        String sql = "UPDATE br "
-                + "SET br.BookingStatus = 'Cancelled' "
-                + "FROM Booking_Room br "
-                + "JOIN Booking b ON br.BookingId = b.BookingId "
-                + "LEFT JOIN Invoice inv ON b.BookingId = inv.BookingId "
-                + "WHERE br.BookingStatus = 'Confirmed' "
-                + "  AND (inv.InvoiceStatus = 'Unpaid' OR inv.InvoiceStatus IS NULL) "
-                + "  AND DATEDIFF(MINUTE, b.CreateDate, GETDATE()) >= 10";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.executeUpdate();
+        try (CallableStatement cs = conn.prepareCall("{call dbo.sp_DonDepDonHetHanGiuCho}")) {
+            cs.execute();
         }
     }
 

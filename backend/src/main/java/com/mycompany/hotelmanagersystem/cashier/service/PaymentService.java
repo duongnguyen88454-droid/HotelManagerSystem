@@ -34,7 +34,7 @@ public class PaymentService {
     /**
      * Thực hiện thanh toán / nạp tiền vào hóa đơn.
      */
-    public PaymentResultDTO processPayment(String maHoaDon, String maNV, double soTien, String phuongThuc) {
+    public PaymentResultDTO processPayment(String maHoaDon, String maTaiKhoan, double soTien, String phuongThuc) {
         if (maHoaDon == null || maHoaDon.trim().isEmpty()) {
             return new PaymentResultDTO(false, "Mã hóa đơn không được để trống!", null, null, soTien, null);
         }
@@ -43,12 +43,11 @@ public class PaymentService {
         }
 
         String invoiceId = maHoaDon.trim();
-        String empId = (maNV != null && !maNV.trim().isEmpty()) ? maNV.trim() : "NV001";
-        String paymentMethod = (phuongThuc != null && !phuongThuc.trim().isEmpty())
-                ? phuongThuc.trim() : "TienMat";
+        String accountId = (maTaiKhoan != null && !maTaiKhoan.trim().isEmpty()) ? maTaiKhoan.trim() : null;
+        String paymentMethod = normalizePaymentMethod(phuongThuc);
 
         try {
-            String maThanhToan = paymentDAO.recordPayment(invoiceId, empId, soTien, paymentMethod);
+            String maThanhToan = paymentDAO.recordPayment(invoiceId, accountId, soTien, paymentMethod);
             InvoiceDetailDTO invoice = invoiceDAO.getInvoiceHeader(invoiceId);
             String trangThaiMoi = (invoice != null) ? invoice.getTrangThaiHoaDon() : "MotPhan";
 
@@ -99,17 +98,17 @@ public class PaymentService {
      * Thực hiện thanh toán kết hợp trả phòng đồng thời (Phương án 2).
      */
     public PaymentResultDTO processPaymentAndCheckOut(
-            String maBooking, String maHoaDon, List<String> roomIds, String maNV, double soTien, String phuongThuc) {
-        String empId = (maNV != null && !maNV.trim().isEmpty()) ? maNV.trim() : "NV001";
+            String maBooking, String maHoaDon, List<String> roomIds, String maTaiKhoan, double soTien, String phuongThuc) {
+        String accountId = (maTaiKhoan != null && !maTaiKhoan.trim().isEmpty()) ? maTaiKhoan.trim() : null;
         String invoiceId = maHoaDon;
 
         try {
             if (roomIds != null && !roomIds.isEmpty()) {
-                invoiceId = checkOutRoomsInternal(maBooking, roomIds, empId);
+                invoiceId = checkOutRoomsInternal(maBooking, roomIds, accountId);
             }
 
             if (soTien > 0) {
-                return executePaymentInternal(invoiceId, empId, soTien, phuongThuc);
+                return executePaymentInternal(invoiceId, accountId, soTien, phuongThuc);
             }
 
             return buildZeroPaymentSuccess(invoiceId);
@@ -132,22 +131,48 @@ public class PaymentService {
     }
 
     private PaymentResultDTO executePaymentInternal(
-            String invoiceId, String empId, double soTien, String phuongThuc) throws Exception {
+            String invoiceId, String accountId, double soTien, String phuongThuc) throws Exception {
         if (invoiceId == null || invoiceId.trim().isEmpty()) {
             return new PaymentResultDTO(false, "Không tìm thấy hóa đơn hợp lệ!", null, null, soTien, null);
         }
-        String method = (phuongThuc != null && !phuongThuc.trim().isEmpty()) ? phuongThuc.trim() : "TienMat";
-        String maThanhToan = paymentDAO.recordPayment(invoiceId, empId, soTien, method);
+        String method = normalizePaymentMethod(phuongThuc);
+        String maThanhToan = paymentDAO.recordPayment(invoiceId, accountId, soTien, method);
         InvoiceDetailDTO invoice = invoiceDAO.getInvoiceHeader(invoiceId);
-        String trangThai = (invoice != null) ? invoice.getTrangThaiHoaDon() : "MotPhan";
+        String trangThai = (invoice != null) ? invoice.getTrangThaiHoaDon() : "Partial";
         return new PaymentResultDTO(true,
                 "Xác nhận trả phòng và thu tiền thành công!", invoiceId, maThanhToan, soTien, trangThai);
     }
 
     private PaymentResultDTO buildZeroPaymentSuccess(String invoiceId) throws Exception {
         InvoiceDetailDTO invoice = (invoiceId != null) ? invoiceDAO.getInvoiceHeader(invoiceId) : null;
-        String trangThai = (invoice != null) ? invoice.getTrangThaiHoaDon() : "DaThanhToanDu";
+        String trangThai = (invoice != null) ? invoice.getTrangThaiHoaDon() : "Paid";
         return new PaymentResultDTO(true,
                 "Đã hoàn tất trả phòng thành công!", invoiceId, null, 0.0, trangThai);
+    }
+
+    /**
+     * Chuẩn hóa phương thức thanh toán sang giá trị hợp lệ với ràng buộc CK_Payment_Method.
+     */
+    public String normalizePaymentMethod(String phuongThuc) {
+        if (phuongThuc == null || phuongThuc.trim().isEmpty()) {
+            return "Cash";
+        }
+        String p = phuongThuc.trim();
+        if ("TienMat".equalsIgnoreCase(p) || "Cash".equalsIgnoreCase(p)) {
+            return "Cash";
+        }
+        if ("TheNganHang".equalsIgnoreCase(p) || "CreditCard".equalsIgnoreCase(p) || "POS".equalsIgnoreCase(p)) {
+            return "CreditCard";
+        }
+        if ("ChuyenKhoan".equalsIgnoreCase(p) || "BankTransfer".equalsIgnoreCase(p)) {
+            return "BankTransfer";
+        }
+        if ("Momo".equalsIgnoreCase(p)) {
+            return "Momo";
+        }
+        if ("VNPay".equalsIgnoreCase(p)) {
+            return "VNPay";
+        }
+        return "Cash";
     }
 }

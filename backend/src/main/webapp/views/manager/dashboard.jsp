@@ -1,40 +1,208 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-        <jsp:include page="/views/common/header.jsp">
-            <jsp:param name="title" value="Bàn Làm Việc Ban Giám Đốc - Dashboard Quản Trị" />
-        </jsp:include>
-        <jsp:include page="/views/common/navbar.jsp" />
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-        <div class="container" style="max-width: 900px; margin-top: 40px; margin-bottom: 50px;">
-            <div class="card" style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 30px;">
-                <div
-                    style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #edf2f7; padding-bottom: 15px; margin-bottom: 20px;">
-                    <div>
-                        <h2 style="color: #1a365d; margin: 0;">📊 TRUNG TÂM ĐIỀU HÀNH QUẢN TRỊ (DASHBOARD)</h2>
-                        <p style="color: #718096; margin: 5px 0 0 0; font-size: 14px;">Báo cáo tổng hợp kinh doanh,
-                            doanh thu và tỷ lệ lấp đầy phòng</p>
-                    </div>
-                    <span class="badge"
-                        style="background: #805ad5; color: white; padding: 6px 14px; border-radius: 20px; font-weight: 600;">
-                        ${sessionScope.CURRENT_USER.role}
-                    </span>
+<jsp:include page="/views/common/header.jsp">
+    <jsp:param name="title" value="Bàn Làm Việc Ban Giám Đốc - Dashboard Quản Trị" />
+</jsp:include>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/portal_layout.css">
+
+<div class="portal-wrapper">
+    <!-- Thanh chức năng bên trái -->
+    <jsp:include page="/views/common/portal_sidebar.jsp">
+        <jsp:param name="activeMenu" value="dashboard" />
+    </jsp:include>
+
+    <!-- Màn hình bên phải -->
+    <main class="portal-main">
+        <!-- Tiêu đề trang -->
+        <header class="portal-header">
+            <div class="portal-header-left">
+                <h1>Trung Tâm Điều Hành Quản Trị</h1>
+                <p>Báo cáo tổng hợp vận hành khách sạn, công suất buồng phòng và các lối tắt điều hành</p>
+            </div>
+            <div class="portal-header-right">
+                <span class="portal-date-pill">Hôm nay: <%= new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date()) %></span>
+            </div>
+        </header>
+
+        <!-- Thẻ tóm tắt thông tin người dùng -->
+        <div class="portal-card" style="padding: 18px 24px;">
+            <div style="font-size: 14px; color: var(--portal-text-secondary);">
+                Xin chào Quản lý cấp cao: <strong style="color: var(--portal-text-primary);">${sessionScope.CURRENT_USER.hoTen}</strong> 
+                (Mã: <code>${sessionScope.CURRENT_USER.maDinhDanh}</code>, Email: <code>${sessionScope.CURRENT_USER.email}</code>).
+            </div>
+        </div>
+
+        <!-- Khối thẻ chỉ số KPI công suất buồng phòng -->
+        <div class="portal-kpi-grid">
+            <!-- Tổng số phòng -->
+            <div class="portal-kpi-card" style="border-top: 4px solid #3b82f6;">
+                <div class="portal-kpi-label">Tổng Số Phòng</div>
+                <div class="portal-kpi-value">${occupancy.tongSoPhong} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
+                <div class="portal-kpi-desc">Toàn bộ tài nguyên phòng</div>
+            </div>
+
+            <!-- Tỷ lệ lấp đầy -->
+            <div class="portal-kpi-card" style="border-top: 4px solid #8b5cf6;">
+                <div class="portal-kpi-label">Tỷ Lệ Lấp Đầy</div>
+                <div class="portal-kpi-value" style="color: #6d28d9;">${occupancy.tyLeLapDayPhanTram}%</div>
+                <div class="portal-kpi-desc">Tỷ lệ phòng đang có khách</div>
+            </div>
+
+            <!-- Đang có khách -->
+            <div class="portal-kpi-card" style="border-top: 4px solid #10b981;">
+                <div class="portal-kpi-label">Đang Có Khách (Occupied)</div>
+                <div class="portal-kpi-value" style="color: #047857;">${occupancy.soPhongDangCoKhach} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
+                <div class="portal-kpi-desc">Đang lưu trú tại khách sạn</div>
+            </div>
+
+            <!-- Phòng trống sẵn sàng -->
+            <div class="portal-kpi-card" style="border-top: 4px solid #06b6d4;">
+                <div class="portal-kpi-label">Phòng Trống (Available)</div>
+                <div class="portal-kpi-value" style="color: #0e7490;">${occupancy.soPhongTrong} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
+                <div class="portal-kpi-desc">Sẵn sàng tiếp đón khách mới</div>
+            </div>
+
+            <!-- Phòng đang dọn -->
+            <div class="portal-kpi-card" style="border-top: 4px solid #f59e0b;">
+                <div class="portal-kpi-label">Đang Dọn (Cleaning)</div>
+                <div class="portal-kpi-value" style="color: #b45309;">${occupancy.soPhongDangDon} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
+                <div class="portal-kpi-desc">Buồng phòng đang phụ trách</div>
+            </div>
+
+            <!-- Phòng hư hại -->
+            <div class="portal-kpi-card" style="border-top: 4px solid #ef4444;">
+                <div class="portal-kpi-label">Bảo Trì (Damaged)</div>
+                <div class="portal-kpi-value" style="color: #b91c1c;">${occupancy.soPhongHuHai} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
+                <div class="portal-kpi-desc">Chờ sửa chữa và nghiệm thu</div>
+            </div>
+        </div>
+
+        <!-- Thẻ phân bổ trạng thái buồng phòng -->
+        <div class="portal-card">
+            <div class="portal-card-header">
+                <div>
+                    <h3 class="portal-card-title">Phân Bổ Tài Nguyên Phòng</h3>
+                    <div class="portal-card-subtitle">Biểu đồ thanh phân bổ trạng thái toàn bộ buồng phòng hiện tại</div>
                 </div>
+            </div>
 
-                <div class="alert alert-success" style="margin-bottom: 25px;">
-                    <strong>✓ Đăng nhập thành công!</strong> Xin chào Quản lý cấp cao:
-                    <strong>${sessionScope.CURRENT_USER.hoTen}</strong>
-                    (Mã NV: <code>${sessionScope.CURRENT_USER.maDinhDanh}</code>, Email:
-                    <code>${sessionScope.CURRENT_USER.email}</code>).
+            <div class="room-dist-bar">
+                <c:set var="totalRooms" value="${occupancy.tongSoPhong > 0 ? occupancy.tongSoPhong : 1}" />
+                <div class="dist-occupied" style="width: ${(occupancy.soPhongDangCoKhach * 100.0) / totalRooms}%;" title="Đang có khách: ${occupancy.soPhongDangCoKhach}"></div>
+                <div class="dist-available" style="width: ${(occupancy.soPhongTrong * 100.0) / totalRooms}%;" title="Trống sạch: ${occupancy.soPhongTrong}"></div>
+                <div class="dist-cleaning" style="width: ${(occupancy.soPhongDangDon * 100.0) / totalRooms}%;" title="Đang dọn: ${occupancy.soPhongDangDon}"></div>
+                <div class="dist-damaged" style="width: ${(occupancy.soPhongHuHai * 100.0) / totalRooms}%;" title="Hư hại: ${occupancy.soPhongHuHai}"></div>
+            </div>
+
+            <div class="room-dist-legend">
+                <div class="dist-legend-item">
+                    <span class="dist-legend-dot" style="background: var(--status-occupied-color);"></span>
+                    <span>Đang Có Khách: <strong>${occupancy.soPhongDangCoKhach}</strong></span>
                 </div>
-
-                <div style="background: #f7fafc; padding: 20px; border-radius: 8px; border-left: 4px solid #805ad5;">
-                    <h4 style="color: #44337a; margin-top: 0;">Giai Đoạn 6 Chuẩn Bị Xây Dựng:</h4>
-                    <p style="color: #4a5568; line-height: 1.6; margin-bottom: 0;">
-                        Tại đây sẽ hiển thị các thẻ KPI doanh thu theo ngày/tháng/năm, tỷ lệ lấp đầy phòng (view
-                        v_TyLeLapDayPhong), biểu đồ cơ cấu nguồn thu và thống kê các dịch vụ sinh lời cao nhất.
-                    </p>
+                <div class="dist-legend-item">
+                    <span class="dist-legend-dot" style="background: var(--status-available-color);"></span>
+                    <span>Trống Sẵn Sàng: <strong>${occupancy.soPhongTrong}</strong></span>
+                </div>
+                <div class="dist-legend-item">
+                    <span class="dist-legend-dot" style="background: var(--status-cleaning-color);"></span>
+                    <span>Đang Dọn Dẹp: <strong>${occupancy.soPhongDangDon}</strong></span>
+                </div>
+                <div class="dist-legend-item">
+                    <span class="dist-legend-dot" style="background: var(--status-damaged-color);"></span>
+                    <span>Hư Hại / Bảo Trì: <strong>${occupancy.soPhongHuHai}</strong></span>
                 </div>
             </div>
         </div>
 
-        <jsp:include page="/views/common/footer.jsp" />
+        <!-- Khối điều hướng các phân hệ quản trị -->
+        <div>
+            <h3 style="color: var(--portal-text-primary); font-size: 18px; font-weight: 700; margin-bottom: 16px;">
+                Các Phân Hệ Quản Trị và Báo Cáo
+            </h3>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                <!-- Thẻ 1: Báo cáo doanh thu -->
+                <div class="portal-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h4 style="margin: 0 0 8px 0; color: var(--portal-text-primary); font-size: 17px; font-weight: 700;">Báo Cáo Doanh Thu & Night Audit</h4>
+                        <p style="color: var(--portal-text-muted); font-size: 13.5px; line-height: 1.5; margin: 0 0 16px 0;">
+                            Chốt ca doanh thu theo ngày, thống kê dòng tiền thực thu (Tiền mặt, Thẻ, CK) và tổng hợp doanh thu theo từng tháng.
+                        </p>
+                    </div>
+                    <a href="${pageContext.request.contextPath}/manager/revenue" class="portal-btn portal-btn-primary">
+                        Xem Báo Cáo Doanh Thu
+                    </a>
+                </div>
+
+                <!-- Thẻ 2: Phân tích dịch vụ -->
+                <div class="portal-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h4 style="margin: 0 0 8px 0; color: var(--portal-text-primary); font-size: 17px; font-weight: 700;">Phân Tích Tiêu Dùng Dịch Vụ</h4>
+                        <p style="color: var(--portal-text-muted); font-size: 13.5px; line-height: 1.5; margin: 0 0 16px 0;">
+                            Xem bảng xếp hạng các dịch vụ khách sạn bán chạy nhất, số lượt khách sử dụng và tổng doanh thu sinh lời của từng dịch vụ.
+                        </p>
+                    </div>
+                    <a href="${pageContext.request.contextPath}/manager/services" class="portal-btn portal-btn-secondary">
+                        Xem Phân Tích Dịch Vụ
+                    </a>
+                </div>
+
+                <!-- Thẻ 3: Xử lý hư hại & bảo trì -->
+                <div class="portal-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h4 style="margin: 0 0 8px 0; color: var(--portal-text-primary); font-size: 17px; font-weight: 700;">Nghiệm Thu Khắc Phục Hư Hại</h4>
+                        <p style="color: var(--portal-text-muted); font-size: 13.5px; line-height: 1.5; margin: 0 0 16px 0;">
+                            Quản lý các biên bản báo hỏng phòng từ nhân viên buồng phòng, xác nhận bảo trì xong để mở khóa phòng sang trạng thái Sẵn sàng.
+                        </p>
+                    </div>
+                    <a href="${pageContext.request.contextPath}/manager/damages" class="portal-btn portal-btn-danger">
+                        Xử Lý Hư Hại Phòng (${occupancy.soPhongHuHai})
+                    </a>
+                </div>
+
+                <!-- Thẻ 4: Quản lý nhân sự & khóa tài khoản -->
+                <div class="portal-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h4 style="margin: 0 0 8px 0; color: var(--portal-text-primary); font-size: 17px; font-weight: 700;">Quản Lý Nhân Sự & Tài Khoản</h4>
+                        <p style="color: var(--portal-text-muted); font-size: 13.5px; line-height: 1.5; margin: 0 0 16px 0;">
+                            Quản lý hồ sơ nhân viên khách sạn, cập nhật trạng thái nghỉ việc tự động kích hoạt khóa tài khoản đăng nhập.
+                        </p>
+                    </div>
+                    <a href="${pageContext.request.contextPath}/manager/employees" class="portal-btn portal-btn-primary">
+                        Quản Lý Nhân Sự
+                    </a>
+                </div>
+
+                <!-- Thẻ 5: Xét duyệt hoàn tiền cọc hủy phòng -->
+                <div class="portal-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h4 style="margin: 0 0 8px 0; color: var(--portal-text-primary); font-size: 17px; font-weight: 700;">Xét Duyệt Hoàn Tiền Cọc Hủy Phòng</h4>
+                        <p style="color: var(--portal-text-muted); font-size: 13.5px; line-height: 1.5; margin: 0 0 16px 0;">
+                            Thẩm định các yêu cầu hủy phòng, tiền hoàn trả tính toán tự động qua hàm nghiệp vụ hoàn tiền từ cơ sở dữ liệu.
+                        </p>
+                    </div>
+                    <a href="${pageContext.request.contextPath}/manager/refunds" class="portal-btn portal-btn-success">
+                        Xét Duyệt Hoàn Cọc
+                    </a>
+                </div>
+
+                <!-- Thẻ 6: Cấu hình khách sạn & biểu phí -->
+                <div class="portal-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h4 style="margin: 0 0 8px 0; color: var(--portal-text-primary); font-size: 17px; font-weight: 700;">Cấu Hình Khách Sạn & Biểu Phí</h4>
+                        <p style="color: var(--portal-text-muted); font-size: 13.5px; line-height: 1.5; margin: 0 0 16px 0;">
+                            Điều chỉnh giá phòng, phụ phí nhận sớm/trả muộn, % cọc, danh mục loại giường (BedType), tiện nghi và dịch vụ tiêu dùng.
+                        </p>
+                    </div>
+                    <a href="${pageContext.request.contextPath}/manager/hotel-config" class="portal-btn portal-btn-secondary">
+                        Cấu Hình & Biểu Phí
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<jsp:include page="/views/common/footer.jsp" />

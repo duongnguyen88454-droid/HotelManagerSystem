@@ -17,7 +17,7 @@ import java.util.List;
 public class ManagerReportDAO extends DBContext {
 
     private static final String SP_DAILY_AUDIT_SQL =
-            "{CALL sp_BaoCaoTongHopKinhDoanhTheoNgay(?)}";
+            "{CALL sp_BaoCaoDoanhThuTheoNgay(?)}";
     private static final String SELECT_MONTHLY_REVENUE_SQL =
             "SELECT Nam, Thang, SoLuotGiaoDich, SoHoaDonDaThanhToan, TongDoanhThuThucThu "
                     + "FROM v_BaoCaoDoanhThuTheoThang ORDER BY Nam DESC, Thang DESC";
@@ -42,13 +42,13 @@ public class ManagerReportDAO extends DBContext {
     }
 
     private DailyAuditReportDTO mapDailyReport(ResultSet rs, LocalDate date) throws Exception {
-        int soDonMoi = rs.getInt("SoDonDatMoi");
-        int checkIn = rs.getInt("SoPhongCheckIn");
-        int checkOut = rs.getInt("SoPhongCheckOut");
-        BigDecimal tong = getNonNullBigDecimal(rs, "TongTienThucThu");
-        BigDecimal tienMat = getNonNullBigDecimal(rs, "ThuTienMat");
-        BigDecimal chuyenKhoan = getNonNullBigDecimal(rs, "ThuChuyenKhoan");
-        BigDecimal the = getNonNullBigDecimal(rs, "ThuTheNganHang");
+        int soDonMoi = rs.getInt("TotalNewBookings");
+        int checkIn = rs.getInt("TotalRoomsCheckedIn");
+        int checkOut = rs.getInt("TotalRoomsCheckedOut");
+        BigDecimal tong = getNonNullBigDecimal(rs, "TotalRevenue");
+        BigDecimal tienMat = getNonNullBigDecimal(rs, "RevenueCash");
+        BigDecimal chuyenKhoan = getNonNullBigDecimal(rs, "RevenueBankTransfer");
+        BigDecimal the = getNonNullBigDecimal(rs, "RevenueCreditCard");
         return new DailyAuditReportDTO(date, soDonMoi, checkIn, checkOut,
                 tong, tienMat, chuyenKhoan, the);
     }

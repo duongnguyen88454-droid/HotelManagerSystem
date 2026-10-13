@@ -140,6 +140,6 @@ public class InvoiceService {
         if (invoice == null) {
             return false;
         }
-        return "DaThanhToanDu".equals(invoice.getTrangThaiHoaDon());
+        return "Paid".equalsIgnoreCase(invoice.getTrangThaiHoaDon());
     }
 }

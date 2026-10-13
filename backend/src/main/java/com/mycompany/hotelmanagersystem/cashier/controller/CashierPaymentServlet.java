@@ -41,14 +41,21 @@ public class CashierPaymentServlet extends HttpServlet {
         String maHoaDon = request.getParameter("maHoaDon");
         String maBooking = request.getParameter("maBooking");
         String[] selectedRooms = request.getParameterValues("selectedRooms");
-        String maNV = resolveEmployeeId(request.getSession(false));
+        String maTaiKhoan = resolveAccountId(request.getSession(false));
 
         InvoiceDetailDTO invoice = (maHoaDon != null && !maHoaDon.trim().isEmpty())
                 ? invoiceService.getFullInvoiceForDisplay(maHoaDon.trim())
-                : invoiceService.getInvoiceByBooking(maBooking, maNV);
+                : invoiceService.getInvoiceByBooking(maBooking, maTaiKhoan);
 
         if (invoice == null) {
             response.sendRedirect(request.getContextPath() + "/cashier/dashboard");
+            return;
+        }
+
+        boolean hasSelectedRooms = (selectedRooms != null && selectedRooms.length > 0);
+        if (invoice.getConThieu() <= 0 && !hasSelectedRooms) {
+            response.sendRedirect(request.getContextPath() + "/cashier/invoice?maHoaDon="
+                    + invoice.getMaHoaDon() + "&info=already_paid");
             return;
         }
 
@@ -92,13 +99,18 @@ public class CashierPaymentServlet extends HttpServlet {
             return;
         }
 
-        String maNV = resolveEmployeeId(request.getSession(false));
+        String maTaiKhoan = resolveAccountId(request.getSession(false));
         PaymentResultDTO result = paymentService.processPaymentAndCheckOut(
-                maBooking, maHoaDon, roomList, maNV, soTien, phuongThuc);
+                maBooking, maHoaDon, roomList, maTaiKhoan, soTien, phuongThuc);
 
         if (result.isSuccess()) {
-            response.sendRedirect(request.getContextPath() + "/cashier/invoice?maHoaDon="
-                    + result.getMaHoaDon() + "&paymentSuccess=1");
+            if (soTien > 0 && result.getMaThanhToan() != null) {
+                response.sendRedirect(request.getContextPath() + "/cashier/invoice?maHoaDon="
+                        + result.getMaHoaDon() + "&paymentSuccess=1");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/cashier/invoice?maHoaDon="
+                        + result.getMaHoaDon() + "&checkoutSuccess=1");
+            }
         } else {
             request.getSession().setAttribute("cashierError", result.getMessage());
             response.sendRedirect(request.getContextPath() + "/cashier/payment?maHoaDon=" + maHoaDon);
@@ -120,13 +132,13 @@ public class CashierPaymentServlet extends HttpServlet {
         }
     }
 
-    private String resolveEmployeeId(HttpSession session) {
+    private String resolveAccountId(HttpSession session) {
         if (session != null) {
             UserSessionDTO user = (UserSessionDTO) session.getAttribute("CURRENT_USER");
-            if (user != null && user.getMaDinhDanh() != null && !user.getMaDinhDanh().trim().isEmpty()) {
-                return user.getMaDinhDanh().trim();
+            if (user != null && user.getMaTaiKhoan() != null && !user.getMaTaiKhoan().trim().isEmpty()) {
+                return user.getMaTaiKhoan().trim();
             }
         }
-        return "NV001";
+        return null;
     }
 }

@@ -27,17 +27,25 @@ public class BookingCheckInQueryDAO {
     /**
      * Lấy danh sách các đơn đặt phòng chờ tiếp nhận tại quầy.
      */
-    public List<CheckInArrivalItemDTO> getArrivalBookings(String hoTen, String cccd, String maBK) {
+    public List<CheckInArrivalItemDTO> getArrivalBookings(String hoTen, String cccd, String maBK, String keyword) {
         List<CheckInArrivalItemDTO> list = new ArrayList<>();
         boolean hasHoTen = hoTen != null && !hoTen.trim().isEmpty();
         boolean hasCccd = cccd != null && !cccd.trim().isEmpty();
         boolean hasMaBK = maBK != null && !maBK.trim().isEmpty();
-        String sql = buildArrivalQuerySql(hasHoTen, hasCccd, hasMaBK);
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        String sql = buildArrivalQuerySql(hasHoTen, hasCccd, hasMaBK, hasKeyword);
 
         try (Connection conn = DBContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
             int idx = 1;
+            if (hasKeyword) {
+                String kwParam = "%" + keyword.trim() + "%";
+                ps.setString(idx++, kwParam);
+                ps.setString(idx++, kwParam);
+                ps.setString(idx++, kwParam);
+                ps.setString(idx++, kwParam);
+            }
             if (hasHoTen) {
                 ps.setString(idx++, "%" + hoTen.trim() + "%");
             }
@@ -59,7 +67,7 @@ public class BookingCheckInQueryDAO {
         return list;
     }
 
-    private String buildArrivalQuerySql(boolean hasHoTen, boolean hasCccd, boolean hasMaBK) {
+    private String buildArrivalQuerySql(boolean hasHoTen, boolean hasCccd, boolean hasMaBK, boolean hasKeyword) {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT b.BookingId AS MaBooking, c.FullName AS HoTen, c.PhoneNumber AS SoDT, c.CCCD, ");
         sb.append("       MIN(br.ExpectedCheckInDate) AS NgayNhan, MAX(br.ExpectedCheckOutDate) AS NgayTra, ");
@@ -69,7 +77,9 @@ public class BookingCheckInQueryDAO {
         sb.append("INNER JOIN Customer c ON b.CustomerId = c.CustomerId ");
         sb.append("INNER JOIN Booking_Room br ON b.BookingId = br.BookingId ");
         sb.append("WHERE br.BookingStatus IN ('Confirmed', 'CheckedIn') ");
-        // Bộ lọc độc lập: HoTen (LIKE), CCCD (khớp chính xác), MaBooking (LIKE)
+        if (hasKeyword) {
+            sb.append("AND (c.FullName LIKE ? OR c.CCCD LIKE ? OR b.BookingId LIKE ? OR c.PhoneNumber LIKE ?) ");
+        }
         if (hasHoTen) {
             sb.append("AND c.FullName LIKE ? ");
         }

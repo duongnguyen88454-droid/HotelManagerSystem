@@ -23,28 +23,30 @@ public class ActiveBookingDAO {
         List<ActiveBookingItemDTO> list = new ArrayList<>();
         boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
 
-        String sql = "SELECT b.MaBooking, kh.HoTen AS TenKhach, kh.SoDT, kh.CCCD, b.ChiPhiDuKien, b.TrangThai, " +
-                     "       COUNT(bp.MaPhong) AS TongSoPhong, " +
-                     "       STRING_AGG(bp.MaPhong, ', ') AS DanhSachPhong, " +
-                     "       SUM(CASE WHEN bp.NgayCheckOutThucTe IS NULL THEN 1 ELSE 0 END) AS SoPhongChuaTra, " +
-                     "       hd.MaHoaDon, " +
-                     "       ISNULL(hd.TrangThai, 'ChuaThanhToan') AS TrangThaiHoaDon, " +
-                     "       ISNULL(hd.TongTienCuoiCung, b.ChiPhiDuKien) AS TongTien, " +
+        String sql = "SELECT b.BookingId AS MaBooking, c.FullName AS TenKhach, c.PhoneNumber AS SoDT, c.CCCD, " +
+                     "       ISNULL(inv.FinalTotalAmount, 0) AS ChiPhiDuKien, " +
+                     "       ISNULL((SELECT TOP 1 br_st.BookingStatus FROM Booking_Room br_st WHERE br_st.BookingId = b.BookingId), 'CheckedIn') AS TrangThai, " +
+                     "       COUNT(br.RoomId) AS TongSoPhong, " +
+                     "       STRING_AGG(br.RoomId, ', ') AS DanhSachPhong, " +
+                     "       SUM(CASE WHEN br.ActualCheckOutDate IS NULL THEN 1 ELSE 0 END) AS SoPhongChuaTra, " +
+                     "       inv.InvoiceId AS MaHoaDon, " +
+                     "       ISNULL(inv.InvoiceStatus, 'Unpaid') AS TrangThaiHoaDon, " +
+                     "       ISNULL(inv.FinalTotalAmount, 0) AS TongTien, " +
                      "       ISNULL(tt.DaTra, 0) AS DaThanhToan, " +
-                     "       (ISNULL(hd.TongTienCuoiCung, b.ChiPhiDuKien) - ISNULL(tt.DaTra, 0)) AS SoTienConNo " +
-                     "FROM BOOKING b " +
-                     "INNER JOIN KHACHHANG kh ON b.MaKH = kh.MaKH " +
-                     "INNER JOIN BOOKING_PHONG bp ON b.MaBooking = bp.MaBooking " +
-                     "LEFT JOIN HOADON hd ON b.MaBooking = hd.MaBooking " +
+                     "       (ISNULL(inv.FinalTotalAmount, 0) - ISNULL(tt.DaTra, 0)) AS SoTienConNo " +
+                     "FROM Booking b " +
+                     "INNER JOIN Customer c ON b.CustomerId = c.CustomerId " +
+                     "INNER JOIN Booking_Room br ON b.BookingId = br.BookingId " +
+                     "LEFT JOIN Invoice inv ON b.BookingId = inv.BookingId " +
                      "OUTER APPLY ( " +
-                     "    SELECT SUM(SoTien) AS DaTra FROM THANHTOAN WHERE MaHoaDon = hd.MaHoaDon " +
+                     "    SELECT SUM(TotalAmount) AS DaTra FROM Payment WHERE InvoiceId = inv.InvoiceId " +
                      ") tt " +
-                     "WHERE b.TrangThai IN ('DaCheckIn', 'DaCheckOut') " +
-                     "  AND ISNULL(hd.TrangThai, 'ChuaThanhToan') <> 'DaThanhToanDu' " +
-                     (hasKeyword ? "  AND (b.MaBooking LIKE ? OR kh.HoTen LIKE ? OR kh.SoDT LIKE ? OR kh.CCCD LIKE ?) " : "") +
-                     "GROUP BY b.MaBooking, kh.HoTen, kh.SoDT, kh.CCCD, b.ChiPhiDuKien, b.TrangThai, " +
-                     "         hd.MaHoaDon, hd.TrangThai, hd.TongTienCuoiCung, tt.DaTra " +
-                     "ORDER BY b.MaBooking DESC";
+                     "WHERE EXISTS (SELECT 1 FROM Booking_Room br2 WHERE br2.BookingId = b.BookingId AND br2.BookingStatus IN ('CheckedIn', 'CheckedOut')) " +
+                     "  AND ISNULL(inv.InvoiceStatus, 'Unpaid') <> 'Paid' " +
+                     (hasKeyword ? "  AND (b.BookingId LIKE ? OR c.FullName LIKE ? OR c.PhoneNumber LIKE ? OR c.CCCD LIKE ?) " : "") +
+                     "GROUP BY b.BookingId, c.FullName, c.PhoneNumber, c.CCCD, inv.FinalTotalAmount, " +
+                     "         inv.InvoiceId, inv.InvoiceStatus, tt.DaTra " +
+                     "ORDER BY b.BookingId DESC";
 
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -68,7 +70,7 @@ public class ActiveBookingDAO {
      * Kiểm tra xem đơn đặt phòng có còn phòng nào chưa thực hiện Check-out hay không.
      */
     public boolean hasUncheckedOutRooms(String maBooking) throws SQLException, ClassNotFoundException {
-        String sql = "SELECT 1 FROM BOOKING_PHONG WHERE MaBooking = ? AND NgayCheckOutThucTe IS NULL";
+        String sql = "SELECT 1 FROM Booking_Room WHERE BookingId = ? AND ActualCheckOutDate IS NULL AND BookingStatus = 'CheckedIn'";
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maBooking);

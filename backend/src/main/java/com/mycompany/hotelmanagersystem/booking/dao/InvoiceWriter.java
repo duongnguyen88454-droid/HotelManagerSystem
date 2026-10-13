@@ -6,7 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Lớp phụ trợ nội bộ (package-private) quản lý thao tác Hóa đơn trong Transaction của Booking.
+ * Lớp phụ trợ nội bộ (package-private) quản lý thao tác Hóa đơn trong
+ * Transaction của Booking.
  * Tuân thủ QT 2.2 và QT 2.3 trong ARCHITECTURE_RULES.md.
  */
 class InvoiceWriter {
@@ -30,7 +31,7 @@ class InvoiceWriter {
             String invoiceId = "INV001";
             String getInvoiceIdSql = "SELECT dbo.fn_SinhMaInvoice()";
             try (PreparedStatement psId = conn.prepareStatement(getInvoiceIdSql);
-                 ResultSet rsId = psId.executeQuery()) {
+                    ResultSet rsId = psId.executeQuery()) {
                 if (rsId.next() && rsId.getString(1) != null) {
                     invoiceId = rsId.getString(1);
                 }
@@ -53,7 +54,8 @@ class InvoiceWriter {
     }
 
     /**
-     * Trách nhiệm: Cập nhật tổng chi phí dịch vụ và tổng tiền cuối cùng trong Invoice
+     * Trách nhiệm: Cập nhật tổng chi phí dịch vụ và tổng tiền cuối cùng trong
+     * Invoice
      */
     void updateBookingTotalCost(Connection conn, String maBooking, double deltaAmount) throws SQLException {
         String updateInvSql = "UPDATE Invoice SET "

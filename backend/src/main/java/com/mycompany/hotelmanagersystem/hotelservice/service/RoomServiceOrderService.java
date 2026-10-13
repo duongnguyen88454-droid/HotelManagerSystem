@@ -49,12 +49,34 @@ public class RoomServiceOrderService {
             return ServiceOrderResultDTO.failure("Số lượng dịch vụ phải lớn hơn 0!");
         }
 
-        ServiceItem serviceItem = serviceDAO.getServiceById(req.getMaDichVu().trim());
+        String normalizedId = normalizeServiceId(req.getMaDichVu().trim());
+        req.setMaDichVu(normalizedId);
+
+        ServiceItem serviceItem = serviceDAO.getServiceById(normalizedId);
         if (serviceItem == null || !"ApDung".equalsIgnoreCase(serviceItem.getTrangThai())) {
             return ServiceOrderResultDTO.failure("Dịch vụ không tồn tại hoặc đã tạm ngưng cung cấp!");
         }
 
         return roomServiceOrderDAO.executeOrderService(req);
+    }
+
+    private String normalizeServiceId(String maDichVu) {
+        if (maDichVu == null) {
+            return null;
+        }
+        String id = maDichVu.trim().toUpperCase();
+        if (id.startsWith("DV")) {
+            switch (id) {
+                case "DV01": case "DV1": return "SRV001";
+                case "DV02": case "DV2": return "SRV002";
+                case "DV03": case "DV3": return "SRV003";
+                case "DV04": case "DV4": return "SRV004";
+                case "DV05": case "DV5": return "SRV005";
+                case "DV06": case "DV6": return "SRV006";
+                default: break;
+            }
+        }
+        return id;
     }
 
     /**
@@ -68,7 +90,7 @@ public class RoomServiceOrderService {
     }
 
     /**
-     * Lấy mã Booking đang lưu trú (DaCheckIn) của một phòng cụ thể.
+     * Lấy mã Booking đang lưu trú (CheckedIn) của một phòng cụ thể.
      */
     public String getActiveBookingByRoom(String maPhong) {
         if (maPhong == null || maPhong.trim().isEmpty()) {

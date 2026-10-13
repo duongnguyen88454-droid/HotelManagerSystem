@@ -13,6 +13,12 @@ function applyFilters() {
         checkedPrices.push(cb.value);
     });
 
+    // Lấy danh sách loại giường được tích
+    var checkedBeds = [];
+    document.querySelectorAll("input[name='bedCheckbox']:checked").forEach(function(cb) {
+        checkedBeds.push(cb.value.toLowerCase());
+    });
+
     // Lấy sức chứa
     var capacityEl = document.querySelector("input[name='capacityRadio']:checked");
     var minCapacity = capacityEl ? capacityEl.value : "all";
@@ -47,7 +53,19 @@ function applyFilters() {
         if (minCapacity === "2" && capacity < 2) matchCapacity = false;
         if (minCapacity === "3" && capacity < 3) matchCapacity = false;
 
-        if (matchKeyword && matchType && matchPrice && matchCapacity) {
+        var matchBed = true;
+        if (checkedBeds.length > 0) {
+            var bed = (card.getAttribute("data-bed") || "").toLowerCase();
+            matchBed = false;
+            for (var b = 0; b < checkedBeds.length; b++) {
+                if (bed.indexOf(checkedBeds[b]) !== -1) {
+                    matchBed = true;
+                    break;
+                }
+            }
+        }
+
+        if (matchKeyword && matchType && matchPrice && matchCapacity && matchBed) {
             card.style.display = "flex";
             visibleCount++;
         } else {
@@ -71,6 +89,7 @@ function resetFilters() {
     if (kw) kw.value = "";
     document.querySelectorAll("input[name='typeCheckbox']").forEach(function(cb) { cb.checked = false; });
     document.querySelectorAll("input[name='priceCheckbox']").forEach(function(cb) { cb.checked = false; });
+    document.querySelectorAll("input[name='bedCheckbox']").forEach(function(cb) { cb.checked = false; });
     var allCap = document.querySelector("input[name='capacityRadio'][value='all']");
     if (allCap) allCap.checked = true;
     applyFilters();

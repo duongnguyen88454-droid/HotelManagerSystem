@@ -20,10 +20,10 @@ public class MaintenanceDAO extends DBContext {
                     + "FROM v_DanhSachPhongHuHaiCanBaoTri ORDER BY NgayPhatHien DESC";
 
     private static final String UPDATE_REPORT_STATUS_SQL =
-            "UPDATE BAOCAOHUHAI SET TrangThai = 'DaXuLy' WHERE MaBaoCao = ?";
+            "UPDATE DamageReport SET DamageReportStatus = 'Resolved' WHERE DamageReportId = ?";
 
     private static final String UPDATE_ROOM_AVAILABLE_SQL =
-            "UPDATE PHONG SET TrangThai = 'Available' WHERE MaPhong = ?";
+            "UPDATE Room SET RoomStatus = 'Available' WHERE RoomId = ?";
 
     public List<DamagedRoomItemDTO> getPendingDamagedRooms() {
         List<DamagedRoomItemDTO> list = new ArrayList<>();

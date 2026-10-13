@@ -18,8 +18,17 @@
 
                 <c:if test="${paymentSuccess}">
                     <div class="alert-success">
-                        Giao dịch thanh toán đã được ghi nhận thành công vào hệ thống! Hóa đơn quyết toán đã được cập
-                        nhật.
+                        Giao dịch thanh toán đã được ghi nhận thành công vào hệ thống! Hóa đơn quyết toán đã được cập nhật.
+                    </div>
+                </c:if>
+                <c:if test="${checkoutSuccess}">
+                    <div class="alert-success" style="background-color: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;">
+                        Đã cập nhật hoàn tất trả phòng thành công!
+                    </div>
+                </c:if>
+                <c:if test="${alreadyPaidInfo}">
+                    <div class="alert-info" style="background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-weight: 500;">
+                        Đơn đặt phòng này đã hoàn tất toàn bộ thủ tục trả phòng và thanh toán đầy đủ trước đó.
                     </div>
                 </c:if>
 
@@ -97,11 +106,11 @@
                                 <span class="meta-label">Trạng thái quyết toán:</span>
                                 <span class="meta-value">
                                     <c:choose>
-                                        <c:when test="${invoice.trangThaiHoaDon == 'DaThanhToanDu'}">
+                                        <c:when test="${invoice.trangThaiHoaDon == 'Paid'}">
                                             <span class="badge-status badge-paid">ĐÃ THANH TOÁN ĐỦ</span>
                                         </c:when>
                                         <c:when
-                                            test="${invoice.trangThaiHoaDon == 'MotPhan' || invoice.daThanhToan gt 0}">
+                                            test="${invoice.trangThaiHoaDon == 'PartiallyPaid' || invoice.trangThaiHoaDon == 'Partial' || invoice.daThanhToan gt 0}">
                                             <span class="badge-status badge-partial">THANH TOÁN MỘT PHẦN</span>
                                         </c:when>
                                         <c:otherwise>
@@ -236,8 +245,40 @@
                     <!-- Tổng Kết Tài Chính -->
                     <div class="summary-block">
                         <div class="summary-box">
+                            <c:if test="${invoice.totalRoomCharge != null && invoice.totalRoomCharge gt 0}">
+                                <div class="summary-row">
+                                    <span style="color: #475569;">Tiền phòng lưu trú:</span>
+                                    <span style="font-weight: 600;">
+                                        <fmt:formatNumber value="${invoice.totalRoomCharge}" pattern="#,##0" /> đ
+                                    </span>
+                                </div>
+                            </c:if>
+                            <c:if test="${invoice.totalServiceCharge != null && invoice.totalServiceCharge gt 0}">
+                                <div class="summary-row">
+                                    <span style="color: #475569;">Tiền dịch vụ phát sinh:</span>
+                                    <span style="font-weight: 600;">
+                                        <fmt:formatNumber value="${invoice.totalServiceCharge}" pattern="#,##0" /> đ
+                                    </span>
+                                </div>
+                            </c:if>
+                            <c:if test="${invoice.earlyCheckInFee != null && invoice.earlyCheckInFee gt 0}">
+                                <div class="summary-row">
+                                    <span style="color: #d97706;">Phụ thu nhận phòng sớm (&lt;13h):</span>
+                                    <span style="font-weight: 600; color: #d97706;">
+                                        + <fmt:formatNumber value="${invoice.earlyCheckInFee}" pattern="#,##0" /> đ
+                                    </span>
+                                </div>
+                            </c:if>
+                            <c:if test="${invoice.lateCheckOutFee != null && invoice.lateCheckOutFee gt 0}">
+                                <div class="summary-row">
+                                    <span style="color: #d97706;">Phụ thu trả phòng trễ (&gt;12h):</span>
+                                    <span style="font-weight: 600; color: #d97706;">
+                                        + <fmt:formatNumber value="${invoice.lateCheckOutFee}" pattern="#,##0" /> đ
+                                    </span>
+                                </div>
+                            </c:if>
                             <div class="summary-row">
-                                <span style="color: #475569;">Tổng chi phí phòng &amp; dịch vụ:</span>
+                                <span style="color: #1e293b; font-weight: 700;">Tổng cộng quyết toán:</span>
                                 <span style="font-weight: 700;">
                                     <fmt:formatNumber value="${invoice.tongTienCuoiCung}" pattern="#,##0" /> đ
                                 </span>

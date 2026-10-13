@@ -36,11 +36,11 @@ public class CashierInvoiceServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String maHoaDon = request.getParameter("maHoaDon");
         String maBooking = request.getParameter("maBooking");
-        String maNV = resolveEmployeeId(request.getSession(false));
+        String maTaiKhoan = resolveAccountId(request.getSession(false));
 
         InvoiceDetailDTO invoice = (maHoaDon != null && !maHoaDon.trim().isEmpty())
                 ? invoiceService.getFullInvoiceForDisplay(maHoaDon.trim())
-                : invoiceService.getInvoiceByBooking(maBooking, maNV);
+                : invoiceService.getInvoiceByBooking(maBooking, maTaiKhoan);
 
         if (invoice == null) {
             response.sendRedirect(request.getContextPath() + "/cashier/dashboard");
@@ -52,16 +52,18 @@ public class CashierInvoiceServlet extends HttpServlet {
         request.setAttribute("invoice", invoice);
         request.setAttribute("paymentHistory", paymentHistory);
         request.setAttribute("paymentSuccess", "1".equals(request.getParameter("paymentSuccess")));
+        request.setAttribute("checkoutSuccess", "1".equals(request.getParameter("checkoutSuccess")));
+        request.setAttribute("alreadyPaidInfo", "already_paid".equals(request.getParameter("info")));
         request.getRequestDispatcher("/views/cashier/invoice_detail.jsp").forward(request, response);
     }
 
-    private String resolveEmployeeId(HttpSession session) {
+    private String resolveAccountId(HttpSession session) {
         if (session != null) {
             UserSessionDTO user = (UserSessionDTO) session.getAttribute("CURRENT_USER");
-            if (user != null && user.getMaDinhDanh() != null && !user.getMaDinhDanh().trim().isEmpty()) {
-                return user.getMaDinhDanh().trim();
+            if (user != null && user.getMaTaiKhoan() != null && !user.getMaTaiKhoan().trim().isEmpty()) {
+                return user.getMaTaiKhoan().trim();
             }
         }
-        return "NV001";
+        return null;
     }
 }

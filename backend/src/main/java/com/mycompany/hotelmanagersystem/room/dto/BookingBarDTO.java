@@ -14,7 +14,7 @@ public class BookingBarDTO {
     private Date ngayTraDuKien;
     private Timestamp ngayCheckInThucTe;
     private Timestamp ngayCheckOutThucTe;
-    private String trangThaiBooking; // DaXacNhan, DaCheckIn, DaTraPhong
+    private String trangThaiBooking; // Confirmed, CheckedIn, CheckedOut, Cancelled
     private int startCol; // 1-7
     private int colSpan;  // Số cột chiếm dụng
     private String cssClass; // bar-confirmed, bar-occupied

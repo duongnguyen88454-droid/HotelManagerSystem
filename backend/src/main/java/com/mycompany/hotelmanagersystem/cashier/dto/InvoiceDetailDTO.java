@@ -15,6 +15,10 @@ public class InvoiceDetailDTO implements Serializable {
     private String maBooking;
     private Timestamp ngayLap;
     private Double tongTienCuoiCung;
+    private Double totalRoomCharge;
+    private Double totalServiceCharge;
+    private Double earlyCheckInFee;
+    private Double lateCheckOutFee;
     private Double daThanhToan;
     private Double conThieu;
     private String trangThaiHoaDon;
@@ -140,5 +144,37 @@ public class InvoiceDetailDTO implements Serializable {
 
     public void setServices(List<InvoiceServiceItemDTO> services) {
         this.services = services;
+    }
+
+    public Double getTotalRoomCharge() {
+        return totalRoomCharge;
+    }
+
+    public void setTotalRoomCharge(Double totalRoomCharge) {
+        this.totalRoomCharge = totalRoomCharge;
+    }
+
+    public Double getTotalServiceCharge() {
+        return totalServiceCharge;
+    }
+
+    public void setTotalServiceCharge(Double totalServiceCharge) {
+        this.totalServiceCharge = totalServiceCharge;
+    }
+
+    public Double getEarlyCheckInFee() {
+        return earlyCheckInFee;
+    }
+
+    public void setEarlyCheckInFee(Double earlyCheckInFee) {
+        this.earlyCheckInFee = earlyCheckInFee;
+    }
+
+    public Double getLateCheckOutFee() {
+        return lateCheckOutFee;
+    }
+
+    public void setLateCheckOutFee(Double lateCheckOutFee) {
+        this.lateCheckOutFee = lateCheckOutFee;
     }
 }

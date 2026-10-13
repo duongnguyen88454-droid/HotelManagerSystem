@@ -36,13 +36,13 @@ public class CheckInRoomDetailDTO {
     }
 
     private String resolveStatusText(String status) {
-        if ("Available".equalsIgnoreCase(status)) {
+        if ("Clean".equalsIgnoreCase(status) || "Available".equalsIgnoreCase(status)) {
             return "[Đã dọn sạch]";
         } else if ("Cleaning".equalsIgnoreCase(status)) {
             return "[Đang dọn]";
         } else if ("Dirty".equalsIgnoreCase(status)) {
             return "[Bẩn chờ dọn]";
-        } else if ("Damaged".equalsIgnoreCase(status)) {
+        } else if ("Damaged".equalsIgnoreCase(status) || "Maintenance".equalsIgnoreCase(status)) {
             return "[Bảo trì]";
         } else if ("Occupied".equalsIgnoreCase(status)) {
             return "[Đang có khách]";
@@ -51,13 +51,13 @@ public class CheckInRoomDetailDTO {
     }
 
     private String resolveStatusCss(String status) {
-        if ("Available".equalsIgnoreCase(status)) {
+        if ("Clean".equalsIgnoreCase(status) || "Available".equalsIgnoreCase(status)) {
             return "badge-clean";
         } else if ("Cleaning".equalsIgnoreCase(status)) {
             return "badge-cleaning";
         } else if ("Dirty".equalsIgnoreCase(status)) {
             return "badge-dirty";
-        } else if ("Damaged".equalsIgnoreCase(status)) {
+        } else if ("Damaged".equalsIgnoreCase(status) || "Maintenance".equalsIgnoreCase(status)) {
             return "badge-damaged";
         } else if ("Occupied".equalsIgnoreCase(status)) {
             return "badge-occupied";

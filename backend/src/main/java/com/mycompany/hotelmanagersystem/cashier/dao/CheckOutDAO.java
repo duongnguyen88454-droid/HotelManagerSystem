@@ -20,11 +20,10 @@ public class CheckOutDAO {
      * @throws ClassNotFoundException nếu thiếu driver JDBC
      */
     public boolean executeCheckOutAll(String maBooking, String maNV) throws SQLException, ClassNotFoundException {
-        String sql = "{call sp_CheckOut(?, ?, NULL)}";
+        String sql = "{call dbo.sp_CheckOutTraPhong(?, NULL)}";
         try (Connection conn = DBContext.getConnection();
              CallableStatement cs = conn.prepareCall(sql)) {
             cs.setString(1, maBooking);
-            cs.setString(2, maNV);
             cs.execute();
             return true;
         }
@@ -42,12 +41,11 @@ public class CheckOutDAO {
      */
     public boolean executeCheckOutRoom(String maBooking, String maPhong, String maNV)
             throws SQLException, ClassNotFoundException {
-        String sql = "{call sp_CheckOut(?, ?, ?)}";
+        String sql = "{call dbo.sp_CheckOutTraPhong(?, ?)}";
         try (Connection conn = DBContext.getConnection();
              CallableStatement cs = conn.prepareCall(sql)) {
             cs.setString(1, maBooking);
-            cs.setString(2, maNV);
-            cs.setString(3, maPhong);
+            cs.setString(2, maPhong);
             cs.execute();
             return true;
         }

@@ -42,10 +42,10 @@ public class CheckInService {
 
     /**
      * Lấy danh sách các đơn đặt phòng chờ tiếp nhận tại Quầy Check-in.
-     * Hỗ trợ lọc độc lập theo: HoTen (LIKE), CCCD (khớp chính xác), MaBooking (LIKE).
+     * Hỗ trợ tìm kiếm theo từ khóa hoặc lọc độc lập theo: HoTen, CCCD, MaBooking.
      */
-    public List<CheckInArrivalItemDTO> getArrivalBookings(String hoTen, String cccd, String maBK) {
-        return checkInQueryDAO.getArrivalBookings(hoTen, cccd, maBK);
+    public List<CheckInArrivalItemDTO> getArrivalBookings(String hoTen, String cccd, String maBK, String keyword) {
+        return checkInQueryDAO.getArrivalBookings(hoTen, cccd, maBK, keyword);
     }
 
     /**
@@ -61,7 +61,7 @@ public class CheckInService {
     /**
      * Thực hiện Check-in cho nhiều phòng được chọn trong đơn.
      */
-    public CheckInResultDTO executeCheckInMultipleRooms(String maBooking, List<String> roomIds, String maNV) {
+    public CheckInResultDTO executeCheckInMultipleRooms(String maBooking, List<String> roomIds) {
         if (maBooking == null || maBooking.trim().isEmpty()) {
             return new CheckInResultDTO(false, "Mã Booking không được để trống!", null, null, null);
         }
@@ -69,8 +69,7 @@ public class CheckInService {
             return new CheckInResultDTO(false, "Vui lòng chọn ít nhất một phòng để Check-in!", maBooking, null, null);
         }
 
-        String empId = (maNV != null && !maNV.trim().isEmpty()) ? maNV.trim() : "NV001";
-        boolean success = checkInDAO.executeCheckInRooms(maBooking.trim(), roomIds, empId);
+        boolean success = checkInDAO.executeCheckInRooms(maBooking.trim(), roomIds);
 
         if (success) {
             String roomListStr = String.join(", ", roomIds);
@@ -94,8 +93,6 @@ public class CheckInService {
 
         String maBooking = request.getMaBooking();
         String maPhong = request.getMaPhong();
-        String maNV = (request.getMaNV() != null && !request.getMaNV().trim().isEmpty())
-                ? request.getMaNV().trim() : "NV001";
 
         if (maBooking == null || maBooking.trim().isEmpty()) {
             return new CheckInResultDTO(false, "Mã Booking không được để trống!", maBooking, maPhong, null);
@@ -111,7 +108,7 @@ public class CheckInService {
                     maBooking, maPhong, null);
         }
 
-        boolean success = checkInDAO.executeCheckIn(maBooking.trim(), maPhong.trim(), maNV);
+        boolean success = checkInDAO.executeCheckIn(maBooking.trim(), maPhong.trim());
         if (success) {
             return new CheckInResultDTO(true,
                     "Xác nhận Check-in nhận phòng " + maPhong + " thành công!",

@@ -10,7 +10,8 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * DAO chuyên trách quản lý các dịch vụ đi kèm trong đơn đặt phòng (Booking Services).
+ * DAO chuyên trách quản lý các dịch vụ đi kèm trong đơn đặt phòng (Booking
+ * Services).
  * Tách biệt từ BookingDAO theo QT 2.1 và QT 2.3 trong ARCHITECTURE_RULES.md.
  */
 public class BookingDichVuDAO {
@@ -73,7 +74,8 @@ public class BookingDichVuDAO {
     }
 
     /**
-     * Trách nhiệm: Tra cứu giá và chèn danh sách dịch vụ đã chọn vào bảng BOOKING_DICHVU (nhận Connection)
+     * Trách nhiệm: Tra cứu giá và chèn danh sách dịch vụ đã chọn vào bảng
+     * BOOKING_DICHVU (nhận Connection)
      */
     void insertBookingServices(Connection conn, String maBooking, String maPhong,
             Map<String, Integer> selectedServices) throws SQLException {
@@ -102,7 +104,8 @@ public class BookingDichVuDAO {
     }
 
     /**
-     * Trách nhiệm: Chèn hoặc cộng dồn dịch vụ phòng vào bảng Booking_Room_Service (nhận Connection)
+     * Trách nhiệm: Chèn hoặc cộng dồn dịch vụ phòng vào bảng Booking_Room_Service
+     * (nhận Connection)
      */
     void insertSingleBookingService(Connection conn, String maBooking, String maPhong,
             CartServiceItemDTO sItem, String nguoiThem) throws SQLException {
@@ -164,7 +167,8 @@ public class BookingDichVuDAO {
     }
 
     /**
-     * Trách nhiệm: Lấy thành tiền của 1 dịch vụ đã đặt trong phòng (trả về -1 nếu không tìm thấy)
+     * Trách nhiệm: Lấy thành tiền của 1 dịch vụ đã đặt trong phòng (trả về -1 nếu
+     * không tìm thấy)
      */
     double getBookingServiceCost(Connection conn, String maBookingDichVu, String maBooking)
             throws SQLException {

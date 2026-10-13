@@ -46,6 +46,7 @@ public class BookingDetailDTO implements Serializable {
     private void updateCapabilities() {
         this.coTheHuy = "Confirmed".equalsIgnoreCase(this.trangThaiBooking);
         boolean daCoc = "PartiallyPaid".equalsIgnoreCase(this.trangThaiHoaDon)
+                || "Partial".equalsIgnoreCase(this.trangThaiHoaDon)
                 || "Paid".equalsIgnoreCase(this.trangThaiHoaDon);
         this.coTheThemDichVu = !daCoc && ("Confirmed".equalsIgnoreCase(this.trangThaiBooking)
                 || "CheckedIn".equalsIgnoreCase(this.trangThaiBooking));

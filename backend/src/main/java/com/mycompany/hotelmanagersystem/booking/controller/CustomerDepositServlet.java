@@ -100,9 +100,8 @@ public class CustomerDepositServlet extends HttpServlet {
     private boolean isAlreadyDepositedOrPaid(BookingDetailDTO detail) {
         String status = detail.getTrangThaiHoaDon();
         return "Paid".equalsIgnoreCase(status)
-                || "DaThanhToan".equalsIgnoreCase(status)
                 || "PartiallyPaid".equalsIgnoreCase(status)
-                || "ThanhToanMotPhan".equalsIgnoreCase(status);
+                || "Partial".equalsIgnoreCase(status);
     }
 
     private void handleDepositFailure(HttpServletRequest request, HttpServletResponse response,

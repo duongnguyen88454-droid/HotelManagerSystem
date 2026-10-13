@@ -113,6 +113,21 @@
                 </c:forEach>
             </div>
 
+            <!-- Lọc theo Loại Giường (BedType 3NF) -->
+            <c:if test="${not empty bedTypes}">
+                <div style="margin-bottom: 20px; border-bottom: 1px solid #f0f4f8; padding-bottom: 16px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 10px;">
+                        Loại Giường
+                    </div>
+                    <c:forEach var="bt" items="${bedTypes}">
+                        <label style="display: flex; align-items: center; font-size: 13px; color: #4a5568; margin-bottom: 8px; cursor: pointer;">
+                            <input type="checkbox" name="bedCheckbox" value="${bt.bedTypeName}" onchange="applyFilters()" style="margin-right: 8px;">
+                            ${bt.bedTypeName}
+                        </label>
+                    </c:forEach>
+                </div>
+            </c:if>
+
             <!-- Lọc theo Mức giá (Ngân sách) -->
             <div style="margin-bottom: 20px; border-bottom: 1px solid #f0f4f8; padding-bottom: 16px;">
                 <div style="font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 10px;">
@@ -199,6 +214,7 @@
                                  data-type="${room.maLoaiPhong}"
                                  data-price="${room.donGia}"
                                  data-capacity="${room.soNguoiToiDa}"
+                                 data-bed="${room.loaiGiuong}"
                                  style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: row; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); transition: box-shadow 0.2s;"
                                  onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'"
                                  onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.05)'">

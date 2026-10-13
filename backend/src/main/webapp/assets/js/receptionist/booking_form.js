@@ -9,9 +9,18 @@ function calculateNights() {
 function onDateFilterChange() {
     const dIn = document.getElementById('dateCheckIn').value;
     const dOut = document.getElementById('dateCheckOut').value;
+    const guests = document.getElementById('filterGuests') ? document.getElementById('filterGuests').value : '';
+    const roomType = document.getElementById('filterRoomType') ? document.getElementById('filterRoomType').value : '';
     if (dIn && dOut && dIn < dOut) {
         const contextPath = window.CONTEXT_PATH || '';
-        window.location.href = contextPath + '/receptionist/booking?checkIn=' + encodeURIComponent(dIn) + '&checkOut=' + encodeURIComponent(dOut);
+        let url = contextPath + '/receptionist/booking?checkIn=' + encodeURIComponent(dIn) + '&checkOut=' + encodeURIComponent(dOut);
+        if (guests) {
+            url += '&guests=' + encodeURIComponent(guests);
+        }
+        if (roomType && roomType !== 'ALL') {
+            url += '&roomType=' + encodeURIComponent(roomType);
+        }
+        window.location.href = url;
     }
 }
 
@@ -98,12 +107,16 @@ function recalculateStep2Bill() {
     const nights = calculateNights();
     let totalRoomCost = 0;
     let totalSvcCost = 0;
+    let totalDeposit = 0;
     let selectedCount = 0;
 
     document.querySelectorAll('input[name="selectedRooms"]:checked').forEach(chk => {
         selectedCount++;
         const price = parseFloat(chk.getAttribute('data-price')) || 0;
-        totalRoomCost += price * nights;
+        const depPct = parseFloat(chk.getAttribute('data-depositpercent')) || 0;
+        const roomTotal = price * nights;
+        totalRoomCost += roomTotal;
+        totalDeposit += (roomTotal * depPct) / 100.0;
 
         const card = document.getElementById('roomSvcCard_' + chk.value);
         if (card) {
@@ -119,6 +132,10 @@ function recalculateStep2Bill() {
     document.getElementById('step2SumRoomCost').innerText = formatVnd(totalRoomCost);
     document.getElementById('step2SumServiceCost').innerText = formatVnd(totalSvcCost);
     document.getElementById('step2SumTotalCost').innerText = formatVnd(totalRoomCost + totalSvcCost);
+    const depElem = document.getElementById('step2SumDepositCost');
+    if (depElem) {
+        depElem.innerText = formatVnd(totalDeposit);
+    }
 }
 
 function formatVnd(num) {

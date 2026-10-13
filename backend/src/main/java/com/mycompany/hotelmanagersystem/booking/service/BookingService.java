@@ -1,5 +1,6 @@
 package com.mycompany.hotelmanagersystem.booking.service;
 
+import com.mycompany.hotelmanagersystem.booking.dao.BookingCancellationDAO;
 import com.mycompany.hotelmanagersystem.booking.dao.BookingDAO;
 import com.mycompany.hotelmanagersystem.booking.dao.BookingDichVuDAO;
 import com.mycompany.hotelmanagersystem.booking.dao.BookingQueryDAO;
@@ -29,19 +30,22 @@ public class BookingService {
     private final BookingDAO bookingDAO;
     private final BookingQueryDAO bookingQueryDAO;
     private final BookingDichVuDAO bookingDichVuDAO;
+    private final BookingCancellationDAO bookingCancellationDAO;
     private final RoomService roomService;
     private final HotelServiceService hotelServiceService;
 
     public BookingService() {
         this(new BookingDAO(), new BookingQueryDAO(), new BookingDichVuDAO(),
-                new RoomService(), new HotelServiceService());
+                new BookingCancellationDAO(), new RoomService(), new HotelServiceService());
     }
 
     public BookingService(BookingDAO bookingDAO, BookingQueryDAO bookingQueryDAO, BookingDichVuDAO bookingDichVuDAO,
-            RoomService roomService, HotelServiceService hotelServiceService) {
+            BookingCancellationDAO bookingCancellationDAO, RoomService roomService,
+            HotelServiceService hotelServiceService) {
         this.bookingDAO = bookingDAO;
         this.bookingQueryDAO = bookingQueryDAO;
         this.bookingDichVuDAO = bookingDichVuDAO;
+        this.bookingCancellationDAO = bookingCancellationDAO;
         this.roomService = roomService;
         this.hotelServiceService = hotelServiceService;
     }
@@ -203,17 +207,19 @@ public class BookingService {
      * Hủy đơn đặt phòng khi chưa Check-in.
      */
     public boolean cancelBooking(String maBooking, String maKH, String maTaiKhoan) throws Exception {
-        if (maBooking == null) {
+        if (maBooking == null || maBooking.trim().isEmpty()) {
             return false;
         }
         BookingDetailDTO booking = getBookingDetail(maBooking, maKH, maTaiKhoan);
         if (booking == null) {
-            throw new IllegalArgumentException("Đơn đặt phòng không tồn tại!");
+            throw new IllegalArgumentException("Đơn đặt phòng không tồn tại hoặc bạn không có quyền truy cập!");
         }
         if (!"Confirmed".equalsIgnoreCase(booking.getTrangThaiBooking())) {
             throw new IllegalStateException("Đơn đặt phòng đã Check-in hoặc đã hủy, không thể hủy!");
         }
-        return bookingDAO.cancelBooking(maBooking.trim(), booking.getMaKH(), maTaiKhoan);
+        String cancelledBy = (maTaiKhoan != null && !maTaiKhoan.trim().isEmpty()) ? maTaiKhoan.trim() : "ACC002";
+        return bookingCancellationDAO.cancelAllRoomsInBooking(
+                maBooking.trim(), cancelledBy, "Khách hàng tự hủy trên website");
     }
 
     // --- CÁC PHƯƠNG THỨC HELPER NỘI BỘ (PRIVATE) ---

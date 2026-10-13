@@ -71,8 +71,7 @@ public class ReceptionistServiceServlet extends HttpServlet {
             soLuong = 1;
         }
 
-        String maNV = resolveEmployeeId(request.getSession(false));
-        ServiceOrderRequestDTO req = new ServiceOrderRequestDTO(maBooking, maPhong, maDichVu, soLuong, maNV, ghiChu);
+        ServiceOrderRequestDTO req = new ServiceOrderRequestDTO(maBooking, maPhong, maDichVu, soLuong, null, ghiChu);
         ServiceOrderResultDTO result = orderService.orderService(req);
 
         response.getWriter().write(buildOrderResultJson(result));
@@ -145,13 +144,6 @@ public class ReceptionistServiceServlet extends HttpServlet {
           .append("\"totalCost\":").append(result.getTongTienDichVuMoi())
           .append("}");
         return sb.toString();
-    }
-
-    private String resolveEmployeeId(HttpSession session) {
-        if (session != null && session.getAttribute("maNV") != null) {
-            return (String) session.getAttribute("maNV");
-        }
-        return "NV001";
     }
 
     private String escapeJson(String str) {

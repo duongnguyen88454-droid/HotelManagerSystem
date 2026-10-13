@@ -6,24 +6,33 @@
 <jsp:include page="/views/common/header.jsp">
     <jsp:param name="pageTitle" value="Tiếp Nhận Đặt Phòng Tại Quầy - Bàn Làm Việc Lễ Tân" />
 </jsp:include>
-<jsp:include page="/views/common/navbar.jsp" />
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/portal_layout.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/receptionist/booking_form.css">
 
-<div class="pms-wrap">
-    <div class="pms-container">
+<div class="portal-wrapper">
+    <!-- Thanh chức năng bên trái -->
+    <jsp:include page="/views/common/portal_sidebar.jsp">
+        <jsp:param name="activeMenu" value="booking" />
+    </jsp:include>
 
-        <!-- HEADER & ACTIONS -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-            <div>
-                <h2 style="color: #0f172a; margin: 0; font-size: 22px; font-weight: 800;">TIẾP NHẬN ĐẶT PHÒNG TẠI QUẦY (WALK-IN)</h2>
-                <p style="color: #64748b; margin: 4px 0 0 0; font-size: 13px;">Quy trình tiếp nhận đặt phòng doanh nghiệp: Chọn phòng khả dụng & Điền hồ sơ lưu trú</p>
+    <!-- Màn hình bên phải -->
+    <main class="portal-main">
+        <header class="portal-header">
+            <div class="portal-header-left">
+                <h1>Tiếp Nhận Đặt Phòng Tại Quầy (Walk-in)</h1>
+                <p>Quy trình tiếp nhận đặt phòng: Chọn phòng khả dụng và điền hồ sơ lưu trú</p>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <a href="${pageContext.request.contextPath}/receptionist/room-map" class="pms-btn pms-btn-secondary">[ Sơ Đồ Phòng ]</a>
-                <a href="${pageContext.request.contextPath}/receptionist/checkin" class="pms-btn pms-btn-secondary">[ Quầy Check-in ]</a>
+            <div class="portal-header-right">
+                <a href="${pageContext.request.contextPath}/receptionist/checkin" class="portal-btn portal-btn-secondary">
+                    Quầy Check-in
+                </a>
+                <a href="${pageContext.request.contextPath}/receptionist/room-map" class="portal-btn portal-btn-secondary">
+                    Danh Sách Phòng
+                </a>
             </div>
-        </div>
+        </header>
+
+        <div class="portal-card" style="padding: 24px;">
 
         <!-- STEPPER NAV -->
         <div class="stepper-nav">
@@ -51,22 +60,43 @@
             <!-- ========================================================================= -->
             <div id="step1Container">
                 
-                <!-- KHUNG CHỌN NGÀY -->
+                <!-- KHUNG CHỌN TIÊU CHÍ LỌC PHÒNG KHẢ DỤNG -->
                 <div class="pms-card" style="padding: 16px 20px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
-                        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <label style="font-size: 13px; font-weight: 700; color: #334155;">Ngày nhận:</label>
-                                <input type="date" id="dateCheckIn" name="checkIn" value="${checkIn}" class="pms-input" style="width: 160px; padding: 6px 10px;" onchange="onDateFilterChange()">
+                                <input type="date" id="dateCheckIn" name="checkIn" value="${checkIn}" class="pms-input" style="width: 145px; padding: 6px 10px;" onchange="onDateFilterChange()">
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <label style="font-size: 13px; font-weight: 700; color: #334155;">Ngày trả:</label>
-                                <input type="date" id="dateCheckOut" name="checkOut" value="${checkOut}" class="pms-input" style="width: 160px; padding: 6px 10px;" onchange="onDateFilterChange()">
+                                <input type="date" id="dateCheckOut" name="checkOut" value="${checkOut}" class="pms-input" style="width: 145px; padding: 6px 10px;" onchange="onDateFilterChange()">
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label style="font-size: 13px; font-weight: 700; color: #334155;">Số khách:</label>
+                                <select id="filterGuests" class="pms-input" style="width: 110px; padding: 6px 10px;" onchange="onDateFilterChange()">
+                                    <option value="">Tất cả</option>
+                                    <option value="1" ${paramGuests=='1' ? 'selected' : ''}>1 người</option>
+                                    <option value="2" ${paramGuests=='2' ? 'selected' : ''}>2 người</option>
+                                    <option value="3" ${paramGuests=='3' ? 'selected' : ''}>3 người</option>
+                                    <option value="4" ${paramGuests=='4' ? 'selected' : ''}>4+ người</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label style="font-size: 13px; font-weight: 700; color: #334155;">Hạng phòng:</label>
+                                <select id="filterRoomType" class="pms-input" style="width: 160px; padding: 6px 10px;" onchange="onDateFilterChange()">
+                                    <option value="ALL">Tất cả</option>
+                                    <c:forEach var="rt" items="${roomTypes}">
+                                        <option value="${rt.maLoaiPhong}" ${paramRoomType==rt.maLoaiPhong ? 'selected' : ''}>
+                                            ${rt.tenLoaiPhong}
+                                        </option>
+                                    </c:forEach>
+                                </select>
                             </div>
                             <span id="nightsCounter" style="background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 700;">1 đêm</span>
                         </div>
                         <button type="button" class="pms-btn pms-btn-secondary" style="padding: 7px 14px;" onclick="onDateFilterChange()">
-                            [ Cập Nhật Phòng ]
+                            [ Lọc Phòng ]
                         </button>
                     </div>
                 </div>
@@ -106,10 +136,10 @@
                                             <td style="text-align: center;">
                                                 <c:choose>
                                                     <c:when test="${rm.maPhong eq preselectedRoomId}">
-                                                        <input type="checkbox" name="selectedRooms" value="${rm.maPhong}" id="chk_${rm.maPhong}" checked data-price="${rm.giaPhong}" data-roomno="${rm.soPhong}" data-typename="${rm.tenLoaiPhong}" onchange="onRoomCheckboxChange()" style="width: 18px; height: 18px; cursor: pointer;">
+                                                        <input type="checkbox" name="selectedRooms" value="${rm.maPhong}" id="chk_${rm.maPhong}" checked data-price="${rm.giaPhong}" data-depositpercent="${rm.depositPercent}" data-roomno="${rm.soPhong}" data-typename="${rm.tenLoaiPhong}" onchange="onRoomCheckboxChange()" style="width: 18px; height: 18px; cursor: pointer;">
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <input type="checkbox" name="selectedRooms" value="${rm.maPhong}" id="chk_${rm.maPhong}" data-price="${rm.giaPhong}" data-roomno="${rm.soPhong}" data-typename="${rm.tenLoaiPhong}" onchange="onRoomCheckboxChange()" style="width: 18px; height: 18px; cursor: pointer;">
+                                                        <input type="checkbox" name="selectedRooms" value="${rm.maPhong}" id="chk_${rm.maPhong}" data-price="${rm.giaPhong}" data-depositpercent="${rm.depositPercent}" data-roomno="${rm.soPhong}" data-typename="${rm.tenLoaiPhong}" onchange="onRoomCheckboxChange()" style="width: 18px; height: 18px; cursor: pointer;">
                                                     </c:otherwise>
                                                 </c:choose>
                                                 <input type="hidden" name="soPhong_${rm.maPhong}" value="${rm.soPhong}">
@@ -267,17 +297,40 @@
                         <strong id="step2SumTotalCost" style="color: #dc2626; font-size: 18px;">0 VNĐ</strong>
                     </div>
 
+                    <!-- KHUNG THU TIỀN CỌC KHI ĐẶT PHÒNG GIỮ CHỖ -->
+                    <div style="margin-top: 16px; padding: 14px 16px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-weight: 700; color: #1e3a8a; font-size: 14px;">Tiền cọc cần thu để giữ chỗ:</span>
+                            <strong id="step2SumDepositCost" style="color: #1e3a8a; font-size: 16px;">0 VNĐ</strong>
+                        </div>
+                        <div style="font-size: 12px; color: #475569; margin-bottom: 8px; font-weight: 600;">Hình thức khách nộp cọc tại quầy:</div>
+                        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #1e293b; font-weight: 600;">
+                                <input type="radio" name="depositPaymentMethod" value="Cash" checked>
+                                Tiền mặt (Cash)
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #1e293b; font-weight: 600;">
+                                <input type="radio" name="depositPaymentMethod" value="CreditCard">
+                                Quẹt thẻ (POS)
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #1e293b; font-weight: 600;">
+                                <input type="radio" name="depositPaymentMethod" value="BankTransfer">
+                                Chuyển khoản (BankTransfer)
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- HÀNG NÚT ĐIỀU HƯỚNG VÀ XÁC NHẬN -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 12px; flex-wrap: wrap;">
                         <button type="button" class="pms-btn pms-btn-secondary" onclick="goToStep(1)">
                             [ <- Quay Lại Chọn Phòng ]
                         </button>
                         <div style="display: flex; gap: 10px;">
-                            <button type="submit" name="actionType" value="checkin_now" class="pms-btn pms-btn-success" style="padding: 12px 20px; font-size: 14px;">
-                                [ Đặt & Nhận Phòng Ngay ]
-                            </button>
                             <button type="submit" name="actionType" value="reserve" class="pms-btn pms-btn-primary" style="padding: 12px 20px; font-size: 14px;">
-                                [ Đặt Phòng Giữ Chỗ (Chờ Nhận) ]
+                                [ Xác Nhận Thu Cọc &amp; Giữ Chỗ ]
+                            </button>
+                            <button type="submit" name="actionType" value="checkin_now" class="pms-btn pms-btn-success" style="padding: 12px 20px; font-size: 14px;">
+                                [ Đặt &amp; Nhận Phòng Ngay ]
                             </button>
                         </div>
                     </div>
@@ -287,7 +340,8 @@
 
         </form>
 
-    </div>
+        </div>
+    </main>
 </div>
 
 <script>

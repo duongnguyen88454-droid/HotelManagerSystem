@@ -2,7 +2,6 @@ package com.mycompany.hotelmanagersystem.receptionist.service;
 
 import com.mycompany.hotelmanagersystem.booking.service.CheckInService;
 import com.mycompany.hotelmanagersystem.room.dto.BookingBarDTO;
-import com.mycompany.hotelmanagersystem.room.dto.RoomMapKpiDTO;
 import com.mycompany.hotelmanagersystem.room.dto.RoomTimelineDTO;
 import com.mycompany.hotelmanagersystem.room.service.RoomService;
 
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Service tổng hợp dữ liệu buồng phòng, dải đặt phòng và KPI phục vụ giao diện Lễ tân.
+ * Service tổng hợp dữ liệu buồng phòng và dải đặt phòng phục vụ giao diện Lễ tân.
  */
 public class RoomMapService {
 
@@ -56,12 +55,5 @@ public class RoomMapService {
         }
 
         return rooms;
-    }
-
-    /**
-     * Lấy số liệu thống kê buồng phòng thời gian thực (KPI).
-     */
-    public RoomMapKpiDTO getRoomMapKpi() {
-        return roomService.getRoomMapKpi();
     }
 }

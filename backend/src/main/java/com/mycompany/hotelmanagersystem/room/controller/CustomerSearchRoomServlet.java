@@ -44,6 +44,8 @@ public class CustomerSearchRoomServlet extends HttpServlet {
 
         List<RoomType> roomTypes = roomService.getActiveRoomTypes();
         request.setAttribute("roomTypes", roomTypes);
+        request.setAttribute("bedTypes", roomService.getActiveBedTypes());
+        request.setAttribute("amenities", roomService.getActiveAmenities());
 
         request.setAttribute("paramCheckIn", checkIn);
         request.setAttribute("paramCheckOut", checkOut);

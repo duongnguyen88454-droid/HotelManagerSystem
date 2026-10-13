@@ -5,6 +5,7 @@ import com.mycompany.hotelmanagersystem.booking.dto.BookingCartDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartRoomItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
 import com.mycompany.hotelmanagersystem.booking.service.BookingService;
+import com.mycompany.hotelmanagersystem.booking.service.PaymentService;
 import com.mycompany.hotelmanagersystem.customer.model.Customer;
 import com.mycompany.hotelmanagersystem.customer.service.CustomerService;
 import com.mycompany.hotelmanagersystem.hotelservice.model.ServiceItem;
@@ -32,12 +33,14 @@ public class ReceptionistBookingServlet extends HttpServlet {
     private BookingService bookingService;
     private RoomService roomService;
     private CustomerService customerService;
+    private PaymentService paymentService;
 
     @Override
     public void init() {
         this.bookingService = new BookingService();
         this.roomService = new RoomService();
         this.customerService = new CustomerService();
+        this.paymentService = new PaymentService();
     }
 
     @Override
@@ -66,6 +69,7 @@ public class ReceptionistBookingServlet extends HttpServlet {
         String checkOutStr = request.getParameter("checkOut");
         String[] selectedRooms = request.getParameterValues("selectedRooms");
         String actionType = request.getParameter("actionType");
+        String depositPaymentMethod = request.getParameter("depositPaymentMethod");
         String note = request.getParameter("note");
 
         try {
@@ -81,14 +85,27 @@ public class ReceptionistBookingServlet extends HttpServlet {
             // Dựng giỏ phòng và dịch vụ
             BookingCartDTO cart = buildCartFromRequest(request, selectedRooms, checkInStr, checkOutStr);
 
-            // Ghi nhận đặt phòng tại quầy
-            String maBooking = bookingService.createMultiRoomBooking(maKH, null, cart, note);
+            // Ghi nhận đặt phòng tại quầy lưu đúng AccountId của Lễ tân tạo đơn
+            String creatorAccount = (currentUser != null && currentUser.getMaTaiKhoan() != null)
+                    ? currentUser.getMaTaiKhoan().trim()
+                    : null;
+            String maBooking = bookingService.createMultiRoomBooking(maKH, creatorAccount, cart, note);
 
             boolean checkInNow = "checkin_now".equalsIgnoreCase(actionType);
             if (checkInNow) {
                 response.sendRedirect(request.getContextPath() + "/receptionist/checkin?autoModal=" + maBooking);
             } else {
-                response.sendRedirect(request.getContextPath() + "/receptionist/room-map?bookingSuccess=" + maBooking);
+                // Luồng 1: Xác nhận nộp cọc giữ chỗ tại quầy
+                String method = (depositPaymentMethod != null && !depositPaymentMethod.trim().isEmpty())
+                        ? depositPaymentMethod.trim() : "Cash";
+                try {
+                    paymentService.processDepositPayment(maBooking, method,
+                            "Lễ tân thu tiền cọc tại quầy (" + method + ")");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                response.sendRedirect(request.getContextPath() + "/receptionist/room-map?bookingSuccess="
+                        + maBooking + "&depositPaid=true");
             }
         } catch (Exception e) {
             request.setAttribute("errorMessage", e.getMessage());
@@ -100,6 +117,8 @@ public class ReceptionistBookingServlet extends HttpServlet {
             throws ServletException, IOException {
         String checkInStr = request.getParameter("checkIn");
         String checkOutStr = request.getParameter("checkOut");
+        String guests = request.getParameter("guests");
+        String roomType = request.getParameter("roomType");
         LocalDate today = LocalDate.now();
 
         if (checkInStr == null || checkInStr.trim().isEmpty()) {
@@ -111,7 +130,7 @@ public class ReceptionistBookingServlet extends HttpServlet {
 
         List<AvailableRoomDTO> availableRooms;
         try {
-            availableRooms = roomService.searchRooms(checkInStr, checkOutStr, null, null);
+            availableRooms = roomService.searchRooms(checkInStr, checkOutStr, guests, roomType);
         } catch (Exception e) {
             availableRooms = java.util.Collections.emptyList();
         }
@@ -120,6 +139,8 @@ public class ReceptionistBookingServlet extends HttpServlet {
 
         request.setAttribute("checkIn", checkInStr);
         request.setAttribute("checkOut", checkOutStr);
+        request.setAttribute("paramGuests", guests);
+        request.setAttribute("paramRoomType", roomType);
         request.setAttribute("availableRooms", availableRooms);
         request.setAttribute("roomTypes", roomTypes);
         request.setAttribute("services", services);

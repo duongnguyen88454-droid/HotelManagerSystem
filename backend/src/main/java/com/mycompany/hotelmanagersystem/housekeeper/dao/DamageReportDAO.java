@@ -18,7 +18,7 @@ import java.util.UUID;
 public class DamageReportDAO extends DBContext {
 
     private static final String SELECT_CATEGORIES_SQL =
-            "SELECT MaLoaiHuHai, TenLoaiHuHai, MoTa FROM LOAIHUHAI ORDER BY MaLoaiHuHai ASC";
+            "SELECT DamageTypeId, DamageName FROM DamageType ORDER BY DamageTypeId ASC";
 
     public List<DamageCategoryDTO> getAllDamageCategories() {
         List<DamageCategoryDTO> list = new ArrayList<>();
@@ -27,9 +27,9 @@ public class DamageReportDAO extends DBContext {
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(new DamageCategoryDTO(
-                        rs.getString("MaLoaiHuHai"),
-                        rs.getString("TenLoaiHuHai"),
-                        rs.getString("MoTa")
+                        rs.getString("DamageTypeId"),
+                        rs.getString("DamageName"),
+                        rs.getString("DamageName")
                 ));
             }
         } catch (Exception e) {
@@ -51,11 +51,12 @@ public class DamageReportDAO extends DBContext {
                 throw new SQLException("Nhiệm vụ dọn phòng không tồn tại!");
             }
 
-            updateTaskAndRoomToDamaged(conn, maNhiemVu, maNV, maPhong);
+            String accountId = resolveAccountId(conn, maNV);
+            updateTaskAndRoomToDamaged(conn, maNhiemVu, accountId, maPhong);
 
-            String maBaoCao = "BC_" + UUID.randomUUID().toString().substring(0, 7).toUpperCase();
-            insertDamageReport(conn, maBaoCao, maNhiemVu, moTaChung);
-            insertDamageDetails(conn, maBaoCao, damageItems);
+            String maBaoCao = "DR" + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+            insertDamageReport(conn, maBaoCao, maPhong, accountId);
+            insertDamageDetails(conn, maBaoCao, moTaChung, damageItems);
 
             conn.commit();
         } catch (Exception e) {
@@ -69,61 +70,92 @@ public class DamageReportDAO extends DBContext {
         }
     }
 
+    private String resolveAccountId(Connection conn, String id) {
+        if (id == null || id.trim().isEmpty()) {
+            return "ACC004";
+        }
+        String clean = id.trim();
+        String sqlAcc = "SELECT AccountId FROM Account WHERE AccountId = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sqlAcc)) {
+            ps.setString(1, clean);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return clean;
+                }
+            }
+        } catch (SQLException ignored) {
+        }
+        String sqlEmp = "SELECT AccountId FROM Employee WHERE EmployeeId = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sqlEmp)) {
+            ps.setString(1, clean);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("AccountId");
+                }
+            }
+        } catch (SQLException ignored) {
+        }
+        return "ACC004";
+    }
+
     private String findRoomIdByTask(Connection conn, String maNhiemVu) throws SQLException {
-        String sql = "SELECT MaPhong FROM NHIEMVUDOPHONG WHERE MaNhiemVu = ?";
+        String sql = "SELECT RoomId FROM RoomCleaningTask WHERE RoomCleaningTaskId = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maNhiemVu);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getString("MaPhong");
+                    return rs.getString("RoomId");
                 }
             }
         }
         return null;
     }
 
-    private void updateTaskAndRoomToDamaged(Connection conn, String maNhiemVu, String maNV, String maPhong)
+    private void updateTaskAndRoomToDamaged(Connection conn, String maNhiemVu, String accountId, String maPhong)
             throws SQLException {
-        String updateTaskSql = "UPDATE NHIEMVUDOPHONG SET ThoiGianKetThuc = GETDATE(), "
-                + "TrangThai = 'HoanThanh', KetQua = 'CoThietHai', MaNV = ? WHERE MaNhiemVu = ?";
+        String updateTaskSql = "UPDATE RoomCleaningTask SET EndTime = GETDATE(), "
+                + "RoomCleaningTaskStatus = 'Completed', Result = N'Có thiệt hại', ReceivedBy = ? "
+                + "WHERE RoomCleaningTaskId = ?";
         try (PreparedStatement psTask = conn.prepareStatement(updateTaskSql)) {
-            psTask.setString(1, maNV);
+            psTask.setString(1, accountId);
             psTask.setString(2, maNhiemVu);
             psTask.executeUpdate();
         }
 
-        String updatePhongSql = "UPDATE PHONG SET TrangThai = 'Damaged' WHERE MaPhong = ?";
+        String updatePhongSql = "UPDATE Room SET RoomStatus = 'Maintenance' WHERE RoomId = ?";
         try (PreparedStatement psP = conn.prepareStatement(updatePhongSql)) {
             psP.setString(1, maPhong);
             psP.executeUpdate();
         }
     }
 
-    private void insertDamageReport(Connection conn, String maBaoCao, String maNhiemVu, String moTaChung)
+    private void insertDamageReport(Connection conn, String maBaoCao, String maPhong, String accountId)
             throws SQLException {
-        String insertReportSql = "INSERT INTO BAOCAOHUHAI (MaBaoCao, MaNhiemVu, NgayPhatHien, MoTa, TrangThai) "
-                + "VALUES (?, ?, GETDATE(), ?, 'ChoXuLy')";
+        String insertReportSql = "INSERT INTO DamageReport (DamageReportId, RoomId, CreateBy, "
+                + "DetectedAt, ConfirmedAt, DamageReportStatus) VALUES (?, ?, ?, GETDATE(), GETDATE(), 'Confirmed')";
         try (PreparedStatement psRep = conn.prepareStatement(insertReportSql)) {
             psRep.setString(1, maBaoCao);
-            psRep.setString(2, maNhiemVu);
-            psRep.setString(3, (moTaChung != null && !moTaChung.trim().isEmpty())
-                    ? moTaChung.trim() : "Phát hiện sự cố hư hại thiết bị khi dọn phòng");
+            psRep.setString(2, maPhong);
+            psRep.setString(3, accountId);
             psRep.executeUpdate();
         }
     }
 
-    private void insertDamageDetails(Connection conn, String maBaoCao, List<DamageDetailItemDTO> items)
+    private void insertDamageDetails(Connection conn, String maBaoCao, String moTaChung,
+                                     List<DamageDetailItemDTO> items)
             throws SQLException {
         if (items == null || items.isEmpty()) {
             return;
         }
-        String insertDetailSql = "INSERT INTO CHITIETBAOCAOHUHAI (MaBaoCao, MaLoaiHuHai, MoTaChiTiet) VALUES (?, ?, ?)";
+        String insertDetailSql = "INSERT INTO DamageReport_DamageType (DamageReportId, DamageTypeId, Note) "
+                + "VALUES (?, ?, ?)";
         try (PreparedStatement psDet = conn.prepareStatement(insertDetailSql)) {
             for (DamageDetailItemDTO item : items) {
                 psDet.setString(1, maBaoCao);
                 psDet.setString(2, item.getMaLoaiHuHai());
-                psDet.setString(3, (item.getMoTaChiTiet() != null && !item.getMoTaChiTiet().trim().isEmpty())
-                        ? item.getMoTaChiTiet().trim() : "Cần bảo trì thay thế");
+                String note = (item.getMoTaChiTiet() != null && !item.getMoTaChiTiet().trim().isEmpty())
+                        ? item.getMoTaChiTiet().trim() : moTaChung;
+                psDet.setString(3, (note != null && !note.isEmpty()) ? note : "Cần bảo trì");
                 psDet.addBatch();
             }
             psDet.executeBatch();

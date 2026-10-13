@@ -1,9 +1,12 @@
 package com.mycompany.hotelmanagersystem.room.service;
 
 import com.mycompany.hotelmanagersystem.room.dao.RoomDAO;
+import com.mycompany.hotelmanagersystem.room.dao.RoomAmenityDAO;
 import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
 import com.mycompany.hotelmanagersystem.room.dto.RoomMapKpiDTO;
 import com.mycompany.hotelmanagersystem.room.dto.RoomTimelineDTO;
+import com.mycompany.hotelmanagersystem.room.model.BedType;
+import com.mycompany.hotelmanagersystem.room.model.RoomAmenity;
 import com.mycompany.hotelmanagersystem.room.model.RoomType;
 import com.mycompany.hotelmanagersystem.room.util.RoomUtil;
 
@@ -13,13 +16,16 @@ import java.util.List;
 public class RoomService {
 
     private final RoomDAO roomDAO;
+    private final RoomAmenityDAO amenityDAO;
 
     public RoomService() {
         this.roomDAO = new RoomDAO();
+        this.amenityDAO = new RoomAmenityDAO();
     }
 
     public RoomService(RoomDAO roomDAO) {
         this.roomDAO = roomDAO;
+        this.amenityDAO = new RoomAmenityDAO();
     }
 
     /**
@@ -101,5 +107,13 @@ public class RoomService {
         } catch (Exception ex) {
             return false;
         }
+    }
+
+    public List<BedType> getActiveBedTypes() {
+        return amenityDAO.getAllActiveBedTypes();
+    }
+
+    public List<RoomAmenity> getActiveAmenities() {
+        return amenityDAO.getAllActiveAmenities();
     }
 }

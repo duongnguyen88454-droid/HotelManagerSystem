@@ -14,7 +14,7 @@ public class Booking implements Serializable {
     private String maTaiKhoan; // Khóa ngoại trỏ đến TAIKHOAN (Người tạo đơn trên web)
     private String maNV;
     private Timestamp ngayDat;
-    private String trangThai; // 'DaXacNhan', 'DaCheckIn', 'DaCheckOut', 'DaHuy'
+    private String trangThai; // 'Confirmed', 'CheckedIn', 'CheckedOut', 'Cancelled'
     private double chiPhiDuKien;
     private Timestamp thoiDiemHuy;
     private Double phiHuy;

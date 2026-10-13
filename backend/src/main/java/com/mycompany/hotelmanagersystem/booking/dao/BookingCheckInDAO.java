@@ -22,8 +22,7 @@ import java.util.List;
 public class BookingCheckInDAO {
 
     /**
-     * Truy vấn toàn bộ dải đặt phòng trong tuần có trạng thái DaXacNhan hoặc
-     * DaCheckIn.
+     * Truy vấn toàn bộ dải đặt phòng trong tuần có trạng thái Confirmed hoặc CheckedIn.
      */
     public List<BookingBarDTO> getBookingBarsInWeek(LocalDate startDate, LocalDate endDate) {
         List<BookingBarDTO> list = new ArrayList<>();
@@ -71,7 +70,7 @@ public class BookingCheckInDAO {
         int colSpan = Math.max(1, Math.min(maxAllowedSpan, endCol - startCol + 1));
 
         String status = rs.getString("TrangThaiBooking");
-        String cssClass = ("CheckedIn".equalsIgnoreCase(status) || "DaCheckIn".equalsIgnoreCase(status)) ? "bar-occupied" : "bar-confirmed";
+        String cssClass = "CheckedIn".equalsIgnoreCase(status) ? "bar-occupied" : "bar-confirmed";
 
         BookingBarDTO bar = new BookingBarDTO(
                 rs.getString("MaBooking"),
@@ -117,7 +116,7 @@ public class BookingCheckInDAO {
     /**
      * Thực hiện Check-in nhận phòng qua Stored Procedure sp_CheckInNhanPhong.
      */
-    public boolean executeCheckIn(String maBooking, String maPhong, String maNV) {
+    public boolean executeCheckIn(String maBooking, String maPhong) {
         String callSql = "{CALL sp_CheckInNhanPhong(?, ?)}";
 
         try (Connection conn = DBContext.getConnection();
@@ -131,7 +130,7 @@ public class BookingCheckInDAO {
         } catch (SQLException e) {
             // Lỗi 2812: Stored procedure không tồn tại -> dùng fallback transaction
             if (e.getErrorCode() == 2812) {
-                return executeCheckInFallback(maBooking, maPhong, maNV);
+                return executeCheckInFallback(maBooking, maPhong);
             }
             return false;
         } catch (ClassNotFoundException e) {
@@ -143,7 +142,7 @@ public class BookingCheckInDAO {
     /**
      * Fallback transaction nếu SP có vấn đề kết nối: đảm bảo cập nhật đồng bộ CSDL.
      */
-    private boolean executeCheckInFallback(String maBooking, String maPhong, String maNV) {
+    private boolean executeCheckInFallback(String maBooking, String maPhong) {
         String updateBp = "UPDATE Booking_Room SET ActualCheckInDate = GETDATE(), BookingStatus = 'CheckedIn' "
                 + "WHERE BookingId = ? AND RoomId = ? AND ActualCheckInDate IS NULL";
         String updateP = "UPDATE Room SET OccupancyStatus = 'Occupied' WHERE RoomId = ?";
@@ -190,14 +189,14 @@ public class BookingCheckInDAO {
     /**
      * Thực hiện Check-in cho danh sách các phòng được chọn trong đơn.
      */
-    public boolean executeCheckInRooms(String maBooking, List<String> roomIds, String maNV) {
+    public boolean executeCheckInRooms(String maBooking, List<String> roomIds) {
         if (roomIds == null || roomIds.isEmpty()) {
             return false;
         }
         boolean anySuccess = false;
         for (String roomId : roomIds) {
             if (roomId != null && !roomId.trim().isEmpty()) {
-                boolean ok = executeCheckIn(maBooking, roomId.trim(), maNV);
+                boolean ok = executeCheckIn(maBooking, roomId.trim());
                 if (ok) {
                     anySuccess = true;
                 }

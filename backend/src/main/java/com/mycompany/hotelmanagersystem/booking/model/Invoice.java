@@ -14,7 +14,7 @@ public class Invoice implements Serializable {
     private Timestamp ngayLap;
     private Double tongTienCuoiCung;
     private String maNV;
-    private String trangThai; // 'ChuaThanhToan', 'MotPhan', 'DaThanhToanDu'
+    private String trangThai; // 'Unpaid', 'PartiallyPaid', 'Paid'
 
     public Invoice() {
     }

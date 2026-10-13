@@ -1,20 +1,13 @@
 // 1. TÌM KIẾM VA BỘ LỌC TIMELINE
 function applyFilter() {
-    const kw = document.getElementById('filterKeyword').value.trim().toLowerCase();
-    const floor = document.getElementById('filterFloor').value;
-    const status = document.getElementById('filterStatus').value;
+    const kwInput = document.getElementById('filterKeyword');
+    const kw = kwInput ? kwInput.value.trim().toLowerCase() : '';
     const rows = document.querySelectorAll('.room-row');
 
     rows.forEach(r => {
-        const rFloor = r.getAttribute('data-floor');
-        const rStatus = r.getAttribute('data-status');
         const rText = r.innerText.toLowerCase();
-
         let matchKw = (kw === '' || rText.includes(kw));
-        let matchFloor = (floor === 'ALL' || rFloor === floor);
-        let matchStatus = (status === 'ALL' || rStatus === status);
-
-        r.style.display = (matchKw && matchFloor && matchStatus) ? '' : 'none';
+        r.style.display = matchKw ? '' : 'none';
     });
 
     // Ẩn tiêu đề tầng nếu không có phòng nào trong tầng hiển thị
@@ -26,9 +19,10 @@ function applyFilter() {
 }
 
 function resetFilter() {
-    document.getElementById('filterKeyword').value = '';
-    document.getElementById('filterFloor').value = 'ALL';
-    document.getElementById('filterStatus').value = 'ALL';
+    const kwInput = document.getElementById('filterKeyword');
+    if (kwInput) {
+        kwInput.value = '';
+    }
     applyFilter();
 }
 
@@ -73,7 +67,7 @@ function handleBookingBarClick(roomId, roomNo, bookingId, guestName, phone, cccd
 
     const btnGoToCheckIn = document.getElementById('btnGoToCheckIn');
 
-    if (status === 'DaCheckIn') {
+    if (status === 'CheckedIn') {
         modalTitle.innerText = 'THÔNG TIN CHI TIẾT PHÒNG ĐANG LƯU TRÚ - ' + roomId;
         occupiedArea.style.display = 'block';
         btnOrderService.style.display = '';
@@ -94,13 +88,13 @@ function handleBookingBarClick(roomId, roomNo, bookingId, guestName, phone, cccd
     openModal('bookingModal');
 }
 
-// Hỗ trợ tương thích ngược
+// Hỗ trợ tương thích
 function openRoomDetailModal(roomId, bookingId, guestName, phone, cccd, inDate, outDate, actualIn, actualOut) {
-    handleBookingBarClick(roomId, roomId, bookingId, guestName, phone, cccd, 'DaCheckIn', inDate, outDate, actualIn, actualOut);
+    handleBookingBarClick(roomId, roomId, bookingId, guestName, phone, cccd, 'CheckedIn', inDate, outDate, actualIn, actualOut);
 }
 
 function openCheckInModal(roomId, roomNo, bookingId, guestName, phone, cccd, inDate, outDate) {
-    handleBookingBarClick(roomId, roomNo, bookingId, guestName, phone, cccd, 'XacNhan', inDate, outDate, '___', '___');
+    handleBookingBarClick(roomId, roomNo, bookingId, guestName, phone, cccd, 'Confirmed', inDate, outDate, '___', '___');
 }
 
 // Tải danh sách dịch vụ phòng đã dùng từ API (FN-3.5)
@@ -329,7 +323,7 @@ function updateTimelineAfterCheckIn(roomId, bookingId) {
                 + String(now.getSeconds()).padStart(2, '0');
             bar.innerText = guestName;
             bar.title = '[' + bookingId + '] ' + guestName + ' (Đang lưu trú)';
-            bar.setAttribute('onclick', "handleBookingBarClick('" + roomId + "', '" + roomNo + "', '" + bookingId + "', '" + guestName + "', '" + phone + "', '" + cccd + "', 'DaCheckIn', '" + inDate + "', '" + outDate + "', '" + nowStr + "', '___')");
+            bar.setAttribute('onclick', "handleBookingBarClick('" + roomId + "', '" + roomNo + "', '" + bookingId + "', '" + guestName + "', '" + phone + "', '" + cccd + "', 'CheckedIn', '" + inDate + "', '" + outDate + "', '" + nowStr + "', '___')");
         }
     }
 }

@@ -46,7 +46,8 @@ public class HousekeeperPortalServlet extends HttpServlet {
             String currentMaNV = ((UserSessionDTO) userObj).getMaDinhDanh();
             if (currentMaNV != null) {
                 for (HousekeeperTaskDTO task : taskList) {
-                    if ("DangDon".equalsIgnoreCase(task.getTrangThaiNhiemVu())
+                    if (("DangDon".equalsIgnoreCase(task.getTrangThaiNhiemVu())
+                            || "InProgress".equalsIgnoreCase(task.getTrangThaiNhiemVu()))
                             && currentMaNV.equalsIgnoreCase(task.getMaNV())) {
                         return task;
                     }

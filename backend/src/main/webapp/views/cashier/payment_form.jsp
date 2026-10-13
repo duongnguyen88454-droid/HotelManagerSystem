@@ -101,17 +101,17 @@
                     <label class="form-label">Phương Thức Thanh Toán</label>
                     <div class="method-options">
                         <label class="method-label">
-                            <input type="radio" name="phuongThuc" value="TienMat" checked class="method-radio" />
+                            <input type="radio" name="phuongThuc" value="Cash" checked class="method-radio" />
                             <span class="method-text">Tiền Mặt</span>
                             <span class="method-desc">Thu tiền mặt trực tiếp tại quầy</span>
                         </label>
                         <label class="method-label">
-                            <input type="radio" name="phuongThuc" value="TheNganHang" class="method-radio" />
+                            <input type="radio" name="phuongThuc" value="CreditCard" class="method-radio" />
                             <span class="method-text">Thẻ Ngân Hàng (POS)</span>
                             <span class="method-desc">Quẹt thẻ ATM / Visa / Mastercard</span>
                         </label>
                         <label class="method-label">
-                            <input type="radio" name="phuongThuc" value="ChuyenKhoan" class="method-radio" />
+                            <input type="radio" name="phuongThuc" value="BankTransfer" class="method-radio" />
                             <span class="method-text">Chuyển Khoản Ngân Hàng</span>
                             <span class="method-desc">Quét mã QR / Chuyển khoản qua số tài khoản</span>
                         </label>
