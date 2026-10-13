@@ -1,0 +1,598 @@
+/* ==========================================================================
+   HOTEL MANAGEMENT SYSTEM - PORTAL LAYOUT STYLESHEET
+   Thiết kế thống nhất cho: Receptionist, Housekeeper, Manager
+   Bố cục: Thanh chức năng bên trái (Sidebar) + Màn hình bên phải (Workspace)
+   Tuyệt đối không dùng icon theo quy định người dùng.
+   ========================================================================== */
+
+:root {
+    --portal-bg: #f4f6fa;
+    --portal-sidebar-bg: #ffffff;
+    --portal-card-bg: #ffffff;
+    --portal-text-primary: #0f172a;
+    --portal-text-secondary: #475569;
+    --portal-text-muted: #94a3b8;
+    --portal-border: #e2e8f0;
+    --portal-border-light: #f1f5f9;
+    --portal-primary: #1e3a8a;
+    --portal-primary-hover: #1d4ed8;
+    --portal-primary-light: #eff6ff;
+    
+    /* Trạng thái phòng & nhiệm vụ */
+    --status-occupied-bg: #fef2f2;
+    --status-occupied-color: #dc2626;
+    --status-available-bg: #ecfdf5;
+    --status-available-color: #059669;
+    --status-cleaning-bg: #fffbeb;
+    --status-cleaning-color: #d97706;
+    --status-damaged-bg: #f1f5f9;
+    --status-damaged-color: #475569;
+    --status-waiting-bg: #eff6ff;
+    --status-waiting-color: #2563eb;
+}
+
+/* Ẩn navbar công khai và footer mặc định khi nằm trong portal */
+body:has(.portal-wrapper) > .navbar,
+body:has(.portal-wrapper) > .footer,
+body:has(.portal-wrapper) > .content-wrapper > .navbar,
+body:has(.portal-wrapper) > .content-wrapper > .footer {
+    display: none !important;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--portal-bg);
+    color: var(--portal-text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   KHUNG BỐ CỤC CHÍNH (SPLIT-SCREEN SHELL)
+   ========================================================================== */
+.portal-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--portal-bg);
+    width: 100%;
+}
+
+/* Thanh chức năng bên trái (Sidebar) */
+.portal-sidebar {
+    width: 260px;
+    min-width: 260px;
+    max-width: 260px;
+    background: var(--portal-sidebar-bg);
+    border-right: 1px solid var(--portal-border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 50;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.02);
+}
+
+.portal-brand {
+    padding: 24px 20px 18px;
+    border-bottom: 1px solid var(--portal-border-light);
+}
+
+.portal-brand-title {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--portal-primary);
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.portal-brand-subtitle {
+    font-size: 11.5px;
+    color: var(--portal-text-muted);
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+.portal-nav {
+    flex: 1;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-group-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--portal-text-muted);
+    letter-spacing: 0.6px;
+    padding: 12px 10px 4px;
+}
+
+.portal-nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: var(--portal-text-secondary);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 600;
+    transition: all 0.15s ease-in-out;
+}
+
+.portal-nav-item:hover {
+    background: #f8fafc;
+    color: var(--portal-text-primary);
+}
+
+.portal-nav-item.active {
+    background: var(--portal-primary);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.portal-nav-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-weight: 700;
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.portal-nav-item.active .portal-nav-badge {
+    background: #ffffff;
+    color: var(--portal-primary);
+}
+
+/* Chân thanh chức năng bên trái (Profile Card) */
+.portal-sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid var(--portal-border-light);
+    background: #fafbfc;
+}
+
+.portal-user-card {
+    background: #ffffff;
+    border: 1px solid var(--portal-border);
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.portal-user-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--portal-text-primary);
+}
+
+.portal-user-role {
+    font-size: 11.5px;
+    color: var(--portal-text-muted);
+    margin-top: 2px;
+}
+
+.portal-logout-btn {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    transition: background 0.15s ease;
+}
+
+.portal-logout-btn:hover {
+    background: #fee2e2;
+}
+
+/* ==========================================================================
+   MÀN HÌNH CHÍNH BÊN PHẢI (WORKSPACE)
+   ========================================================================== */
+.portal-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 28px 36px 48px;
+    overflow-y: auto;
+}
+
+.portal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.portal-header-left h1,
+.portal-header-left h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--portal-text-primary);
+    margin: 0;
+}
+
+.portal-header-left p {
+    font-size: 13.5px;
+    color: var(--portal-text-muted);
+    margin: 4px 0 0;
+}
+
+.portal-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.portal-date-pill {
+    background: #ffffff;
+    border: 1px solid var(--portal-border);
+    padding: 8px 16px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--portal-text-secondary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+/* ==========================================================================
+   THẺ NỘI DUNG (CARDS) & KHỐI KPI
+   ========================================================================== */
+.portal-card {
+    background: var(--portal-card-bg);
+    border: 1px solid var(--portal-border);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.portal-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--portal-border-light);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.portal-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--portal-text-primary);
+    margin: 0;
+}
+
+.portal-card-subtitle {
+    font-size: 12.5px;
+    color: var(--portal-text-muted);
+    margin-top: 2px;
+}
+
+/* Lưới thẻ thống kê KPI */
+.portal-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.portal-kpi-card {
+    background: #ffffff;
+    border: 1px solid var(--portal-border);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.portal-kpi-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--portal-text-muted);
+    letter-spacing: 0.5px;
+}
+
+.portal-kpi-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--portal-text-primary);
+    margin: 8px 0 4px;
+}
+
+.portal-kpi-desc {
+    font-size: 12px;
+    color: var(--portal-text-secondary);
+}
+
+/* Thanh phân bổ trạng thái phòng */
+.room-dist-bar {
+    display: flex;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 16px 0;
+    background: #e2e8f0;
+}
+
+.dist-occupied { background: var(--status-occupied-color); }
+.dist-available { background: var(--status-available-color); }
+.dist-cleaning { background: var(--status-cleaning-color); }
+.dist-damaged { background: var(--status-damaged-color); }
+
+.room-dist-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 12.5px;
+    color: var(--portal-text-secondary);
+}
+
+.dist-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dist-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* ==========================================================================
+   BẢNG DỮ LIỆU (PORTAL TABLE)
+   ========================================================================== */
+.portal-table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--portal-border);
+}
+
+.portal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    text-align: left;
+    background: #ffffff;
+}
+
+.portal-table th {
+    background: #f8fafc;
+    color: var(--portal-text-secondary);
+    font-weight: 700;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--portal-border);
+    white-space: nowrap;
+}
+
+.portal-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--portal-border-light);
+    color: var(--portal-text-primary);
+    vertical-align: middle;
+}
+
+.portal-table tr:hover td {
+    background-color: #f8fafc;
+}
+
+.portal-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* ==========================================================================
+   NHÃN TRẠNG THÁI (PILL BADGES)
+   ========================================================================== */
+.badge-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.badge-occupied {
+    background-color: var(--status-occupied-bg);
+    color: var(--status-occupied-color);
+}
+
+.badge-available {
+    background-color: var(--status-available-bg);
+    color: var(--status-available-color);
+}
+
+.badge-cleaning {
+    background-color: var(--status-cleaning-bg);
+    color: var(--status-cleaning-color);
+}
+
+.badge-damaged {
+    background-color: var(--status-damaged-bg);
+    color: var(--status-damaged-color);
+}
+
+.badge-waiting {
+    background-color: var(--status-waiting-bg);
+    color: var(--status-waiting-color);
+}
+
+.badge-partial {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+/* ==========================================================================
+   NÚT BẤM (BUTTONS) & THANH TÌM KIẾM
+   ========================================================================== */
+.portal-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.portal-btn-primary {
+    background: var(--portal-primary);
+    color: #ffffff;
+}
+
+.portal-btn-primary:hover {
+    background: var(--portal-primary-hover);
+}
+
+.portal-btn-secondary {
+    background: #f1f5f9;
+    color: var(--portal-text-secondary);
+}
+
+.portal-btn-secondary:hover {
+    background: #e2e8f0;
+    color: var(--portal-text-primary);
+}
+
+.portal-btn-success {
+    background: #16a34a;
+    color: #ffffff;
+}
+
+.portal-btn-success:hover {
+    background: #15803d;
+}
+
+.portal-btn-danger {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.portal-btn-danger:hover {
+    background: #b91c1c;
+}
+
+.portal-input {
+    padding: 9px 14px;
+    border: 1px solid var(--portal-border);
+    border-radius: 10px;
+    font-size: 13px;
+    background: #ffffff;
+    color: var(--portal-text-primary);
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.portal-input:focus {
+    border-color: var(--portal-primary);
+}
+
+.portal-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--portal-border);
+    padding-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.portal-tab-item {
+    padding: 8px 18px;
+    text-decoration: none;
+    color: var(--portal-text-secondary);
+    font-size: 13.5px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+}
+
+.portal-tab-item:hover {
+    background: #f1f5f9;
+    color: var(--portal-text-primary);
+}
+
+.portal-tab-item.active {
+    background: var(--portal-primary);
+    color: #ffffff;
+}
+
+/* Thông báo Flash Message */
+.portal-alert {
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 13.5px;
+    font-weight: 600;
+}
+
+.portal-alert-success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-left: 4px solid #16a34a;
+    color: #166534;
+}
+
+.portal-alert-danger {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-left: 4px solid #dc2626;
+    color: #991b1b;
+}
+
+.portal-alert-info {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-left: 4px solid #2563eb;
+    color: #1e40af;
+}
+
+/* Modal Backdrop & Card */
+.portal-modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.portal-modal-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid var(--portal-border);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    max-width: 680px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}

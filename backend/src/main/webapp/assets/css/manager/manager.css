@@ -1,0 +1,218 @@
+/* Manager Module Common Stylesheet - Hotel Management System */
+
+/* Badge Styles */
+.badge-working {
+    background-color: #f0fdf4;
+    color: #16a34a;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.badge-resigned {
+    background-color: #fef2f2;
+    color: #dc2626;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.badge-active {
+    background-color: #ecfdf5;
+    color: #059669;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.badge-locked,
+.badge-inactive {
+    background-color: #fef2f2;
+    color: #991b1b;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.badge-manager {
+    background-color: #f3e8ff;
+    color: #7e22ce;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-receptionist {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-default {
+    background-color: #fef3c7;
+    color: #b45309;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-pending {
+    background-color: #fef3c7;
+    color: #b45309;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.badge-completed {
+    background-color: #f0fdf4;
+    color: #16a34a;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.badge-rejected {
+    background-color: #fef2f2;
+    color: #dc2626;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-block;
+}
+
+/* Row State Styles */
+.row-resigned {
+    background-color: #fafafa;
+    opacity: 0.85;
+}
+
+.row-working,
+.row-default {
+    background-color: #ffffff;
+}
+
+.row-pending {
+    background-color: #fffbeb;
+}
+
+/* Button Styles */
+.btn-resign {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-reinstate {
+    background-color: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-lock {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-unlock {
+    background-color: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-save {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.btn-save-sm {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-add {
+    width: 100%;
+    background-color: #16a34a;
+    color: #ffffff;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-approve {
+    background-color: #16a34a;
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-reject {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}

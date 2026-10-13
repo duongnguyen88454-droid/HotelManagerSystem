@@ -1,0 +1,212 @@
+.hk-container {
+    max-width: 1240px;
+    margin: 28px auto;
+    padding: 0 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b;
+}
+.hk-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+.hk-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+.hk-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+}
+.hk-user-badge {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #334155;
+    text-align: right;
+}
+.hk-user-name {
+    font-weight: 600;
+    color: #0f172a;
+}
+.hk-user-role {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+}
+.hk-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+}
+.hk-tab-item {
+    padding: 8px 18px;
+    text-decoration: none;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.15s ease-in-out;
+}
+.hk-tab-item:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+.hk-tab-item.active {
+    background: #1e3a8a;
+    color: #ffffff;
+}
+.hk-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+.hk-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+.hk-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    text-align: left;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+.hk-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+.hk-table tr:hover {
+    background-color: #f8fafc;
+}
+.room-number {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 15px;
+}
+.room-type {
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 2px;
+}
+.task-id {
+    color: #94a3b8;
+    font-size: 11px;
+    margin-top: 2px;
+}
+.badge-room-status {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-align: center;
+}
+.room-dirty {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+.room-cleaning {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+.room-available {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+.room-damaged {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+.badge-you {
+    display: inline-block;
+    background: #e0e7ff;
+    color: #3730a3;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 4px;
+}
+.btn-action-start {
+    padding: 6px 14px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.15s ease-in-out;
+}
+.btn-action-start:hover {
+    background: #1d4ed8;
+}
+.btn-action-clean {
+    padding: 6px 12px;
+    background: #16a34a;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 6px;
+    transition: background 0.15s ease-in-out;
+}
+.btn-action-clean:hover {
+    background: #15803d;
+}
+.btn-action-damage {
+    padding: 6px 12px;
+    background: #dc2626;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.15s ease-in-out;
+}
+.btn-action-damage:hover {
+    background: #b91c1c;
+}
+.empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: #64748b;
+}
+.empty-state-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+.empty-state-desc {
+    font-size: 13px;
+}
