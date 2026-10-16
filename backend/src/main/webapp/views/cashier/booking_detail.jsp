@@ -1,17 +1,26 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<jsp:include page="/views/common/header.jsp" />
-<jsp:include page="/views/common/navbar.jsp" />
-
+<jsp:include page="/views/common/header.jsp">
+    <jsp:param name="title" value="Thu Ngân - Chi Tiết Đơn Đặt Phòng ${invoice.maBooking}" />
+</jsp:include>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/portal_layout.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/cashier/booking_detail.css">
 
-<div class="cashier-detail-container">
-    <div class="nav-breadcrumbs">
-        <a href="${pageContext.request.contextPath}/cashier/dashboard">Thu Ngân</a>
-        <span>&gt;</span>
-        <strong>Chi Tiết Đơn ${invoice.maBooking}</strong>
-    </div>
+<div class="portal-wrapper">
+    <!-- Thanh chức năng bên trái (Sidebar) -->
+    <jsp:include page="/views/common/portal_sidebar.jsp">
+        <jsp:param name="activeMenu" value="cashier" />
+    </jsp:include>
+
+    <!-- Màn hình bên phải -->
+    <main class="portal-main">
+        <div class="cashier-detail-container">
+            <div class="nav-breadcrumbs">
+                <a href="${pageContext.request.contextPath}/cashier/dashboard">Quầy Thu Ngân</a>
+                <span>&gt;</span>
+                <strong>Chi Tiết Đơn ${invoice.maBooking}</strong>
+            </div>
 
     <c:if test="${not empty errorMessage}">
         <div class="alert-error">
@@ -135,7 +144,7 @@
                                 <c:choose>
                                     <c:when test="${room.ngayCheckOutThucTe == null}">
                                         <input type="checkbox" name="selectedRooms" value="${room.maPhong}"
-                                               class="room-checkbox room-selectable" checked />
+                                               class="room-checkbox room-selectable" />
                                     </c:when>
                                     <c:otherwise>
                                         <input type="checkbox" disabled class="room-checkbox" />
@@ -255,6 +264,8 @@
             </div>
         </div>
     </form>
+        </div>
+    </main>
 </div>
 
 <script src="${pageContext.request.contextPath}/assets/js/cashier/booking_detail.js"></script>

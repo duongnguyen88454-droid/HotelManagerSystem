@@ -14,19 +14,6 @@
 
     <!-- Màn hình bên phải -->
     <main class="portal-main">
-        <header class="portal-header">
-            <div class="portal-header-left">
-                <h1>Quầy Tiếp Đón - Thủ Tục Check-in Nhận Phòng</h1>
-                <p>Tra cứu đơn đặt phòng và thực hiện bàn giao chìa khóa cho khách tại quầy</p>
-            </div>
-            <div class="portal-header-right">
-                <span class="portal-date-pill">Hôm nay: <%= new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date()) %></span>
-                <a href="${pageContext.request.contextPath}/receptionist/room-map" class="portal-btn portal-btn-secondary">
-                    Danh Sách Phòng
-                </a>
-            </div>
-        </header>
-
         <!-- Khối thẻ tìm kiếm và bảng danh sách tiếp nhận -->
         <div class="portal-card" style="padding: 0; overflow: hidden;">
             <div class="toolbar-header" style="padding: 16px 20px; background: #f8fafc; border-bottom: 1px solid var(--portal-border);">
@@ -151,6 +138,6 @@
     window.CONTEXT_PATH = '${pageContext.request.contextPath}';
     window.AUTO_SELECT_BOOKING = '${autoSelectBooking}';
 </script>
-<script src="${pageContext.request.contextPath}/assets/js/receptionist/checkin.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/receptionist/checkin.js?v=<%= System.currentTimeMillis() %>"></script>
 
 <jsp:include page="/views/common/footer.jsp" />

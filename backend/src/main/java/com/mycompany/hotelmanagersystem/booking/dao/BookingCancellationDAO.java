@@ -1,21 +1,35 @@
 package com.mycompany.hotelmanagersystem.booking.dao;
 
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * DAO chuyên trách duy nhất nghiệp vụ Hủy phòng & Hủy đơn đặt phòng (Cancellation).
  * Tách biệt khỏi BookingDAO theo QT 2.1 trong ARCHITECTURE_RULES.md.
  */
-public class BookingCancellationDAO {
+public class BookingCancellationDAO extends BaseRepository<String, String> {
+
+    @Override
+    protected String getTableName() {
+        return "Booking_Room";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "BookingId";
+    }
+
+    @Override
+    protected RowMapper<String> getRowMapper() {
+        return rs -> rs.getString("RoomId");
+    }
 
     /**
      * Hủy một phòng cụ thể trong đơn qua Stored Procedure dbo.sp_HuyPhong.
@@ -62,17 +76,7 @@ public class BookingCancellationDAO {
      * Hàm phụ trợ lấy danh sách mã phòng đang Confirmed của một Booking.
      */
     public List<String> getConfirmedRoomsInBooking(String bookingId) throws SQLException, ClassNotFoundException {
-        List<String> rooms = new ArrayList<>();
         String sql = "SELECT RoomId FROM Booking_Room WHERE BookingId = ? AND BookingStatus = 'Confirmed'";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, bookingId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    rooms.add(rs.getString("RoomId"));
-                }
-            }
-        }
-        return rooms;
+        return query(sql, bookingId);
     }
 }

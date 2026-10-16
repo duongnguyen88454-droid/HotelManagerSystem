@@ -1,5 +1,7 @@
 package com.mycompany.hotelmanagersystem.housekeeper.dao;
 
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 import com.mycompany.hotelmanagersystem.housekeeper.dto.HousekeeperTaskDTO;
 
@@ -8,16 +10,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * DAO truy vấn dữ liệu nhiệm vụ dọn phòng từ CSDL.
  */
-public class HousekeeperTaskDAO extends DBContext {
+public class HousekeeperTaskDAO extends BaseRepository<HousekeeperTaskDTO, String> {
 
-    private static final String SELECT_TASKS_SQL =
-            "SELECT rct.RoomCleaningTaskId AS MaNhiemVu, r.RoomId AS MaPhong, r.RoomName AS SoPhong, "
+    private static final String SELECT_TASKS_SQL = "SELECT rct.RoomCleaningTaskId AS MaNhiemVu, r.RoomId AS MaPhong, r.RoomName AS SoPhong, "
             + "rt.RoomTypeName AS TenLoaiPhong, r.HousekeepingStatus AS TrangThaiPhong, "
             + "rct.RoomCleaningTaskStatus AS TrangThaiNhiemVu, "
             + "ISNULL(rct.ReceivedBy, '') AS MaNhanVienDon, "
@@ -35,24 +35,52 @@ public class HousekeeperTaskDAO extends DBContext {
             + "WHEN 'Pending' THEN 2 "
             + "ELSE 3 END, rct.RoomCleaningTaskId DESC";
 
+    private static final String SELECT_BY_ID_SQL = "SELECT rct.RoomCleaningTaskId AS MaNhiemVu, r.RoomId AS MaPhong, r.RoomName AS SoPhong, "
+            + "rt.RoomTypeName AS TenLoaiPhong, r.HousekeepingStatus AS TrangThaiPhong, "
+            + "rct.RoomCleaningTaskStatus AS TrangThaiNhiemVu, "
+            + "ISNULL(rct.ReceivedBy, '') AS MaNhanVienDon, "
+            + "ISNULL(emp.FullName, acc.UserName) AS TenNhanVienDon, "
+            + "rct.StartTime AS ThoiGianNhan, rct.StartTime AS ThoiGianBatDau, "
+            + "rct.EndTime AS ThoiGianKetThuc, rct.Result AS KetQua "
+            + "FROM RoomCleaningTask rct "
+            + "INNER JOIN Room r ON rct.RoomId = r.RoomId "
+            + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
+            + "LEFT JOIN Account acc ON rct.ReceivedBy = acc.AccountId "
+            + "LEFT JOIN Employee emp ON acc.AccountId = emp.AccountId "
+            + "WHERE rct.RoomCleaningTaskId = ?";
+
+    @Override
+    protected String getTableName() {
+        return "RoomCleaningTask";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "RoomCleaningTaskId";
+    }
+
+    @Override
+    protected RowMapper<HousekeeperTaskDTO> getRowMapper() {
+        return this::mapTaskRow;
+    }
+
     public List<HousekeeperTaskDTO> getTasks(String statusFilter) {
-        List<HousekeeperTaskDTO> list = new ArrayList<>();
-        String filterVal = resolveFilterValue(statusFilter);
+        return getTasks(statusFilter, null, null);
+    }
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_TASKS_SQL)) {
-            ps.setString(1, filterVal);
-            ps.setString(2, filterVal);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapTaskRow(rs));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public List<HousekeeperTaskDTO> getTasks(String statusFilter, String maTK, String maNV) {
+        if ("MyActive".equalsIgnoreCase(statusFilter)) {
+            String sql = SELECT_TASKS_SQL.replace("WHERE (? IS NULL OR rct.RoomCleaningTaskStatus = ?)",
+                    "WHERE rct.RoomCleaningTaskStatus = 'InProgress' AND (rct.ReceivedBy = ? OR rct.ReceivedBy = ?)");
+            return query(sql, maTK, maNV);
         }
-        return list;
+        if ("MyHistory".equalsIgnoreCase(statusFilter)) {
+            String sql = SELECT_TASKS_SQL.replace("WHERE (? IS NULL OR rct.RoomCleaningTaskStatus = ?)",
+                    "WHERE rct.RoomCleaningTaskStatus = 'Completed' AND (rct.ReceivedBy = ? OR rct.ReceivedBy = ?)");
+            return query(sql, maTK, maNV);
+        }
+        String filterVal = resolveFilterValue(statusFilter);
+        return query(SELECT_TASKS_SQL, filterVal, filterVal);
     }
 
     private String resolveFilterValue(String statusFilter) {
@@ -77,7 +105,7 @@ public class HousekeeperTaskDAO extends DBContext {
             throws SQLException, ClassNotFoundException {
         String callSql = "{call dbo.sp_CapNhatTienDoDonPhong(?, ?, ?, ?)}";
         String normalizedAction = normalizeAction(hanhDong);
-        try (Connection conn = getConnection()) {
+        try (Connection conn = DBContext.getConnection()) {
             String validAccountId = resolveAccountId(conn, maNV);
             try (CallableStatement cs = conn.prepareCall(callSql)) {
                 cs.setString(1, maNhiemVu);
@@ -112,7 +140,8 @@ public class HousekeeperTaskDAO extends DBContext {
         try (PreparedStatement ps = conn.prepareStatement(sqlAcc)) {
             ps.setString(1, clean);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return clean;
+                if (rs.next())
+                    return clean;
             }
         } catch (SQLException ignored) {
         }
@@ -120,7 +149,8 @@ public class HousekeeperTaskDAO extends DBContext {
         try (PreparedStatement ps = conn.prepareStatement(sqlEmp)) {
             ps.setString(1, clean);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getString("AccountId");
+                if (rs.next())
+                    return rs.getString("AccountId");
             }
         } catch (SQLException ignored) {
         }
@@ -128,31 +158,7 @@ public class HousekeeperTaskDAO extends DBContext {
     }
 
     public HousekeeperTaskDTO getTaskById(String maNhiemVu) {
-        String sql = "SELECT rct.RoomCleaningTaskId AS MaNhiemVu, r.RoomId AS MaPhong, r.RoomName AS SoPhong, "
-                + "rt.RoomTypeName AS TenLoaiPhong, r.HousekeepingStatus AS TrangThaiPhong, "
-                + "rct.RoomCleaningTaskStatus AS TrangThaiNhiemVu, "
-                + "ISNULL(rct.ReceivedBy, '') AS MaNhanVienDon, "
-                + "ISNULL(emp.FullName, acc.UserName) AS TenNhanVienDon, "
-                + "rct.StartTime AS ThoiGianNhan, rct.StartTime AS ThoiGianBatDau, "
-                + "rct.EndTime AS ThoiGianKetThuc, rct.Result AS KetQua "
-                + "FROM RoomCleaningTask rct "
-                + "INNER JOIN Room r ON rct.RoomId = r.RoomId "
-                + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
-                + "LEFT JOIN Account acc ON rct.ReceivedBy = acc.AccountId "
-                + "LEFT JOIN Employee emp ON acc.AccountId = emp.AccountId "
-                + "WHERE rct.RoomCleaningTaskId = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, maNhiemVu);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapTaskRow(rs);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return queryOne(SELECT_BY_ID_SQL, maNhiemVu).orElse(null);
     }
 
     private HousekeeperTaskDTO mapTaskRow(ResultSet rs) throws SQLException {

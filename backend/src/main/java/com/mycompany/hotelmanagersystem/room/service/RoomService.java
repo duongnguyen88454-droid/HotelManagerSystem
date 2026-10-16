@@ -38,7 +38,8 @@ public class RoomService {
     /**
      * Tìm kiếm phòng trống theo tiêu chí và tính toán chi phí lưu trú
      */
-    public List<AvailableRoomDTO> searchRooms(String checkInStr, String checkOutStr, String guestsStr, String roomTypeId) {
+    public List<AvailableRoomDTO> searchRooms(String checkInStr, String checkOutStr, String guestsStr,
+            String roomTypeId) {
         LocalDate[] dates = RoomUtil.parseAndValidateDates(checkInStr, checkOutStr);
         Integer guests = RoomUtil.parseGuests(guestsStr);
 
@@ -66,7 +67,8 @@ public class RoomService {
     }
 
     /**
-     * FN-3.1: Lấy toàn bộ danh sách phòng thực tế theo tầng và chuẩn hóa trạng thái hiển thị
+     * FN-3.1: Lấy toàn bộ danh sách phòng thực tế theo tầng và chuẩn hóa trạng thái
+     * hiển thị
      */
     public List<RoomTimelineDTO> getAllRoomsForTimeline() {
         List<RoomTimelineDTO> list = roomDAO.getAllRoomsForTimeline();

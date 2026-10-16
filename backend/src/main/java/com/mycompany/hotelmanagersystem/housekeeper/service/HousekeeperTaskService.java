@@ -33,8 +33,12 @@ public class HousekeeperTaskService {
      * Lấy danh sách nhiệm vụ dọn phòng theo điều kiện lọc trạng thái.
      */
     public List<HousekeeperTaskDTO> getTaskList(String statusFilter) {
+        return getTaskList(statusFilter, null, null);
+    }
+
+    public List<HousekeeperTaskDTO> getTaskList(String statusFilter, String maTK, String maNV) {
         try {
-            return taskDAO.getTasks(statusFilter);
+            return taskDAO.getTasks(statusFilter, maTK, maNV);
         } catch (Exception e) {
             return Collections.emptyList();
         }

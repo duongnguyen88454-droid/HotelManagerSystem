@@ -1,5 +1,7 @@
 package com.mycompany.hotelmanagersystem.manager.dao;
 
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 import com.mycompany.hotelmanagersystem.manager.dto.DamagedRoomItemDTO;
 
@@ -9,10 +11,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-public class MaintenanceDAO extends DBContext {
+public class MaintenanceDAO extends BaseRepository<DamagedRoomItemDTO, String> {
 
     private static final String SELECT_PENDING_DAMAGES_SQL =
             "SELECT MaBaoCao, MaPhong, SoPhong, TenLoaiPhong, NgayPhatHien, "
@@ -25,24 +26,29 @@ public class MaintenanceDAO extends DBContext {
     private static final String UPDATE_ROOM_AVAILABLE_SQL =
             "UPDATE Room SET RoomStatus = 'Available' WHERE RoomId = ?";
 
+    @Override
+    protected String getTableName() {
+        return "v_DanhSachPhongHuHaiCanBaoTri";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "MaBaoCao";
+    }
+
+    @Override
+    protected RowMapper<DamagedRoomItemDTO> getRowMapper() {
+        return this::mapResultSetToDTO;
+    }
+
     public List<DamagedRoomItemDTO> getPendingDamagedRooms() {
-        List<DamagedRoomItemDTO> list = new ArrayList<>();
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_PENDING_DAMAGES_SQL);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(mapResultSetToDTO(rs));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
+        return query(SELECT_PENDING_DAMAGES_SQL);
     }
 
     public boolean resolveDamagedRoom(String maBaoCao, String maPhong) {
         Connection conn = null;
         try {
-            conn = getConnection();
+            conn = DBContext.getConnection();
             conn.setAutoCommit(false);
 
             try (PreparedStatement psReport = conn.prepareStatement(UPDATE_REPORT_STATUS_SQL);
@@ -68,7 +74,7 @@ public class MaintenanceDAO extends DBContext {
         }
     }
 
-    private DamagedRoomItemDTO mapResultSetToDTO(ResultSet rs) throws Exception {
+    private DamagedRoomItemDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
         Timestamp ts = rs.getTimestamp("NgayPhatHien");
         LocalDateTime ldt = (ts != null) ? ts.toLocalDateTime() : null;
         return new DamagedRoomItemDTO(
@@ -94,3 +100,4 @@ public class MaintenanceDAO extends DBContext {
         }
     }
 }
+

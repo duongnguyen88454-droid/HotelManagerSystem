@@ -67,13 +67,18 @@ public class ReceptionistCheckInServlet extends HttpServlet {
             throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         String maBooking = request.getParameter("maBooking");
-        CheckInDetailDTO detail = checkInService.getBookingCheckInDetail(maBooking);
+        try {
+            CheckInDetailDTO detail = checkInService.getBookingCheckInDetail(maBooking);
 
-        if (detail == null) {
-            response.getWriter().write("{\"success\":false,\"message\":\"Không tìm thấy đơn đặt phòng!\"}");
-            return;
+            if (detail == null) {
+                response.getWriter().write("{\"success\":false,\"message\":\"Không tìm thấy đơn đặt phòng!\"}");
+                return;
+            }
+            response.getWriter().write(buildDetailJsonResponse(detail));
+        } catch (Exception e) {
+            response.getWriter().write("{\"success\":false,\"message\":\"Lỗi máy chủ: "
+                    + escapeJson(e.getMessage()) + "\"}");
         }
-        response.getWriter().write(buildDetailJsonResponse(detail));
     }
 
     @Override

@@ -1,37 +1,41 @@
 package com.mycompany.hotelmanagersystem.manager.dao;
 
-import com.mycompany.hotelmanagersystem.common.config.DBContext;
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.manager.dto.ServiceAnalyticsDTO;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.List;
 
-public class ServiceAnalyticsDAO extends DBContext {
+public class ServiceAnalyticsDAO extends BaseRepository<ServiceAnalyticsDTO, String> {
 
     private static final String SELECT_SERVICE_ANALYTICS_SQL =
             "SELECT MaDichVu, TenDichVu, DonGiaHienTai, TongSoLuongSuDung, TongDoanhThuDichVu "
                     + "FROM v_ThongKeDichVuBanChay "
                     + "ORDER BY TongDoanhThuDichVu DESC, TongSoLuongSuDung DESC";
 
-    public List<ServiceAnalyticsDTO> getServiceAnalytics() {
-        List<ServiceAnalyticsDTO> list = new ArrayList<>();
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_SERVICE_ANALYTICS_SQL);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(mapResultSetToDTO(rs));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
+    @Override
+    protected String getTableName() {
+        return "v_ThongKeDichVuBanChay";
     }
 
-    private ServiceAnalyticsDTO mapResultSetToDTO(ResultSet rs) throws Exception {
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "MaDichVu";
+    }
+
+    @Override
+    protected RowMapper<ServiceAnalyticsDTO> getRowMapper() {
+        return this::mapResultSetToDTO;
+    }
+
+    public List<ServiceAnalyticsDTO> getServiceAnalytics() {
+        return query(SELECT_SERVICE_ANALYTICS_SQL);
+    }
+
+    private ServiceAnalyticsDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
         BigDecimal donGia = rs.getBigDecimal("DonGiaHienTai");
         BigDecimal doanhThu = rs.getBigDecimal("TongDoanhThuDichVu");
         return new ServiceAnalyticsDTO(
@@ -43,3 +47,4 @@ public class ServiceAnalyticsDAO extends DBContext {
         );
     }
 }
+

@@ -1,33 +1,39 @@
 package com.mycompany.hotelmanagersystem.manager.dao;
 
-import com.mycompany.hotelmanagersystem.common.config.DBContext;
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.manager.dto.RoomOccupancyDTO;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class ManagerDashboardDAO extends DBContext {
+public class ManagerDashboardDAO extends BaseRepository<RoomOccupancyDTO, Integer> {
 
     private static final String SELECT_OCCUPANCY_SQL =
             "SELECT TongSoPhong, SoPhongDangCoKhach, SoPhongTrong, SoPhongDangDon, "
                     + "SoPhongHuHai, TyLeLapDayPhanTram FROM v_TyLeLapDayPhong";
 
-    public RoomOccupancyDTO getOccupancySummary() {
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_OCCUPANCY_SQL);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return mapResultSetToDTO(rs);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new RoomOccupancyDTO(0, 0, 0, 0, 0, BigDecimal.ZERO);
+    @Override
+    protected String getTableName() {
+        return "v_TyLeLapDayPhong";
     }
 
-    private RoomOccupancyDTO mapResultSetToDTO(ResultSet rs) throws Exception {
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "TongSoPhong";
+    }
+
+    @Override
+    protected RowMapper<RoomOccupancyDTO> getRowMapper() {
+        return this::mapResultSetToDTO;
+    }
+
+    public RoomOccupancyDTO getOccupancySummary() {
+        return queryOne(SELECT_OCCUPANCY_SQL).orElseGet(() -> new RoomOccupancyDTO(0, 0, 0, 0, 0, BigDecimal.ZERO));
+    }
+
+    private RoomOccupancyDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
         int tong = rs.getInt("TongSoPhong");
         int coKhach = rs.getInt("SoPhongDangCoKhach");
         int trong = rs.getInt("SoPhongTrong");
@@ -40,3 +46,4 @@ public class ManagerDashboardDAO extends DBContext {
         return new RoomOccupancyDTO(tong, coKhach, trong, dangDon, huHai, tyLe);
     }
 }
+

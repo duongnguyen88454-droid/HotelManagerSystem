@@ -18,7 +18,12 @@ function openCheckInDetailModal(maBooking) {
     const url = contextPath + '/receptionist/checkin?action=detail&maBooking=' + encodeURIComponent(maBooking);
 
     fetch(url)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('Máy chủ phản hồi mã lỗi ' + res.status);
+            }
+            return res.json();
+        })
         .then(data => {
             if (data.success) {
                 renderDetailModal(data);
@@ -59,7 +64,7 @@ function renderDetailModal(data) {
             if (r.daNhanPhong) {
                 chkHtml = '<span style="color: #94a3b8; font-weight: 700;">[--]</span>';
             } else {
-                chkHtml = '<input type="checkbox" name="selectedRoom" value="' + escapeHtml(r.maPhong) + '" checked onchange="updateSelectAllState()">';
+                chkHtml = '<input type="checkbox" name="selectedRoom" value="' + escapeHtml(r.maPhong) + '" onchange="updateSelectAllState()">';
                 anyAvailableToSelect = true;
             }
 
@@ -93,11 +98,11 @@ function renderDetailModal(data) {
     }
 
     const chkAll = document.getElementById('chkSelectAll');
-    chkAll.checked = anyAvailableToSelect;
+    chkAll.checked = false;
     chkAll.disabled = !anyAvailableToSelect;
 
     const btnConfirm = document.getElementById('btnConfirmCheckIn');
-    btnConfirm.disabled = !anyAvailableToSelect;
+    btnConfirm.disabled = true;
 }
 
 function toggleSelectAllRooms(masterChk) {
@@ -107,13 +112,20 @@ function toggleSelectAllRooms(masterChk) {
             cb.checked = masterChk.checked;
         }
     });
+    updateSelectAllState();
 }
 
 function updateSelectAllState() {
     const checkboxes = document.querySelectorAll('input[name="selectedRoom"]');
     const checkedCount = document.querySelectorAll('input[name="selectedRoom"]:checked').length;
     const chkAll = document.getElementById('chkSelectAll');
-    chkAll.checked = (checkboxes.length > 0 && checkedCount === checkboxes.length);
+    if (chkAll) {
+        chkAll.checked = (checkboxes.length > 0 && checkedCount === checkboxes.length);
+    }
+    const btnConfirm = document.getElementById('btnConfirmCheckIn');
+    if (btnConfirm) {
+        btnConfirm.disabled = (checkedCount === 0);
+    }
 }
 
 function submitCheckInSelection() {

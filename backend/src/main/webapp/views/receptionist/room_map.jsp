@@ -14,21 +14,6 @@
 
     <!-- Màn hình bên phải -->
     <main class="portal-main">
-        <header class="portal-header">
-            <div class="portal-header-left">
-                <h1>Danh Sách & Tình Trạng Phòng</h1>
-                <p>Theo dõi tình trạng buồng phòng, thông tin khách đang lưu trú và dịch vụ phát sinh</p>
-            </div>
-            <div class="portal-header-right">
-                <a href="${pageContext.request.contextPath}/receptionist/checkin" class="portal-btn portal-btn-success">
-                    Quầy Check-in
-                </a>
-                <a href="${pageContext.request.contextPath}/receptionist/booking" class="portal-btn portal-btn-primary">
-                    Đặt Phòng Mới
-                </a>
-            </div>
-        </header>
-
         <c:if test="${param.depositPaid eq 'true'}">
             <div class="portal-alert portal-alert-success">
                 Đã ghi nhận giữ chỗ và thu tiền đặt cọc thành công cho đơn đặt phòng ${param.bookingSuccess}!
@@ -38,8 +23,12 @@
         <!-- Thẻ tìm kiếm & danh sách phòng -->
         <div class="portal-card" style="padding: 0; overflow: hidden;">
             <div style="padding: 16px 20px; background: #f8fafc; border-bottom: 1px solid var(--portal-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="filterKeyword" class="portal-input" placeholder="Tìm tên khách, SĐT, số phòng, mã BK..." style="width: 360px;" oninput="applyFilter()">
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <div style="display: inline-flex; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden;">
+                        <a href="${pageContext.request.contextPath}/receptionist/timeline" style="padding: 7px 14px; font-size: 13px; font-weight: 600; text-decoration: none; color: #475569; background: #ffffff;">&#9638; Lưới</a>
+                        <span style="padding: 7px 14px; font-size: 13px; font-weight: 600; background: #0284c7; color: #ffffff;">&#9776; Danh Sách</span>
+                    </div>
+                    <input type="text" id="filterKeyword" class="portal-input" placeholder="Tìm tên khách, SĐT, số phòng, mã BK..." style="width: 320px;" oninput="applyFilter()">
                     <button type="button" class="portal-btn portal-btn-secondary" onclick="resetFilter()">Đặt Lại</button>
                 </div>
 

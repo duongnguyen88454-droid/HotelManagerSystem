@@ -1,22 +1,20 @@
 package com.mycompany.hotelmanagersystem.manager.dao;
 
 import com.mycompany.hotelmanagersystem.booking.dto.CancellationRecordDTO;
-import com.mycompany.hotelmanagersystem.common.config.DBContext;
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * DAO truy vấn và xét duyệt hoàn tiền cọc hủy phòng cho Manager (CancellationHistory & fn_TinhTienHoanTraHuyPhong).
  */
-public class ManagerRefundDAO extends DBContext {
+public class ManagerRefundDAO extends BaseRepository<CancellationRecordDTO, String> {
 
     private static final String SELECT_CANCELLATIONS_SQL =
             "SELECT ch.CancellationId, ch.BookingId, ch.RoomId, r.RoomName, "
@@ -31,30 +29,27 @@ public class ManagerRefundDAO extends DBContext {
     private static final String UPDATE_REFUND_STATUS_SQL =
             "UPDATE CancellationHistory SET RefundStatus = ? WHERE CancellationId = ?";
 
+    @Override
+    protected String getTableName() {
+        return "CancellationHistory";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "CancellationId";
+    }
+
+    @Override
+    protected RowMapper<CancellationRecordDTO> getRowMapper() {
+        return this::mapRowToDTO;
+    }
+
     public List<CancellationRecordDTO> getAllCancellationRequests() {
-        List<CancellationRecordDTO> list = new ArrayList<>();
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_CANCELLATIONS_SQL);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(mapRowToDTO(rs));
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return list;
+        return query(SELECT_CANCELLATIONS_SQL);
     }
 
     public boolean updateRefundStatus(String cancellationId, String status) {
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(UPDATE_REFUND_STATUS_SQL)) {
-            ps.setString(1, status);
-            ps.setString(2, cancellationId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return executeUpdate(UPDATE_REFUND_STATUS_SQL, status, cancellationId) > 0;
     }
 
     private CancellationRecordDTO mapRowToDTO(ResultSet rs) throws SQLException {
@@ -79,3 +74,4 @@ public class ManagerRefundDAO extends DBContext {
         );
     }
 }
+

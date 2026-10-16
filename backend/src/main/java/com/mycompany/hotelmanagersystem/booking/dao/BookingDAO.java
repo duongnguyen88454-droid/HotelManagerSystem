@@ -4,6 +4,8 @@ import com.mycompany.hotelmanagersystem.booking.dto.BookingCartDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartRoomItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.SingleBookingRequestDTO;
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.sql.CallableStatement;
@@ -16,15 +18,28 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Data Access Object quản lý điều phối tạo đơn đặt phòng (Booking) và giao dịch
- * toàn vẹn.
- * Đã refactor tinh gọn theo QT 2.1, QT 2.2 và QT 2.3 trong
- * ARCHITECTURE_RULES.md.
+ * Data Access Object quản lý điều phối tạo đơn đặt phòng (Booking) và giao dịch toàn vẹn.
+ * Đã refactor tinh gọn theo QT 2.1, QT 2.2 và QT 2.3 trong ARCHITECTURE_RULES.md.
  */
-public class BookingDAO {
+public class BookingDAO extends BaseRepository<Object, String> {
 
     private final BookingDichVuDAO bookingDichVuDAO = new BookingDichVuDAO();
     private final InvoiceWriter invoiceWriter = new InvoiceWriter();
+
+    @Override
+    protected String getTableName() {
+        return "Booking";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "BookingId";
+    }
+
+    @Override
+    protected RowMapper<Object> getRowMapper() {
+        return rs -> null;
+    }
 
     /**
      * Điều phối tạo đơn đặt phòng trực tuyến 1 phòng kèm dịch vụ trong 1

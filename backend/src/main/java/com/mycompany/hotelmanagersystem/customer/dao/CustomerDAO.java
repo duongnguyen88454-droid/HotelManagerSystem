@@ -1,87 +1,53 @@
 package com.mycompany.hotelmanagersystem.customer.dao;
 
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.customer.model.Customer;
-import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
- * Data Access Object chuyên trách quản lý Hồ Sơ Khách Hàng Lưu Trú (KHACHHANG)
+ * Data Access Object chuyên trách quản lý Hồ Sơ Khách Hàng Lưu Trú (Customer)
  * Phục vụ nghiệp vụ đối chiếu CCCD (12 chữ số) khi đặt phòng và check-in tại quầy
- *
- * Lưu ý thiết kế: KHACHHANG không còn liên kết MaTaiKhoan.
- * Việc ai đặt phòng (tài khoản) được ghi nhận tại bảng BOOKING.MaTaiKhoan.
  */
-public class CustomerDAO {
+public class CustomerDAO extends BaseRepository<Customer, String> {
 
-    /**
-     * Tra cứu hồ sơ khách hàng theo số Căn Cước Công Dân (CCCD)
-     */
+    @Override
+    protected String getTableName() {
+        return "Customer";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "CustomerId";
+    }
+
+    @Override
+    protected RowMapper<Customer> getRowMapper() {
+        return rs -> new Customer(
+                rs.getString("CustomerId"),
+                rs.getNString("FullName"),
+                rs.getString("Email"),
+                rs.getString("PhoneNumber"),
+                rs.getString("CCCD")
+        );
+    }
+
     public Customer findCustomerByCCCD(String cccd) {
         if (cccd == null || cccd.trim().isEmpty()) {
             return null;
         }
-
-        String sql = "SELECT CustomerId AS MaKH, FullName AS HoTen, Email, PhoneNumber AS SoDT, CCCD FROM Customer WHERE CCCD = ?";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, cccd.trim());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new Customer(
-                            rs.getString("MaKH"),
-                            rs.getNString("HoTen"),
-                            rs.getString("Email"),
-                            rs.getString("SoDT"),
-                            rs.getString("CCCD")
-                    );
-                }
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
+        String sql = "SELECT * FROM Customer WHERE CCCD = ?";
+        return queryOne(sql, cccd.trim()).orElse(null);
     }
 
-    /**
-     * Lấy hồ sơ khách hàng theo mã MaKH
-     */
     public Customer getCustomerByMaKH(String maKH) {
         if (maKH == null || maKH.trim().isEmpty()) {
             return null;
         }
-
-        String sql = "SELECT CustomerId AS MaKH, FullName AS HoTen, Email, PhoneNumber AS SoDT, CCCD FROM Customer WHERE CustomerId = ?";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, maKH.trim());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new Customer(
-                            rs.getString("MaKH"),
-                            rs.getNString("HoTen"),
-                            rs.getString("Email"),
-                            rs.getString("SoDT"),
-                            rs.getString("CCCD")
-                    );
-                }
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return findById(maKH.trim()).orElse(null);
     }
 
-    /**
-     * Thuật toán cốt lõi: Tìm kiếm hoặc Cập nhật / Tạo mới hồ sơ lưu trú theo CCCD
-     * - Nếu CCCD đã có: cập nhật Họ tên, SĐT, Email nếu có thay đổi
-     * - Nếu CCCD chưa có: sinh MaKH mới và INSERT vào KHACHHANG
-     *
-     * Lưu ý: MaTaiKhoan (ai đặt) được lưu tại BOOKING, không còn trong KHACHHANG
-     */
     public String findOrUpsertGuestByCCCD(String hoTen, String email, String soDT, String cccd) throws Exception {
         validateGuestInput(hoTen, email, soDT, cccd);
         String cleanCCCD = cccd.trim();
@@ -120,79 +86,42 @@ public class CustomerDAO {
         }
 
         String updateSql = "UPDATE Customer SET FullName = ?, Email = ?, PhoneNumber = ? WHERE CCCD = ?";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(updateSql)) {
-            ps.setNString(1, name);
-            ps.setString(2, email);
-            ps.setString(3, phone);
-            ps.setString(4, cleanCCCD);
-            ps.executeUpdate();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        executeUpdate(updateSql, name, email, phone, cleanCCCD);
     }
 
     private String insertNewGuestWithFallback(String hoTen, String email, String soDT, String cleanCCCD) throws Exception {
         String insertSql = "INSERT INTO Customer (CustomerId, FullName, Email, PhoneNumber, CCCD) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DBContext.getConnection()) {
-            String newMaKH = getNextCustomerIdFromDB(conn);
-            try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
-                ps.setString(1, newMaKH);
-                ps.setNString(2, hoTen);
-                ps.setString(3, email);
-                ps.setString(4, soDT);
-                ps.setString(5, cleanCCCD);
-                ps.executeUpdate();
-                return newMaKH;
-            }
-        } catch (SQLException | ClassNotFoundException e) {
+        String newMaKH = getNextCustomerIdFromDB(null);
+        try {
+            executeUpdate(insertSql, newMaKH, hoTen, email, soDT, cleanCCCD);
+            return newMaKH;
+        } catch (Exception e) {
             String fallbackMaKH = fallbackLinkByContact(hoTen, email, soDT, cleanCCCD);
             if (fallbackMaKH != null) {
                 return fallbackMaKH;
             }
-            throw new Exception("Lỗi ghi nhận hồ sơ khách lưu trú: " + e.getMessage());
+            throw new Exception("Lỗi ghi nhận hồ sơ khách lưu trú: " + e.getMessage(), e);
         }
     }
 
     private String fallbackLinkByContact(String hoTen, String email, String soDT, String cleanCCCD) {
-        String fallbackSql = "SELECT CustomerId AS MaKH FROM Customer WHERE PhoneNumber = ? OR Email = ?";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(fallbackSql)) {
-            ps.setString(1, soDT);
-            ps.setString(2, email);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String matchedMaKH = rs.getString("MaKH");
-                    updateGuestProfileByMaKH(conn, matchedMaKH, cleanCCCD, hoTen, email, soDT);
-                    return matchedMaKH;
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        String fallbackSql = "SELECT CustomerId FROM Customer WHERE PhoneNumber = ? OR Email = ?";
+        String matchedMaKH = queryScalarString(fallbackSql, soDT, email);
+        if (matchedMaKH != null) {
+            updateGuestProfileByMaKH(matchedMaKH, cleanCCCD, hoTen, email, soDT);
+            return matchedMaKH;
         }
         return null;
     }
 
-    private void updateGuestProfileByMaKH(Connection conn, String maKH, String cccd, String hoTen, String email, String soDT)
-            throws SQLException {
+    private void updateGuestProfileByMaKH(String maKH, String cccd, String hoTen, String email, String soDT) {
         String sql = "UPDATE Customer SET CCCD = ?, FullName = ?, Email = ?, PhoneNumber = ? WHERE CustomerId = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, cccd);
-            ps.setNString(2, hoTen);
-            ps.setString(3, email);
-            ps.setString(4, soDT);
-            ps.setString(5, maKH);
-            ps.executeUpdate();
-        }
+        executeUpdate(sql, cccd, hoTen, email, soDT, maKH);
     }
 
     public String getNextCustomerIdFromDB(Connection conn) {
-        try (PreparedStatement ps = conn.prepareStatement("SELECT dbo.fn_SinhMaCustomer()");
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) return rs.getString(1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "CUS001";
+        String nextId = queryScalarString("SELECT dbo.fn_SinhMaCustomer()");
+        return nextId != null ? nextId : "CUS001";
     }
 }
+

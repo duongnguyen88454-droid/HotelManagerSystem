@@ -29,8 +29,10 @@
         <div class="portal-tabs">
             <a href="${pageContext.request.contextPath}/housekeeper/tasks?status=TatCa"
                class="portal-tab-item ${empty currentStatus || currentStatus == 'TatCa' ? 'active' : ''}">Tất Cả</a>
-            <a href="${pageContext.request.contextPath}/housekeeper/tasks?status=Pending"
-               class="portal-tab-item ${currentStatus == 'Pending' || currentStatus == 'ChoXuLy' ? 'active' : ''}">Chờ Xử Lý</a>
+            <a href="${pageContext.request.contextPath}/housekeeper/tasks?status=MyActive"
+               class="portal-tab-item ${currentStatus == 'MyActive' ? 'active' : ''}">Phòng Tôi Đang Dọn</a>
+            <a href="${pageContext.request.contextPath}/housekeeper/tasks?status=MyHistory"
+               class="portal-tab-item ${currentStatus == 'MyHistory' ? 'active' : ''}">Lịch Sử Của Tôi</a>
             <a href="${pageContext.request.contextPath}/housekeeper/tasks?status=InProgress"
                class="portal-tab-item ${currentStatus == 'InProgress' || currentStatus == 'DangDon' ? 'active' : ''}">Đang Dọn</a>
             <a href="${pageContext.request.contextPath}/housekeeper/tasks?status=Completed"
@@ -54,7 +56,7 @@
         <!-- Banner cảnh báo nếu đang có 1 phòng dọn dở -->
         <c:if test="${not empty currentActiveTask}">
             <div class="portal-alert portal-alert-info">
-                Bạn đang tiến hành dọn dẹp <strong>Phòng ${currentActiveTask.soPhong}</strong>. Vui lòng bấm <strong>Nghiệm Thu & Hoàn Tất</strong> để hoàn tất trước khi nhận thêm phòng mới.
+                Bạn đang tiến hành dọn dẹp <strong>Phòng ${currentActiveTask.soPhong}</strong>. Vui lòng bấm <strong>Hoàn Tất Dọn Phòng</strong> để hoàn tất trước khi nhận thêm phòng mới.
             </div>
         </c:if>
 
@@ -114,7 +116,7 @@
                                                 <c:when test="${not empty task.tenNV}">
                                                     <div style="font-weight: 600; color: var(--portal-text-primary);">
                                                         ${task.tenNV}
-                                                        <c:if test="${task.maNV == sessionScope.CURRENT_USER.maDinhDanh}">
+                                                        <c:if test="${task.maNV == sessionScope.CURRENT_USER.maDinhDanh || task.maNV == sessionScope.CURRENT_USER.maTaiKhoan}">
                                                             <span class="badge-pill badge-available" style="padding: 1px 6px; font-size: 11px;">Bạn</span>
                                                         </c:if>
                                                     </div>
@@ -164,10 +166,10 @@
                                                 </c:when>
                                                 <c:when test="${task.trangThaiNhiemVu == 'DangDon' || task.trangThaiNhiemVu == 'InProgress' || task.trangThaiPhong == 'Cleaning'}">
                                                     <c:choose>
-                                                        <c:when test="${empty task.maNV || task.maNV == sessionScope.CURRENT_USER.maDinhDanh}">
+                                                        <c:when test="${empty task.maNV || task.maNV == sessionScope.CURRENT_USER.maDinhDanh || task.maNV == sessionScope.CURRENT_USER.maTaiKhoan}">
                                                             <button type="button" class="portal-btn portal-btn-success" style="padding: 6px 12px; font-size: 12px;"
                                                                     onclick="openInspectionModal('${task.maNhiemVu}', '${task.soPhong}', '${task.tenLoaiPhong}')">
-                                                                Nghiệm Thu & Hoàn Tất
+                                                                Hoàn Tất Dọn Phòng
                                                             </button>
                                                         </c:when>
                                                         <c:otherwise>

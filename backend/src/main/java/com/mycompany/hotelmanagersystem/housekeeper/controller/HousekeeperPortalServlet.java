@@ -29,7 +29,16 @@ public class HousekeeperPortalServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String status = request.getParameter("status");
-        List<HousekeeperTaskDTO> taskList = taskService.getTaskList(status);
+        Object userObj = request.getSession().getAttribute("CURRENT_USER");
+        String maTK = null;
+        String maNV = null;
+        if (userObj instanceof UserSessionDTO) {
+            UserSessionDTO user = (UserSessionDTO) userObj;
+            maTK = user.getMaTaiKhoan();
+            maNV = user.getMaDinhDanh();
+        }
+
+        List<HousekeeperTaskDTO> taskList = taskService.getTaskList(status, maTK, maNV);
         HousekeeperTaskDTO currentActiveTask = findActiveTaskOfCurrentUser(request, taskList);
 
         request.setAttribute("taskList", taskList);
@@ -43,12 +52,14 @@ public class HousekeeperPortalServlet extends HttpServlet {
                                                            List<HousekeeperTaskDTO> taskList) {
         Object userObj = request.getSession().getAttribute("CURRENT_USER");
         if (userObj instanceof UserSessionDTO) {
-            String currentMaNV = ((UserSessionDTO) userObj).getMaDinhDanh();
-            if (currentMaNV != null) {
-                for (HousekeeperTaskDTO task : taskList) {
-                    if (("DangDon".equalsIgnoreCase(task.getTrangThaiNhiemVu())
-                            || "InProgress".equalsIgnoreCase(task.getTrangThaiNhiemVu()))
-                            && currentMaNV.equalsIgnoreCase(task.getMaNV())) {
+            UserSessionDTO user = (UserSessionDTO) userObj;
+            String currentMaNV = user.getMaDinhDanh();
+            String currentMaTK = user.getMaTaiKhoan();
+            for (HousekeeperTaskDTO task : taskList) {
+                if ("DangDon".equalsIgnoreCase(task.getTrangThaiNhiemVu())
+                        || "InProgress".equalsIgnoreCase(task.getTrangThaiNhiemVu())) {
+                    if ((currentMaNV != null && currentMaNV.equalsIgnoreCase(task.getMaNV()))
+                            || (currentMaTK != null && currentMaTK.equalsIgnoreCase(task.getMaNV()))) {
                         return task;
                     }
                 }

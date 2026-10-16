@@ -17,21 +17,6 @@
 
     <!-- Màn hình bên phải -->
     <main class="portal-main">
-        <header class="portal-header">
-            <div class="portal-header-left">
-                <h1>Tiếp Nhận Đặt Phòng Tại Quầy (Walk-in)</h1>
-                <p>Quy trình tiếp nhận đặt phòng: Chọn phòng khả dụng và điền hồ sơ lưu trú</p>
-            </div>
-            <div class="portal-header-right">
-                <a href="${pageContext.request.contextPath}/receptionist/checkin" class="portal-btn portal-btn-secondary">
-                    Quầy Check-in
-                </a>
-                <a href="${pageContext.request.contextPath}/receptionist/room-map" class="portal-btn portal-btn-secondary">
-                    Danh Sách Phòng
-                </a>
-            </div>
-        </header>
-
         <div class="portal-card" style="padding: 24px;">
 
         <!-- STEPPER NAV -->
@@ -62,42 +47,37 @@
                 
                 <!-- KHUNG CHỌN TIÊU CHÍ LỌC PHÒNG KHẢ DỤNG -->
                 <div class="pms-card" style="padding: 16px 20px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
-                        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <label style="font-size: 13px; font-weight: 700; color: #334155;">Ngày nhận:</label>
-                                <input type="date" id="dateCheckIn" name="checkIn" value="${checkIn}" class="pms-input" style="width: 145px; padding: 6px 10px;" onchange="onDateFilterChange()">
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <label style="font-size: 13px; font-weight: 700; color: #334155;">Ngày trả:</label>
-                                <input type="date" id="dateCheckOut" name="checkOut" value="${checkOut}" class="pms-input" style="width: 145px; padding: 6px 10px;" onchange="onDateFilterChange()">
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <label style="font-size: 13px; font-weight: 700; color: #334155;">Số khách:</label>
-                                <select id="filterGuests" class="pms-input" style="width: 110px; padding: 6px 10px;" onchange="onDateFilterChange()">
-                                    <option value="">Tất cả</option>
-                                    <option value="1" ${paramGuests=='1' ? 'selected' : ''}>1 người</option>
-                                    <option value="2" ${paramGuests=='2' ? 'selected' : ''}>2 người</option>
-                                    <option value="3" ${paramGuests=='3' ? 'selected' : ''}>3 người</option>
-                                    <option value="4" ${paramGuests=='4' ? 'selected' : ''}>4+ người</option>
-                                </select>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <label style="font-size: 13px; font-weight: 700; color: #334155;">Hạng phòng:</label>
-                                <select id="filterRoomType" class="pms-input" style="width: 160px; padding: 6px 10px;" onchange="onDateFilterChange()">
-                                    <option value="ALL">Tất cả</option>
-                                    <c:forEach var="rt" items="${roomTypes}">
-                                        <option value="${rt.maLoaiPhong}" ${paramRoomType==rt.maLoaiPhong ? 'selected' : ''}>
-                                            ${rt.tenLoaiPhong}
-                                        </option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            <span id="nightsCounter" style="background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 700;">1 đêm</span>
+                    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="font-size: 13px; font-weight: 700; color: #334155;">Ngày nhận:</label>
+                            <input type="date" id="dateCheckIn" name="checkIn" value="${checkIn}" class="pms-input" style="width: 145px; padding: 6px 10px;" onchange="onDateFilterChange()">
                         </div>
-                        <button type="button" class="pms-btn pms-btn-secondary" style="padding: 7px 14px;" onclick="onDateFilterChange()">
-                            [ Lọc Phòng ]
-                        </button>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="font-size: 13px; font-weight: 700; color: #334155;">Ngày trả:</label>
+                            <input type="date" id="dateCheckOut" name="checkOut" value="${checkOut}" class="pms-input" style="width: 145px; padding: 6px 10px;" onchange="onDateFilterChange()">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="font-size: 13px; font-weight: 700; color: #334155;">Số khách:</label>
+                            <select id="filterGuests" class="pms-input" style="width: 110px; padding: 6px 10px;" onchange="onDateFilterChange()">
+                                <option value="">Tất cả</option>
+                                <option value="1" ${paramGuests=='1' ? 'selected' : ''}>1 người</option>
+                                <option value="2" ${paramGuests=='2' ? 'selected' : ''}>2 người</option>
+                                <option value="3" ${paramGuests=='3' ? 'selected' : ''}>3 người</option>
+                                <option value="4" ${paramGuests=='4' ? 'selected' : ''}>4+ người</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="font-size: 13px; font-weight: 700; color: #334155;">Hạng phòng:</label>
+                            <select id="filterRoomType" class="pms-input" style="width: 160px; padding: 6px 10px;" onchange="onDateFilterChange()">
+                                <option value="ALL">Tất cả</option>
+                                <c:forEach var="rt" items="${roomTypes}">
+                                    <option value="${rt.maLoaiPhong}" ${paramRoomType==rt.maLoaiPhong ? 'selected' : ''}>
+                                        ${rt.tenLoaiPhong}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        <span id="nightsCounter" style="background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 700;">1 đêm</span>
                     </div>
                 </div>
 
@@ -148,7 +128,7 @@
                                                 <input type="hidden" name="donGia_${rm.maPhong}" value="${rm.giaPhong}">
                                             </td>
                                             <td>
-                                                <strong style="color: #0284c7; font-size: 15px;">P.${rm.soPhong}</strong>
+                                                <strong style="color: #0284c7; font-size: 15px;">${rm.soPhong}</strong>
                                             </td>
                                             <td>
                                                 <strong style="color: #1e293b;">${rm.tenLoaiPhong}</strong>

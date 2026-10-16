@@ -1,6 +1,8 @@
 package com.mycompany.hotelmanagersystem.booking.dao;
 
 import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.sql.Connection;
@@ -10,13 +12,27 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * DAO chuyên trách quản lý các dịch vụ đi kèm trong đơn đặt phòng (Booking
- * Services).
+ * DAO chuyên trách quản lý các dịch vụ đi kèm trong đơn đặt phòng (Booking Services).
  * Tách biệt từ BookingDAO theo QT 2.1 và QT 2.3 trong ARCHITECTURE_RULES.md.
  */
-public class BookingDichVuDAO {
+public class BookingDichVuDAO extends BaseRepository<Object, String> {
 
     private final InvoiceWriter invoiceWriter = new InvoiceWriter();
+
+    @Override
+    protected String getTableName() {
+        return "Booking_Room_Service";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "BookingId";
+    }
+
+    @Override
+    protected RowMapper<Object> getRowMapper() {
+        return rs -> null;
+    }
 
     /**
      * Điều phối thêm dịch vụ vào phòng cụ thể trong đơn booking

@@ -1,5 +1,7 @@
 package com.mycompany.hotelmanagersystem.housekeeper.dao;
 
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 import com.mycompany.hotelmanagersystem.housekeeper.dto.DamageCategoryDTO;
 import com.mycompany.hotelmanagersystem.housekeeper.dto.DamageDetailItemDTO;
@@ -8,42 +10,41 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * DAO xử lý lập biên bản hư hại và truy vấn danh mục loại hư hại từ CSDL.
- */
-public class DamageReportDAO extends DBContext {
+public class DamageReportDAO extends BaseRepository<DamageCategoryDTO, String> {
 
-    private static final String SELECT_CATEGORIES_SQL =
-            "SELECT DamageTypeId, DamageName FROM DamageType ORDER BY DamageTypeId ASC";
+    private static final String SELECT_CATEGORIES_SQL = "SELECT DamageTypeId, DamageName FROM DamageType ORDER BY DamageTypeId ASC";
+
+    @Override
+    protected String getTableName() {
+        return "DamageType";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "DamageTypeId";
+    }
+
+    @Override
+    protected RowMapper<DamageCategoryDTO> getRowMapper() {
+        return rs -> new DamageCategoryDTO(
+                rs.getString("DamageTypeId"),
+                rs.getString("DamageName"),
+                rs.getString("DamageName"));
+    }
 
     public List<DamageCategoryDTO> getAllDamageCategories() {
-        List<DamageCategoryDTO> list = new ArrayList<>();
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_CATEGORIES_SQL);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(new DamageCategoryDTO(
-                        rs.getString("DamageTypeId"),
-                        rs.getString("DamageName"),
-                        rs.getString("DamageName")
-                ));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
+        return query(SELECT_CATEGORIES_SQL);
     }
 
     public void createDamageReportAndLockRoom(String maNhiemVu, String maNV, String moTaChung,
-                                             List<DamageDetailItemDTO> damageItems)
+            List<DamageDetailItemDTO> damageItems)
             throws SQLException, ClassNotFoundException {
         Connection conn = null;
         try {
-            conn = getConnection();
+            conn = DBContext.getConnection();
             conn.setAutoCommit(false);
 
             String maPhong = findRoomIdByTask(conn, maNhiemVu);
@@ -142,7 +143,7 @@ public class DamageReportDAO extends DBContext {
     }
 
     private void insertDamageDetails(Connection conn, String maBaoCao, String moTaChung,
-                                     List<DamageDetailItemDTO> items)
+            List<DamageDetailItemDTO> items)
             throws SQLException {
         if (items == null || items.isEmpty()) {
             return;
@@ -154,7 +155,8 @@ public class DamageReportDAO extends DBContext {
                 psDet.setString(1, maBaoCao);
                 psDet.setString(2, item.getMaLoaiHuHai());
                 String note = (item.getMoTaChiTiet() != null && !item.getMoTaChiTiet().trim().isEmpty())
-                        ? item.getMoTaChiTiet().trim() : moTaChung;
+                        ? item.getMoTaChiTiet().trim()
+                        : moTaChung;
                 psDet.setString(3, (note != null && !note.isEmpty()) ? note : "Cần bảo trì");
                 psDet.addBatch();
             }

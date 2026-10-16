@@ -2,6 +2,7 @@ package com.mycompany.hotelmanagersystem.manager.service;
 
 import com.mycompany.hotelmanagersystem.hotelservice.model.ServiceItem;
 import com.mycompany.hotelmanagersystem.manager.dao.ManagerHotelConfigDAO;
+import com.mycompany.hotelmanagersystem.manager.dto.CreateRoomTypeDTO;
 import com.mycompany.hotelmanagersystem.manager.dto.RoomTypePriceDTO;
 import com.mycompany.hotelmanagersystem.room.model.BedType;
 import com.mycompany.hotelmanagersystem.room.model.RoomAmenity;
@@ -35,15 +36,29 @@ public class ManagerHotelConfigService {
         return configDAO.updateRoomTypePricing(dto);
     }
 
+    public boolean addRoomType(CreateRoomTypeDTO dto) {
+        if (dto == null || dto.getRoomTypeName() == null || dto.getRoomTypeName().trim().isEmpty()
+                || dto.getCapacity() <= 0 || dto.getBasePrice() < 0 || dto.getEarlyCheckInFee() < 0
+                || dto.getLateCheckOutFee() < 0 || dto.getDepositPercent() < 0 || dto.getDepositPercent() > 100) {
+            return false;
+        }
+        if (dto.getRoomTypeId() != null) {
+            dto.setRoomTypeId(dto.getRoomTypeId().trim());
+        }
+        dto.setRoomTypeName(dto.getRoomTypeName().trim());
+        return configDAO.addRoomType(dto);
+    }
+
     public List<BedType> getAllBedTypes() {
         return configDAO.getAllBedTypes();
     }
 
     public boolean addBedType(String bedTypeId, String bedTypeName) {
-        if (bedTypeId == null || bedTypeId.trim().isEmpty() || bedTypeName == null || bedTypeName.trim().isEmpty()) {
+        if (bedTypeName == null || bedTypeName.trim().isEmpty()) {
             return false;
         }
-        return configDAO.addBedType(bedTypeId.trim(), bedTypeName.trim());
+        String id = (bedTypeId != null) ? bedTypeId.trim() : "";
+        return configDAO.addBedType(id, bedTypeName.trim());
     }
 
     public boolean toggleBedTypeStatus(String bedTypeId, boolean isActive) {
@@ -58,10 +73,11 @@ public class ManagerHotelConfigService {
     }
 
     public boolean addRoomAmenity(String amenityId, String amenityName) {
-        if (amenityId == null || amenityId.trim().isEmpty() || amenityName == null || amenityName.trim().isEmpty()) {
+        if (amenityName == null || amenityName.trim().isEmpty()) {
             return false;
         }
-        return configDAO.addRoomAmenity(amenityId.trim(), amenityName.trim());
+        String id = (amenityId != null) ? amenityId.trim() : "";
+        return configDAO.addRoomAmenity(id, amenityName.trim());
     }
 
     public boolean toggleRoomAmenityStatus(String amenityId, boolean isActive) {
@@ -76,10 +92,11 @@ public class ManagerHotelConfigService {
     }
 
     public boolean addService(String serviceId, String serviceName, double basePrice) {
-        if (serviceId == null || serviceId.trim().isEmpty() || serviceName == null || serviceName.trim().isEmpty()) {
+        if (serviceName == null || serviceName.trim().isEmpty()) {
             return false;
         }
-        return configDAO.addService(serviceId.trim(), serviceName.trim(), Math.max(0, basePrice));
+        String id = (serviceId != null) ? serviceId.trim() : "";
+        return configDAO.addService(id, serviceName.trim(), Math.max(0, basePrice));
     }
 
     public boolean updateService(String serviceId, double basePrice, boolean isActive) {

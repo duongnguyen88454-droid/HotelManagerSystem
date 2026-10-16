@@ -14,10 +14,11 @@ public class RoomTimelineDTO {
     private String moTa;
     private List<BookingBarDTO> bookingBars = new ArrayList<>();
 
-    public RoomTimelineDTO() {}
+    public RoomTimelineDTO() {
+    }
 
     public RoomTimelineDTO(String maPhong, String soPhong, int soTang, String maLoaiPhong,
-                           String tenLoaiPhong, double giaPhong, String trangThaiPhong, String moTa) {
+            String tenLoaiPhong, double giaPhong, String trangThaiPhong, String moTa) {
         this.maPhong = maPhong;
         this.soPhong = soPhong;
         this.soTang = soTang;
@@ -132,5 +133,15 @@ public class RoomTimelineDTO {
 
     public void setBookingBars(List<BookingBarDTO> bookingBars) {
         this.bookingBars = bookingBars;
+    }
+
+    private List<TimelineCellDTO> cells = new ArrayList<>();
+
+    public List<TimelineCellDTO> getCells() {
+        return cells;
+    }
+
+    public void setCells(List<TimelineCellDTO> cells) {
+        this.cells = cells;
     }
 }

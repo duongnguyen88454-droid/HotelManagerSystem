@@ -1,0 +1,460 @@
+/* ==========================================================================
+   HOTEL MANAGEMENT SYSTEM - RECEPTIONIST ROOM TIMELINE (LƯỚI LỊCH PHÒNG)
+   Thiết kế giao diện sơ đồ buồng phòng dạng Lưới Timeline / Gantt Chart
+   ========================================================================== */
+
+/* 1. THANH CÔNG CỤ TRÊN CÙNG (TOP TOOLBAR) */
+.timeline-toolbar {
+    background: #ffffff;
+    border: 1px solid var(--portal-border);
+    border-radius: 12px;
+    padding: 12px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.toolbar-left,
+.toolbar-center,
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Nút chuyển chế độ xem Lưới / Danh sách */
+.view-switcher {
+    display: inline-flex;
+    border: 1px solid var(--portal-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.view-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    background: #ffffff;
+    color: var(--portal-text-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.view-btn.active {
+    background: #10b981;
+    color: #ffffff;
+}
+
+.view-btn:not(.active):hover {
+    background: #f1f5f9;
+    color: var(--portal-text-primary);
+}
+
+/* Ô tìm kiếm nhanh */
+.timeline-search-box {
+    position: relative;
+    width: 320px;
+}
+
+.timeline-search-input {
+    width: 100%;
+    padding: 8px 14px 8px 36px;
+    border: 1px solid var(--portal-border);
+    border-radius: 8px;
+    font-size: 13.5px;
+    outline: none;
+    background: #f8fafc;
+    transition: all 0.15s ease;
+}
+
+.timeline-search-input:focus {
+    background: #ffffff;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+}
+
+.timeline-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+/* Bộ điều hướng tuần */
+.date-navigator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1px solid var(--portal-border);
+    border-radius: 8px;
+    padding: 4px 8px;
+}
+
+.date-nav-btn {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid var(--portal-border);
+    color: var(--portal-text-primary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    transition: background 0.15s ease;
+}
+
+.date-nav-btn:hover {
+    background: #e2e8f0;
+}
+
+.date-range-display {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--portal-text-primary);
+    padding: 0 8px;
+    white-space: nowrap;
+}
+
+.btn-today {
+    padding: 6px 12px;
+    background: #ffffff;
+    border: 1px solid var(--portal-border);
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--portal-text-secondary);
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.btn-today:hover {
+    background: #e2e8f0;
+    color: var(--portal-text-primary);
+}
+
+.btn-quick-book {
+    padding: 8px 16px;
+    background: #10b981;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+    transition: background 0.15s ease;
+}
+
+.btn-quick-book:hover {
+    background: #059669;
+}
+
+/* 2. THANH CHÚ GIẢI TRẠNG THÁI (STATUS LEGEND) */
+.timeline-legend-bar {
+    background: #ffffff;
+    border: 1px solid var(--portal-border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 12.5px;
+    color: var(--portal-text-secondary);
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-occupied { background-color: #10b981; }
+.dot-confirmed { background-color: #f97316; }
+.dot-pending { background-color: #3b82f6; }
+.dot-available { background-color: #ffffff; border: 1.5px solid #cbd5e1; }
+.dot-cleaning { background-color: #f59e0b; }
+.dot-damaged { background-color: #64748b; }
+
+/* 3. KHỐI LƯỚI BẢNG THỜI GIAN (TIMELINE GRID TABLE) */
+.timeline-card {
+    background: #ffffff;
+    border: 1px solid var(--portal-border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+}
+
+.timeline-table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.timeline-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    min-width: 950px;
+}
+
+/* Cột tiêu đề phòng bên trái */
+.col-room-header {
+    width: 180px;
+    min-width: 180px;
+    background: #f8fafc;
+    border-right: 2px solid var(--portal-border);
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--portal-text-primary);
+    position: sticky;
+    left: 0;
+    z-index: 10;
+}
+
+/* Các cột ngày 1..7 */
+.col-day-header {
+    padding: 10px 8px;
+    text-align: center;
+    background: #f8fafc;
+    border-right: 1px solid var(--portal-border);
+    border-bottom: 2px solid var(--portal-border);
+    vertical-align: middle;
+}
+
+.col-day-header:last-child {
+    border-right: none;
+}
+
+.col-day-header.day-today {
+    background: #ecfdf5;
+}
+
+.day-num {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--portal-text-primary);
+    line-height: 1.2;
+}
+
+.day-name {
+    font-size: 11.5px;
+    color: var(--portal-text-muted);
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.today-indicator {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #10b981;
+    color: #ffffff;
+    border-radius: 9999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+/* Dòng nhóm tầng (Floor Header Row) */
+.floor-header-row td {
+    background: #f1f5f9;
+    padding: 8px 16px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #475569;
+    border-top: 1px solid var(--portal-border);
+    border-bottom: 1px solid var(--portal-border);
+}
+
+.floor-title-cell {
+    position: sticky;
+    left: 0;
+    background: #f1f5f9 !important;
+    z-index: 10;
+    border-right: 2px solid var(--portal-border) !important;
+}
+
+.floor-count-cell {
+    text-align: center;
+    border-right: 1px solid #e2e8f0;
+    font-size: 13px;
+    font-weight: 700;
+    color: #047857;
+}
+
+.floor-count-cell:last-child {
+    border-right: none;
+}
+
+/* Dòng từng phòng */
+.room-timeline-row td {
+    height: 58px;
+    border-bottom: 1px solid var(--portal-border-light);
+    vertical-align: middle;
+}
+
+.room-timeline-row:hover .room-cell-info {
+    background: #f1f5f9;
+}
+
+.room-cell-info {
+    padding: 8px 16px;
+    background: #ffffff;
+    border-right: 2px solid var(--portal-border);
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.02);
+}
+
+.room-no {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--portal-primary);
+}
+
+.room-type-sub {
+    font-size: 11.5px;
+    color: var(--portal-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+
+/* Ô trống (Cell Empty - Clickable để đặt phòng) */
+.timeline-cell {
+    padding: 4px;
+    border-right: 1px solid var(--portal-border-light);
+    position: relative;
+    height: 58px;
+}
+
+.timeline-cell:last-child {
+    border-right: none;
+}
+
+.timeline-cell.cell-today {
+    background-color: #fbfdfc;
+}
+
+.timeline-cell.cell-empty {
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.timeline-cell.cell-empty:hover {
+    background-color: #ecfdf5 !important;
+}
+
+.empty-cell-btn {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    opacity: 0;
+    color: #059669;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px dashed transparent;
+    transition: all 0.15s ease;
+}
+
+.timeline-cell.cell-empty:hover .empty-cell-btn {
+    opacity: 1;
+    border-color: #a7f3d0;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* Ô có thanh đặt phòng (Booking Bar) */
+.timeline-cell.cell-booked {
+    padding: 6px 4px;
+}
+
+.booking-bar {
+    width: 100%;
+    height: 44px;
+    border-radius: 8px;
+    padding: 6px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.booking-bar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.bar-occupied {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-left: 4px solid #047857;
+}
+
+.bar-confirmed {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    border-left: 4px solid #c2410c;
+}
+
+.bar-pending {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-left: 4px solid #1d4ed8;
+}
+
+.bar-guest-name {
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.bar-booking-id {
+    font-size: 11px;
+    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}

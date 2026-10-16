@@ -1,5 +1,7 @@
 package com.mycompany.hotelmanagersystem.booking.dao;
 
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 import com.mycompany.hotelmanagersystem.room.dto.BookingBarDTO;
 
@@ -11,21 +13,33 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DAO chuyên trách các truy vấn và thủ tục Check-in cho Phân hệ Lễ tân (Phase
- * 3).
+ * DAO chuyên trách các truy vấn và thủ tục Check-in cho Phân hệ Lễ tân (Phase 3).
  * Tách biệt hoàn toàn khỏi BookingDAO để tuân thủ QT 2.1 và QT 5.2.
  */
-public class BookingCheckInDAO {
+public class BookingCheckInDAO extends BaseRepository<BookingBarDTO, String> {
+
+    @Override
+    protected String getTableName() {
+        return "Booking_Room";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "BookingId";
+    }
+
+    @Override
+    protected RowMapper<BookingBarDTO> getRowMapper() {
+        return rs -> mapRowToBookingBar(rs, LocalDate.now());
+    }
 
     /**
      * Truy vấn toàn bộ dải đặt phòng trong tuần có trạng thái Confirmed hoặc CheckedIn.
      */
     public List<BookingBarDTO> getBookingBarsInWeek(LocalDate startDate, LocalDate endDate) {
-        List<BookingBarDTO> list = new ArrayList<>();
         String sql = "SELECT br.BookingId AS MaBooking, br.RoomId AS MaPhong, c.FullName AS TenKhachHang, "
                 + "       c.PhoneNumber AS SoDienThoai, c.CCCD AS SoCCCD, br.ExpectedCheckInDate AS NgayNhanDuKien, "
                 + "       br.ExpectedCheckOutDate AS NgayTraDuKien, br.BookingStatus AS TrangThaiBooking, "
@@ -38,21 +52,9 @@ public class BookingCheckInDAO {
                 + "  AND br.ExpectedCheckOutDate >= ? "
                 + "ORDER BY br.ExpectedCheckInDate ASC";
 
-        try (Connection conn = DBContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setDate(1, Date.valueOf(endDate));
-            ps.setDate(2, Date.valueOf(startDate));
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRowToBookingBar(rs, startDate));
-                }
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return list;
+        Date dEnd = Date.valueOf(endDate);
+        Date dStart = Date.valueOf(startDate);
+        return queryCustom(sql, rs -> mapRowToBookingBar(rs, startDate), dEnd, dStart);
     }
 
     private BookingBarDTO mapRowToBookingBar(ResultSet rs, LocalDate startDate) throws SQLException {
@@ -97,20 +99,7 @@ public class BookingCheckInDAO {
                 + "WHERE br.BookingId = ? AND br.RoomId = ? "
                 + "  AND br.BookingStatus = 'Confirmed' "
                 + "  AND br.ActualCheckInDate IS NULL";
-
-        try (Connection conn = DBContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, maBooking);
-            ps.setString(2, maPhong);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return !queryCustom(sql, rs -> 1, maBooking, maPhong).isEmpty();
     }
 
     /**

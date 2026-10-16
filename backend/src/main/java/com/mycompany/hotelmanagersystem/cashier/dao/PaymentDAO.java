@@ -1,6 +1,8 @@
 package com.mycompany.hotelmanagersystem.cashier.dao;
 
 import com.mycompany.hotelmanagersystem.cashier.dto.PaymentRecordDTO;
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
 import java.sql.CallableStatement;
@@ -9,17 +11,28 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * DAO phụ trách thực thi nạp tiền (sp_GhiNhanThanhToan) và truy vấn lịch sử thanh toán.
  */
-public class PaymentDAO {
+public class PaymentDAO extends BaseRepository<PaymentRecordDTO, String> {
 
-    /**
-     * Ghi nhận một đợt thanh toán/đặt cọc mới qua thủ tục dbo.sp_GhiNhanThanhToan.
-     */
+    @Override
+    protected String getTableName() {
+        return "Payment";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "PaymentId";
+    }
+
+    @Override
+    protected RowMapper<PaymentRecordDTO> getRowMapper() {
+        return this::mapRowToPaymentRecord;
+    }
+
     public String recordPayment(String maHoaDon, String maTaiKhoan, double soTien, String phuongThuc)
             throws SQLException, ClassNotFoundException {
         String sql = "{call dbo.sp_GhiNhanThanhToan(?, ?, ?, ?, ?, ?)}";
@@ -70,11 +83,7 @@ public class PaymentDAO {
         return null;
     }
 
-    /**
-     * Lấy toàn bộ lịch sử các đợt nạp tiền/thanh toán của một hóa đơn.
-     */
-    public List<PaymentRecordDTO> getPaymentHistory(String maHoaDon) throws SQLException, ClassNotFoundException {
-        List<PaymentRecordDTO> list = new ArrayList<>();
+    public List<PaymentRecordDTO> getPaymentHistory(String maHoaDon) {
         String sql = "SELECT p.PaymentId AS MaThanhToan, p.InvoiceId AS MaHoaDon, p.ProcessBy AS MaNV, " +
                      "       ISNULL(acc.Username, N'Khách Hàng') AS TenNV, p.TotalAmount AS SoTien, " +
                      "       p.PaymentMethod AS PhuongThucThanhToan, p.PaymentDate AS ThoiDiemThanhToan " +
@@ -82,33 +91,13 @@ public class PaymentDAO {
                      "LEFT JOIN Account acc ON p.ProcessBy = acc.AccountId " +
                      "WHERE p.InvoiceId = ? " +
                      "ORDER BY p.PaymentDate ASC";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, maHoaDon);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRowToPaymentRecord(rs));
-                }
-            }
-        }
-        return list;
+        return query(sql, maHoaDon);
     }
 
-    /**
-     * Lấy tổng số tiền đã thanh toán cho một hóa đơn.
-     */
-    public double getTotalPaid(String maHoaDon) throws SQLException, ClassNotFoundException {
-        String sql = "SELECT ISNULL(SUM(TotalAmount), 0) AS TongDaTra FROM Payment WHERE InvoiceId = ?";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, maHoaDon);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getDouble("TongDaTra");
-                }
-            }
-        }
-        return 0.0;
+    public double getTotalPaid(String maHoaDon) {
+        String sql = "SELECT ISNULL(SUM(TotalAmount), 0) FROM Payment WHERE InvoiceId = ?";
+        String val = queryScalarString(sql, maHoaDon);
+        return val != null ? Double.parseDouble(val) : 0.0;
     }
 
     private PaymentRecordDTO mapRowToPaymentRecord(ResultSet rs) throws SQLException {
@@ -123,3 +112,4 @@ public class PaymentDAO {
         );
     }
 }
+

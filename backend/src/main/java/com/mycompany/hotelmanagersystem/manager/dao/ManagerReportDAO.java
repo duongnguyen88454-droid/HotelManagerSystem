@@ -1,5 +1,7 @@
 package com.mycompany.hotelmanagersystem.manager.dao;
 
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 import com.mycompany.hotelmanagersystem.manager.dto.DailyAuditReportDTO;
 import com.mycompany.hotelmanagersystem.manager.dto.MonthlyRevenueDTO;
@@ -8,13 +10,12 @@ import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
-public class ManagerReportDAO extends DBContext {
+public class ManagerReportDAO extends BaseRepository<MonthlyRevenueDTO, String> {
 
     private static final String SP_DAILY_AUDIT_SQL =
             "{CALL sp_BaoCaoDoanhThuTheoNgay(?)}";
@@ -24,9 +25,30 @@ public class ManagerReportDAO extends DBContext {
     private static final String FN_REVENUE_BY_RANGE_SQL =
             "SELECT dbo.fn_DoanhThuTheoKhoangThoiGian(?, ?) AS TongDoanhThu";
 
+    @Override
+    protected String getTableName() {
+        return "v_BaoCaoDoanhThuTheoThang";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "Nam";
+    }
+
+    @Override
+    protected RowMapper<MonthlyRevenueDTO> getRowMapper() {
+        return rs -> new MonthlyRevenueDTO(
+                rs.getInt("Nam"),
+                rs.getInt("Thang"),
+                rs.getInt("SoLuotGiaoDich"),
+                rs.getInt("SoHoaDonDaThanhToan"),
+                getNonNullBigDecimal(rs, "TongDoanhThuThucThu")
+        );
+    }
+
     public DailyAuditReportDTO getDailyAuditReport(LocalDate reportDate) {
         LocalDate targetDate = (reportDate != null) ? reportDate : LocalDate.now();
-        try (Connection conn = getConnection();
+        try (Connection conn = DBContext.getConnection();
              CallableStatement cs = conn.prepareCall(SP_DAILY_AUDIT_SQL)) {
             cs.setDate(1, Date.valueOf(targetDate));
             try (ResultSet rs = cs.executeQuery()) {
@@ -41,7 +63,20 @@ public class ManagerReportDAO extends DBContext {
                 BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
     }
 
-    private DailyAuditReportDTO mapDailyReport(ResultSet rs, LocalDate date) throws Exception {
+    public List<MonthlyRevenueDTO> getMonthlyRevenueList() {
+        return query(SELECT_MONTHLY_REVENUE_SQL);
+    }
+
+    public BigDecimal getRevenueByRange(LocalDate fromDate, LocalDate toDate) {
+        if (fromDate == null || toDate == null) {
+            return BigDecimal.ZERO;
+        }
+        RowMapper<BigDecimal> mapper = rs -> getNonNullBigDecimal(rs, "TongDoanhThu");
+        return queryOneCustom(FN_REVENUE_BY_RANGE_SQL, mapper, Date.valueOf(fromDate), Date.valueOf(toDate))
+                .orElse(BigDecimal.ZERO);
+    }
+
+    private DailyAuditReportDTO mapDailyReport(ResultSet rs, LocalDate date) throws SQLException {
         int soDonMoi = rs.getInt("TotalNewBookings");
         int checkIn = rs.getInt("TotalRoomsCheckedIn");
         int checkOut = rs.getInt("TotalRoomsCheckedOut");
@@ -53,47 +88,9 @@ public class ManagerReportDAO extends DBContext {
                 tong, tienMat, chuyenKhoan, the);
     }
 
-    public List<MonthlyRevenueDTO> getMonthlyRevenueList() {
-        List<MonthlyRevenueDTO> list = new ArrayList<>();
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_MONTHLY_REVENUE_SQL);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(new MonthlyRevenueDTO(
-                        rs.getInt("Nam"),
-                        rs.getInt("Thang"),
-                        rs.getInt("SoLuotGiaoDich"),
-                        rs.getInt("SoHoaDonDaThanhToan"),
-                        getNonNullBigDecimal(rs, "TongDoanhThuThucThu")
-                ));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public BigDecimal getRevenueByRange(LocalDate fromDate, LocalDate toDate) {
-        if (fromDate == null || toDate == null) {
-            return BigDecimal.ZERO;
-        }
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(FN_REVENUE_BY_RANGE_SQL)) {
-            ps.setDate(1, Date.valueOf(fromDate));
-            ps.setDate(2, Date.valueOf(toDate));
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return getNonNullBigDecimal(rs, "TongDoanhThu");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return BigDecimal.ZERO;
-    }
-
-    private BigDecimal getNonNullBigDecimal(ResultSet rs, String col) throws Exception {
+    private BigDecimal getNonNullBigDecimal(ResultSet rs, String col) throws SQLException {
         BigDecimal val = rs.getBigDecimal(col);
         return (val != null) ? val : BigDecimal.ZERO;
     }
 }
+

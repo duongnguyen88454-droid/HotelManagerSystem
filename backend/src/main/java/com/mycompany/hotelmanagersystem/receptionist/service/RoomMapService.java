@@ -1,5 +1,7 @@
 package com.mycompany.hotelmanagersystem.receptionist.service;
 
+import com.mycompany.hotelmanagersystem.room.dto.TimelineCellDTO;
+import com.mycompany.hotelmanagersystem.room.dto.TimelineDayDTO;
 import com.mycompany.hotelmanagersystem.booking.service.CheckInService;
 import com.mycompany.hotelmanagersystem.room.dto.BookingBarDTO;
 import com.mycompany.hotelmanagersystem.room.dto.RoomTimelineDTO;
@@ -55,5 +57,68 @@ public class RoomMapService {
         }
 
         return rooms;
+    }
+
+    /**
+     * Dựng cấu trúc ô (TimelineCellDTO) cho từng ngày trong tuần của từng phòng.
+     */
+    public List<RoomTimelineDTO> buildTimelineGrid(LocalDate startDate, LocalDate endDate,
+            List<TimelineDayDTO> days) {
+        List<RoomTimelineDTO> rooms = getTimelineWithBookingBars(startDate, endDate);
+        for (RoomTimelineDTO r : rooms) {
+            List<TimelineCellDTO> cells = new ArrayList<>();
+            int skipUntilCol = 0;
+            for (TimelineDayDTO day : days) {
+                int col = day.getDayIndex();
+                TimelineCellDTO cell = new TimelineCellDTO(col, day.getDateStr(), day.getNextDateStr(),
+                        day.getDisplayShort(), day.isToday());
+
+                BookingBarDTO startingBar = findStartingBar(r.getBookingBars(), col);
+                if (startingBar != null) {
+                    cell.setBarStart(true);
+                    cell.setEmpty(false);
+                    cell.setBookingBar(startingBar);
+                    skipUntilCol = col + startingBar.getColSpan() - 1;
+                } else if (col <= skipUntilCol) {
+                    cell.setBarCovered(true);
+                    cell.setEmpty(false);
+                } else {
+                    cell.setEmpty(true);
+                }
+                cells.add(cell);
+            }
+            r.setCells(cells);
+        }
+        return rooms;
+    }
+
+    private BookingBarDTO findStartingBar(List<BookingBarDTO> bars, int col) {
+        if (bars == null) {
+            return null;
+        }
+        for (BookingBarDTO bar : bars) {
+            if (bar.getStartCol() == col) {
+                return bar;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Tính tổng số lượng phòng trống theo từng ngày của mỗi tầng.
+     */
+    public Map<Integer, int[]> computeFloorAvailableCounts(List<RoomTimelineDTO> rooms) {
+        Map<Integer, int[]> map = new HashMap<>();
+        for (RoomTimelineDTO r : rooms) {
+            int floor = r.getSoTang();
+            int[] counts = map.computeIfAbsent(floor, k -> new int[7]);
+            List<TimelineCellDTO> cells = r.getCells();
+            for (int i = 0; i < cells.size() && i < 7; i++) {
+                if (cells.get(i).isEmpty()) {
+                    counts[i]++;
+                }
+            }
+        }
+        return map;
     }
 }

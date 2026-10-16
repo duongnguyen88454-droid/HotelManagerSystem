@@ -1,7 +1,9 @@
 package com.mycompany.hotelmanagersystem.manager.service;
 
 import com.mycompany.hotelmanagersystem.manager.dao.ManagerEmployeeDAO;
+import com.mycompany.hotelmanagersystem.manager.dto.CreateEmployeeDTO;
 import com.mycompany.hotelmanagersystem.manager.dto.EmployeeItemDTO;
+import com.mycompany.hotelmanagersystem.manager.dto.UpdateEmployeeAccountDTO;
 
 import java.util.List;
 
@@ -36,5 +38,36 @@ public class ManagerEmployeeService {
             return false;
         }
         return employeeDAO.updateEmployeeContact(employeeId.trim(), fullName, phone, email);
+    }
+
+    public boolean createEmployee(CreateEmployeeDTO dto) {
+        if (dto == null || isBlank(dto.getFullName()) || isBlank(dto.getPhone())
+                || isBlank(dto.getEmail()) || isBlank(dto.getUserName()) || isBlank(dto.getPassword())) {
+            return false;
+        }
+        String role = dto.getRole();
+        if (!"Receptionist".equalsIgnoreCase(role) && !"Housekeeper".equalsIgnoreCase(role)) {
+            return false;
+        }
+        return employeeDAO.createEmployeeWithAccount(dto);
+    }
+
+    public boolean updateEmployeeAccount(UpdateEmployeeAccountDTO dto) {
+        if (dto == null || isBlank(dto.getEmployeeId()) || isBlank(dto.getUserName())) {
+            return false;
+        }
+        String role = dto.getRole();
+        if (!"Receptionist".equalsIgnoreCase(role) && !"Housekeeper".equalsIgnoreCase(role)) {
+            return false;
+        }
+        String status = dto.getAccountStatus();
+        if (!"Active".equalsIgnoreCase(status) && !"Locked".equalsIgnoreCase(status)) {
+            return false;
+        }
+        return employeeDAO.updateEmployeeAccount(dto);
+    }
+
+    private boolean isBlank(String str) {
+        return str == null || str.trim().isEmpty();
     }
 }

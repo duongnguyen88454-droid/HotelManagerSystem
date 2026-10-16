@@ -1,5 +1,6 @@
 package com.mycompany.hotelmanagersystem.manager.controller;
 
+import com.mycompany.hotelmanagersystem.manager.dto.CreateRoomTypeDTO;
 import com.mycompany.hotelmanagersystem.manager.dto.RoomTypePriceDTO;
 import com.mycompany.hotelmanagersystem.manager.service.ManagerHotelConfigService;
 
@@ -10,6 +11,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Controller tiếp nhận và xử lý cấu hình khách sạn: hạng phòng, loại giường, tiện nghi và dịch vụ.
@@ -38,6 +42,8 @@ public class ManagerHotelConfigServlet extends HttpServlet {
 
         if ("update_roomtype".equalsIgnoreCase(action)) {
             handleRoomTypeUpdate(request, session);
+        } else if ("add_roomtype".equalsIgnoreCase(action)) {
+            handleAddRoomType(request, session);
         } else if ("add_bedtype".equalsIgnoreCase(action) || "toggle_bedtype".equalsIgnoreCase(action)) {
             handleBedType(request, session, action);
         } else if ("add_amenity".equalsIgnoreCase(action) || "toggle_amenity".equalsIgnoreCase(action)) {
@@ -63,6 +69,52 @@ public class ManagerHotelConfigServlet extends HttpServlet {
             setFlash(session, success, "Đã cập nhật biểu phí hạng phòng thành công!", "Lỗi cập nhật biểu phí hạng phòng!");
         } catch (NumberFormatException e) {
             session.setAttribute("flashError", "Dữ liệu biểu phí không hợp lệ!");
+        }
+    }
+
+    private void handleAddRoomType(HttpServletRequest request, HttpSession session) {
+        try {
+            CreateRoomTypeDTO dto = new CreateRoomTypeDTO(
+                    null,
+                    request.getParameter("roomTypeName"),
+                    Integer.parseInt(request.getParameter("capacity")),
+                    Double.parseDouble(request.getParameter("basePrice")),
+                    Double.parseDouble(request.getParameter("earlyFee")),
+                    Double.parseDouble(request.getParameter("lateFee")),
+                    Double.parseDouble(request.getParameter("depositPercent"))
+            );
+
+            String[] selectedBedTypes = request.getParameterValues("selectedBedTypes");
+            if (selectedBedTypes != null) {
+                Map<String, Integer> bedMap = new HashMap<>();
+                for (String bedId : selectedBedTypes) {
+                    int qty = parsePositiveInt(request.getParameter("bedQty_" + bedId), 1);
+                    bedMap.put(bedId, qty);
+                }
+                dto.setBedTypes(bedMap);
+            }
+
+            String[] selectedAmenities = request.getParameterValues("selectedAmenities");
+            if (selectedAmenities != null) {
+                dto.setAmenityIds(Arrays.asList(selectedAmenities));
+            }
+
+            boolean success = configService.addRoomType(dto);
+            setFlash(session, success, "Đã thêm loại phòng mới thành công!",
+                    "Không thể thêm loại phòng (có thể trùng tên loại phòng)!");
+        } catch (NumberFormatException e) {
+            session.setAttribute("flashError", "Dữ liệu nhập loại phòng không hợp lệ!");
+        }
+    }
+
+    private int parsePositiveInt(String value, int defaultValue) {
+        if (value == null || value.trim().isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            return Math.max(1, Integer.parseInt(value.trim()));
+        } catch (NumberFormatException e) {
+            return defaultValue;
         }
     }
 

@@ -1,5 +1,7 @@
 package com.mycompany.hotelmanagersystem.cashier.dao;
 
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -8,7 +10,22 @@ import java.sql.SQLException;
 /**
  * DAO phụ trách thực thi thủ tục Check-out trả phòng (sp_CheckOut).
  */
-public class CheckOutDAO {
+public class CheckOutDAO extends BaseRepository<Object, String> {
+
+    @Override
+    protected String getTableName() {
+        return "Booking_Room";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "BookingId";
+    }
+
+    @Override
+    protected RowMapper<Object> getRowMapper() {
+        return rs -> null;
+    }
 
     /**
      * Check-out toàn bộ các phòng còn lại trong đơn đặt phòng.

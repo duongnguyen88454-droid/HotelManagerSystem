@@ -3,11 +3,10 @@ package com.mycompany.hotelmanagersystem.booking.dao;
 import com.mycompany.hotelmanagersystem.booking.dto.CheckInArrivalItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CheckInDetailDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CheckInRoomDetailDTO;
-import com.mycompany.hotelmanagersystem.common.config.DBContext;
+import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
+import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 
-import java.sql.Connection;
 import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -19,52 +18,54 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * DAO chuyên trách các truy vấn đọc dữ liệu phục vụ Quầy Tiếp Đón Check-in (QT
- * 2.1).
+ * DAO chuyên trách các truy vấn đọc dữ liệu phục vụ Quầy Tiếp Đón Check-in (QT 2.1).
  */
-public class BookingCheckInQueryDAO {
+public class BookingCheckInQueryDAO extends BaseRepository<CheckInArrivalItemDTO, String> {
+
+    @Override
+    protected String getTableName() {
+        return "Booking";
+    }
+
+    @Override
+    protected String getPrimaryKeyColumnName() {
+        return "BookingId";
+    }
+
+    @Override
+    protected RowMapper<CheckInArrivalItemDTO> getRowMapper() {
+        return this::mapRowToArrivalDTO;
+    }
 
     /**
      * Lấy danh sách các đơn đặt phòng chờ tiếp nhận tại quầy.
      */
     public List<CheckInArrivalItemDTO> getArrivalBookings(String hoTen, String cccd, String maBK, String keyword) {
-        List<CheckInArrivalItemDTO> list = new ArrayList<>();
         boolean hasHoTen = hoTen != null && !hoTen.trim().isEmpty();
         boolean hasCccd = cccd != null && !cccd.trim().isEmpty();
         boolean hasMaBK = maBK != null && !maBK.trim().isEmpty();
         boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
         String sql = buildArrivalQuerySql(hasHoTen, hasCccd, hasMaBK, hasKeyword);
 
-        try (Connection conn = DBContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            int idx = 1;
-            if (hasKeyword) {
-                String kwParam = "%" + keyword.trim() + "%";
-                ps.setString(idx++, kwParam);
-                ps.setString(idx++, kwParam);
-                ps.setString(idx++, kwParam);
-                ps.setString(idx++, kwParam);
-            }
-            if (hasHoTen) {
-                ps.setString(idx++, "%" + hoTen.trim() + "%");
-            }
-            if (hasCccd) {
-                ps.setString(idx++, cccd.trim());
-            }
-            if (hasMaBK) {
-                ps.setString(idx++, "%" + maBK.trim() + "%");
-            }
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRowToArrivalDTO(rs));
-                }
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+        List<Object> params = new ArrayList<>();
+        if (hasKeyword) {
+            String kwParam = "%" + keyword.trim() + "%";
+            params.add(kwParam);
+            params.add(kwParam);
+            params.add(kwParam);
+            params.add(kwParam);
         }
-        return list;
+        if (hasHoTen) {
+            params.add("%" + hoTen.trim() + "%");
+        }
+        if (hasCccd) {
+            params.add(cccd.trim());
+        }
+        if (hasMaBK) {
+            params.add("%" + maBK.trim() + "%");
+        }
+
+        return query(sql, params.toArray());
     }
 
     private String buildArrivalQuerySql(boolean hasHoTen, boolean hasCccd, boolean hasMaBK, boolean hasKeyword) {
@@ -112,37 +113,31 @@ public class BookingCheckInQueryDAO {
     }
 
     /**
-     * Lấy thông tin chi tiết một đơn đặt phòng kèm các phòng và dịch vụ đã đặt
-     * trước.
+     * Lấy thông tin chi tiết một đơn đặt phòng kèm các phòng và dịch vụ đã đặt trước.
      */
     public CheckInDetailDTO getBookingCheckInDetail(String maBooking) {
         if (maBooking == null || maBooking.trim().isEmpty()) {
             return null;
         }
 
-        try (Connection conn = DBContext.getConnection()) {
-            CheckInDetailDTO dto = fetchBookingHeader(conn, maBooking.trim());
-            if (dto == null) {
-                return null;
-            }
-            List<CheckInRoomDetailDTO> rooms = fetchRoomsForBooking(conn, maBooking.trim());
-            Map<String, List<String>> servicesMap = fetchServicesByRoom(conn, maBooking.trim());
-
-            for (CheckInRoomDetailDTO r : rooms) {
-                List<String> svcs = servicesMap.get(r.getMaPhong());
-                if (svcs != null && !svcs.isEmpty()) {
-                    r.setDanhSachDichVu(svcs);
-                }
-            }
-            dto.setDanhSachPhong(rooms);
-            return dto;
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+        CheckInDetailDTO dto = fetchBookingHeader(maBooking.trim());
+        if (dto == null) {
             return null;
         }
+        List<CheckInRoomDetailDTO> rooms = fetchRoomsForBooking(maBooking.trim());
+        Map<String, List<String>> servicesMap = fetchServicesByRoom(maBooking.trim());
+
+        for (CheckInRoomDetailDTO r : rooms) {
+            List<String> svcs = servicesMap.get(r.getMaPhong());
+            if (svcs != null && !svcs.isEmpty()) {
+                r.setDanhSachDichVu(svcs);
+            }
+        }
+        dto.setDanhSachPhong(rooms);
+        return dto;
     }
 
-    private CheckInDetailDTO fetchBookingHeader(Connection conn, String maBooking) throws SQLException {
+    private CheckInDetailDTO fetchBookingHeader(String maBooking) {
         String sql = "SELECT b.BookingId AS MaBooking, c.FullName AS HoTen, c.PhoneNumber AS SoDT, c.CCCD, c.Email, "
                 + "       MIN(br.ExpectedCheckInDate) AS NgayNhan, MAX(br.ExpectedCheckOutDate) AS NgayTra "
                 + "FROM Booking b "
@@ -151,30 +146,23 @@ public class BookingCheckInQueryDAO {
                 + "WHERE b.BookingId = ? "
                 + "GROUP BY b.BookingId, c.FullName, c.PhoneNumber, c.CCCD, c.Email";
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, maBooking);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    Date inSql = rs.getDate("NgayNhan");
-                    Date outSql = rs.getDate("NgayTra");
-                    return new CheckInDetailDTO(
-                            rs.getString("MaBooking"),
-                            rs.getString("HoTen"),
-                            rs.getString("SoDT"),
-                            rs.getString("CCCD"),
-                            rs.getString("Email"),
-                            inSql != null ? inSql.toLocalDate() : null,
-                            outSql != null ? outSql.toLocalDate() : null);
-                }
-            }
-        }
-        return null;
+        return queryOneCustom(sql, rs -> {
+            Date inSql = rs.getDate("NgayNhan");
+            Date outSql = rs.getDate("NgayTra");
+            return new CheckInDetailDTO(
+                    rs.getString("MaBooking"),
+                    rs.getString("HoTen"),
+                    rs.getString("SoDT"),
+                    rs.getString("CCCD"),
+                    rs.getString("Email"),
+                    inSql != null ? inSql.toLocalDate() : null,
+                    outSql != null ? outSql.toLocalDate() : null);
+        }, maBooking).orElse(null);
     }
 
-    private List<CheckInRoomDetailDTO> fetchRoomsForBooking(Connection conn, String maBooking)
-            throws SQLException {
-        List<CheckInRoomDetailDTO> rooms = new ArrayList<>();
-        String sql = "SELECT br.RoomId AS MaPhong, r.RoomName AS SoPhong, rt.RoomTypeName AS TenLoaiPhong, "
+    private List<CheckInRoomDetailDTO> fetchRoomsForBooking(String maBooking) {
+        String sql = "SELECT br.RoomId AS MaPhong, r.RoomName AS SoPhong, rt.RoomTypeId AS MaLoaiPhong, "
+                + "       rt.RoomTypeName AS TenLoaiPhong, "
                 + "       r.HousekeepingStatus AS TrangThaiBuong, br.ActualCheckInDate AS NgayCheckInThucTe "
                 + "FROM Booking_Room br "
                 + "INNER JOIN Room r ON br.RoomId = r.RoomId "
@@ -184,26 +172,19 @@ public class BookingCheckInQueryDAO {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, maBooking);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Timestamp ts = rs.getTimestamp("NgayCheckInThucTe");
-                    String actualInStr = (ts != null) ? sdf.format(ts) : null;
-                    rooms.add(new CheckInRoomDetailDTO(
-                            rs.getString("MaPhong"),
-                            rs.getString("SoPhong"),
-                            rs.getString("TenLoaiPhong"),
-                            rs.getString("TrangThaiBuong"),
-                            actualInStr));
-                }
-            }
-        }
-        return rooms;
+        return queryCustom(sql, rs -> {
+            Timestamp ts = rs.getTimestamp("NgayCheckInThucTe");
+            String actualInStr = (ts != null) ? sdf.format(ts) : null;
+            return new CheckInRoomDetailDTO(
+                    rs.getString("MaPhong"),
+                    rs.getString("SoPhong"),
+                    rs.getString("TenLoaiPhong"),
+                    rs.getString("TrangThaiBuong"),
+                    actualInStr);
+        }, maBooking);
     }
 
-    private Map<String, List<String>> fetchServicesByRoom(Connection conn, String maBooking)
-            throws SQLException {
+    private Map<String, List<String>> fetchServicesByRoom(String maBooking) {
         Map<String, List<String>> map = new HashMap<>();
         String sql = "SELECT brs.RoomId AS MaPhong, s.ServiceName AS TenDichVu, brs.Quantity AS SoLuong "
                 + "FROM Booking_Room_Service brs "
@@ -211,16 +192,13 @@ public class BookingCheckInQueryDAO {
                 + "WHERE brs.BookingId = ? "
                 + "ORDER BY brs.RoomId ASC, s.ServiceName ASC";
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, maBooking);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    String maPhong = rs.getString("MaPhong");
-                    String text = "- " + rs.getString("TenDichVu") + " (x" + rs.getInt("SoLuong") + ")";
-                    map.computeIfAbsent(maPhong, k -> new ArrayList<>()).add(text);
-                }
-            }
-        }
+        queryCustom(sql, rs -> {
+            String maPhong = rs.getString("MaPhong");
+            String text = "- " + rs.getString("TenDichVu") + " (x" + rs.getInt("SoLuong") + ")";
+            map.computeIfAbsent(maPhong, k -> new ArrayList<>()).add(text);
+            return null;
+        }, maBooking);
+
         return map;
     }
 }

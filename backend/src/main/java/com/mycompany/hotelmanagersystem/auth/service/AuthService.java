@@ -51,7 +51,7 @@ public class AuthService {
             case "CUSTOMER":
                 return contextPath + "/customer/home";
             case "RECEPTIONIST":
-                return contextPath + "/receptionist/room-map";
+                return contextPath + "/receptionist/timeline";
             case "HOUSEKEEPER":
                 return contextPath + "/housekeeper/tasks";
             case "MANAGER":

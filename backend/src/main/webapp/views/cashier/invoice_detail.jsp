@@ -1,20 +1,28 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-            <jsp:include page="/views/common/header.jsp" />
-            <jsp:include page="/views/common/navbar.jsp" />
+<jsp:include page="/views/common/header.jsp">
+    <jsp:param name="title" value="Hóa Đơn Quyết Toán - ${invoice.maHoaDon}" />
+</jsp:include>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/portal_layout.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/cashier/invoice_detail.css">
 
-            <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/cashier/invoice_detail.css">
+<div class="portal-wrapper">
+    <!-- Thanh chức năng bên trái (Sidebar) -->
+    <jsp:include page="/views/common/portal_sidebar.jsp">
+        <jsp:param name="activeMenu" value="cashier" />
+    </jsp:include>
 
-            <div class="invoice-page-container">
-                <div class="nav-breadcrumbs">
-                    <a href="${pageContext.request.contextPath}/cashier/dashboard">Thu Ngân</a>
-                    <span>&gt;</span>
-                    <a href="${pageContext.request.contextPath}/cashier/booking-detail?maBooking=${invoice.maBooking}">Đơn
-                        ${invoice.maBooking}</a>
-                    <span>&gt;</span>
-                    <strong>Hóa Đơn ${invoice.maHoaDon}</strong>
-                </div>
+    <!-- Màn hình bên phải -->
+    <main class="portal-main">
+        <div class="invoice-page-container">
+            <div class="nav-breadcrumbs">
+                <a href="${pageContext.request.contextPath}/cashier/dashboard">Quầy Thu Ngân</a>
+                <span>&gt;</span>
+                <a href="${pageContext.request.contextPath}/cashier/booking-detail?maBooking=${invoice.maBooking}">Đơn ${invoice.maBooking}</a>
+                <span>&gt;</span>
+                <strong>Hóa Đơn ${invoice.maHoaDon}</strong>
+            </div>
 
                 <c:if test="${paymentSuccess}">
                     <div class="alert-success">
@@ -325,5 +333,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </main>
+</div>
 
-            <jsp:include page="/views/common/footer.jsp" />
+<jsp:include page="/views/common/footer.jsp" />

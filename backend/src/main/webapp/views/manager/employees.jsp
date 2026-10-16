@@ -46,6 +46,9 @@
                 <h3 class="portal-card-title">
                     Danh Sách Hồ Sơ Nhân Viên Toàn Khách Sạn (${not empty employees ? employees.size() : 0} nhân sự)
                 </h3>
+                <button type="button" class="portal-btn portal-btn-primary" onclick="openCreateEmployeeModal()">
+                    + Thêm Nhân Viên Mới
+                </button>
             </div>
 
             <div class="portal-table-wrapper" style="border: none; border-radius: 0;">
@@ -110,30 +113,36 @@
                                             </c:choose>
                                         </td>
                                         <td style="text-align: center;">
-                                            <c:choose>
-                                                <c:when test="${emp.employeeStatus == 'Working'}">
-                                                    <form action="${pageContext.request.contextPath}/manager/employees" method="POST" style="margin: 0; display: inline-block;"
-                                                          onsubmit="return confirmResignation(this);">
-                                                        <input type="hidden" name="action" value="resign" />
-                                                        <input type="hidden" name="employeeId" value="${emp.employeeId}" />
-                                                        <input type="hidden" name="employeeName" value="${emp.fullName}" />
-                                                        <button type="submit" class="portal-btn portal-btn-danger" style="padding: 6px 12px; font-size: 12px;">
-                                                            Nghỉ Việc
-                                                        </button>
-                                                    </form>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <form action="${pageContext.request.contextPath}/manager/employees" method="POST" style="margin: 0; display: inline-block;"
-                                                          onsubmit="return confirmReinstate(this);">
-                                                        <input type="hidden" name="action" value="reinstate" />
-                                                        <input type="hidden" name="employeeId" value="${emp.employeeId}" />
-                                                        <input type="hidden" name="employeeName" value="${emp.fullName}" />
-                                                        <button type="submit" class="portal-btn portal-btn-primary" style="padding: 6px 12px; font-size: 12px;">
-                                                            Kích Hoạt Lại
-                                                        </button>
-                                                    </form>
-                                                </c:otherwise>
-                                            </c:choose>
+                                            <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
+                                                <button type="button" class="portal-btn portal-btn-secondary" style="padding: 6px 12px; font-size: 12px;"
+                                                        onclick="openEditAccountModal('${emp.employeeId}', '${emp.fullName}', '${emp.userName}', '${emp.role}', '${emp.accountStatus}')">
+                                                    ⚙ Đổi Tài Khoản
+                                                </button>
+                                                <c:choose>
+                                                    <c:when test="${emp.employeeStatus == 'Working'}">
+                                                        <form action="${pageContext.request.contextPath}/manager/employees" method="POST" style="margin: 0; display: inline-block;"
+                                                              onsubmit="return confirmResignation(this);">
+                                                            <input type="hidden" name="action" value="resign" />
+                                                            <input type="hidden" name="employeeId" value="${emp.employeeId}" />
+                                                            <input type="hidden" name="employeeName" value="${emp.fullName}" />
+                                                            <button type="submit" class="portal-btn portal-btn-danger" style="padding: 6px 12px; font-size: 12px;">
+                                                                Nghỉ Việc
+                                                            </button>
+                                                        </form>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <form action="${pageContext.request.contextPath}/manager/employees" method="POST" style="margin: 0; display: inline-block;"
+                                                              onsubmit="return confirmReinstate(this);">
+                                                            <input type="hidden" name="action" value="reinstate" />
+                                                            <input type="hidden" name="employeeId" value="${emp.employeeId}" />
+                                                            <input type="hidden" name="employeeName" value="${emp.fullName}" />
+                                                            <button type="submit" class="portal-btn portal-btn-primary" style="padding: 6px 12px; font-size: 12px;">
+                                                                Kích Hoạt Lại
+                                                            </button>
+                                                        </form>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -151,7 +160,133 @@
     </main>
 </div>
 
+<!-- Modal 1: Thêm Nhân Viên Mới -->
+<div id="createEmployeeModal" class="portal-modal-backdrop" style="display: none; align-items: center; justify-content: center;">
+    <div class="portal-modal-card" style="max-width: 520px;">
+        <div style="background: #f8fafc; padding: 16px 20px; border-bottom: 1px solid var(--portal-border); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--portal-text-primary);">Thêm Hồ Sơ Nhân Viên Mới</h3>
+            <button type="button" onclick="closeModal('createEmployeeModal')" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--portal-text-muted); font-weight: 700;">&times;</button>
+        </div>
+        <form action="${pageContext.request.contextPath}/manager/employees" method="POST" style="margin: 0; padding: 24px;">
+            <input type="hidden" name="action" value="create" />
+
+            <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--portal-text-primary);">Họ Và Tên <span style="color: #ef4444;">*</span></label>
+                <input type="text" name="fullName" required class="portal-input" placeholder="Ví dụ: Nguyễn Văn An" style="width: 100%; box-sizing: border-box;" />
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                <div>
+                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--portal-text-primary);">Số Điện Thoại <span style="color: #ef4444;">*</span></label>
+                    <input type="text" name="phone" required class="portal-input" placeholder="0901234567" style="width: 100%; box-sizing: border-box;" />
+                </div>
+                <div>
+                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--portal-text-primary);">Email <span style="color: #ef4444;">*</span></label>
+                    <input type="email" name="email" required class="portal-input" placeholder="an.nv@hotel.com" style="width: 100%; box-sizing: border-box;" />
+                </div>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--portal-text-primary);">Vị Trí / Vai Trò <span style="color: #ef4444;">*</span></label>
+                <select name="role" required class="portal-input" style="width: 100%; box-sizing: border-box;">
+                    <option value="Receptionist">Lễ Tân (Receptionist)</option>
+                    <option value="Housekeeper">Buồng Phòng (Housekeeper)</option>
+                </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
+                <div>
+                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--portal-text-primary);">Tên Đăng Nhập <span style="color: #ef4444;">*</span></label>
+                    <input type="text" name="userName" required class="portal-input" placeholder="letan2" style="width: 100%; box-sizing: border-box;" />
+                </div>
+                <div>
+                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--portal-text-primary);">Mật Khẩu Khởi Tạo <span style="color: #ef4444;">*</span></label>
+                    <input type="password" name="password" required class="portal-input" placeholder="••••••••" style="width: 100%; box-sizing: border-box;" />
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--portal-border); padding-top: 16px;">
+                <button type="button" onclick="closeModal('createEmployeeModal')" class="portal-btn portal-btn-secondary">Hủy Bỏ</button>
+                <button type="submit" class="portal-btn portal-btn-primary">Lưu Nhân Viên Mới</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal 2: Cập Nhật Tài Khoản Nhân Viên -->
+<div id="editAccountModal" class="portal-modal-backdrop" style="display: none; align-items: center; justify-content: center;">
+    <div class="portal-modal-card" style="max-width: 480px;">
+        <div style="background: #f8fafc; padding: 16px 20px; border-bottom: 1px solid var(--portal-border); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--portal-text-primary);">Thay Đổi Tài Khoản Nhân Viên</h3>
+            <button type="button" onclick="closeModal('editAccountModal')" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--portal-text-muted); font-weight: 700;">&times;</button>
+        </div>
+        <form action="${pageContext.request.contextPath}/manager/employees" method="POST" style="margin: 0; padding: 24px;">
+            <input type="hidden" name="action" value="update_account" />
+            <input type="hidden" id="editEmployeeId" name="employeeId" value="" />
+
+            <div style="background: #f1f5f9; border-radius: 6px; padding: 12px 16px; margin-bottom: 16px;">
+                <div style="font-size: 12px; color: var(--portal-text-muted);">Nhân viên được điều chỉnh:</div>
+                <div style="font-weight: 700; font-size: 15px; color: var(--portal-text-primary);" id="editEmployeeName">--</div>
+                <div style="font-size: 12px; color: var(--portal-text-secondary); margin-top: 2px;" id="editEmployeeIdLabel">Mã NV: --</div>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--portal-text-primary);">Tên Đăng Nhập <span style="color: #ef4444;">*</span></label>
+                <input type="text" id="editUserName" name="userName" required class="portal-input" style="width: 100%; box-sizing: border-box;" />
+            </div>
+
+            <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--portal-text-primary);">
+                    Mật Khẩu Mới
+                    <span style="font-size: 12px; font-weight: 400; color: var(--portal-text-muted);">(Để trống nếu giữ nguyên)</span>
+                </label>
+                <input type="password" name="newPassword" class="portal-input" placeholder="Nhập mật khẩu mới nếu muốn đổi" style="width: 100%; box-sizing: border-box;" />
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
+                <div>
+                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--portal-text-primary);">Vai Trò / Phân Quyền</label>
+                    <select id="editRole" name="role" required class="portal-input" style="width: 100%; box-sizing: border-box;">
+                        <option value="Receptionist">Lễ Tân (Receptionist)</option>
+                        <option value="Housekeeper">Buồng Phòng (Housekeeper)</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--portal-text-primary);">Trạng Thái Tài Khoản</label>
+                    <select id="editAccountStatus" name="accountStatus" required class="portal-input" style="width: 100%; box-sizing: border-box;">
+                        <option value="Active">Đang Mở (Active)</option>
+                        <option value="Locked">Đã Khóa (Locked)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--portal-border); padding-top: 16px;">
+                <button type="button" onclick="closeModal('editAccountModal')" class="portal-btn portal-btn-secondary">Hủy Bỏ</button>
+                <button type="submit" class="portal-btn portal-btn-primary">Lưu Thay Đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
+function openCreateEmployeeModal() {
+    document.getElementById('createEmployeeModal').style.display = 'flex';
+}
+function openEditAccountModal(empId, fullName, userName, role, accStatus) {
+    document.getElementById('editEmployeeId').value = empId;
+    document.getElementById('editEmployeeName').innerText = fullName;
+    document.getElementById('editEmployeeIdLabel').innerText = 'Mã NV: ' + empId;
+    document.getElementById('editUserName').value = userName;
+    document.getElementById('editRole').value = role;
+    document.getElementById('editAccountStatus').value = accStatus;
+    document.getElementById('editAccountModal').style.display = 'flex';
+}
+function closeModal(modalId) {
+    var modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
 function confirmResignation(formEl) {
     var name = formEl.elements["employeeName"].value;
     return confirm("Xác nhận cho nhân viên [" + name + "] nghỉ việc? Trạng thái sẽ chuyển sang Resigned và tài khoản đăng nhập sẽ tự động bị khóa.");

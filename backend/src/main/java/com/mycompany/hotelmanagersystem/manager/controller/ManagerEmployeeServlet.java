@@ -1,6 +1,8 @@
 package com.mycompany.hotelmanagersystem.manager.controller;
 
+import com.mycompany.hotelmanagersystem.manager.dto.CreateEmployeeDTO;
 import com.mycompany.hotelmanagersystem.manager.dto.EmployeeItemDTO;
+import com.mycompany.hotelmanagersystem.manager.dto.UpdateEmployeeAccountDTO;
 import com.mycompany.hotelmanagersystem.manager.service.ManagerEmployeeService;
 
 import jakarta.servlet.ServletException;
@@ -33,26 +35,71 @@ public class ManagerEmployeeServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
-        String employeeId = request.getParameter("employeeId");
         HttpSession session = request.getSession();
 
         if ("resign".equalsIgnoreCase(action)) {
-            boolean success = employeeService.updateEmployeeResignation(employeeId, true);
-            setFlashMessage(session, success, "Đã cập nhật trạng thái nghỉ việc và khóa tài khoản thành công!",
-                    "Không thể cập nhật trạng thái nghỉ việc!");
+            handleResign(request, session);
         } else if ("reinstate".equalsIgnoreCase(action)) {
-            boolean success = employeeService.updateEmployeeResignation(employeeId, false);
-            setFlashMessage(session, success, "Đã kích hoạt lại nhân viên và mở khóa tài khoản thành công!",
-                    "Không thể kích hoạt lại nhân viên!");
+            handleReinstate(request, session);
         } else if ("update_contact".equalsIgnoreCase(action)) {
-            String fullName = request.getParameter("fullName");
-            String phone = request.getParameter("phone");
-            String email = request.getParameter("email");
-            boolean success = employeeService.updateEmployeeContact(employeeId, fullName, phone, email);
-            setFlashMessage(session, success, "Đã cập nhật thông tin liên hệ nhân viên thành công!",
-                    "Không thể cập nhật thông tin nhân viên!");
+            handleUpdateContact(request, session);
+        } else if ("create".equalsIgnoreCase(action)) {
+            handleCreate(request, session);
+        } else if ("update_account".equalsIgnoreCase(action)) {
+            handleUpdateAccount(request, session);
         }
         response.sendRedirect(request.getContextPath() + "/manager/employees");
+    }
+
+    private void handleResign(HttpServletRequest request, HttpSession session) {
+        String employeeId = request.getParameter("employeeId");
+        boolean success = employeeService.updateEmployeeResignation(employeeId, true);
+        setFlashMessage(session, success, "Đã cập nhật trạng thái nghỉ việc và khóa tài khoản thành công!",
+                "Không thể cập nhật trạng thái nghỉ việc!");
+    }
+
+    private void handleReinstate(HttpServletRequest request, HttpSession session) {
+        String employeeId = request.getParameter("employeeId");
+        boolean success = employeeService.updateEmployeeResignation(employeeId, false);
+        setFlashMessage(session, success, "Đã kích hoạt lại nhân viên và mở khóa tài khoản thành công!",
+                "Không thể kích hoạt lại nhân viên!");
+    }
+
+    private void handleUpdateContact(HttpServletRequest request, HttpSession session) {
+        String employeeId = request.getParameter("employeeId");
+        String fullName = request.getParameter("fullName");
+        String phone = request.getParameter("phone");
+        String email = request.getParameter("email");
+        boolean success = employeeService.updateEmployeeContact(employeeId, fullName, phone, email);
+        setFlashMessage(session, success, "Đã cập nhật thông tin liên hệ nhân viên thành công!",
+                "Không thể cập nhật thông tin nhân viên!");
+    }
+
+    private void handleCreate(HttpServletRequest request, HttpSession session) {
+        CreateEmployeeDTO dto = new CreateEmployeeDTO(
+                request.getParameter("fullName"),
+                request.getParameter("phone"),
+                request.getParameter("email"),
+                request.getParameter("role"),
+                request.getParameter("userName"),
+                request.getParameter("password")
+        );
+        boolean success = employeeService.createEmployee(dto);
+        setFlashMessage(session, success, "Thêm nhân viên mới thành công!",
+                "Không thể thêm nhân viên mới (Số ĐT, Email hoặc Tên đăng nhập có thể đã tồn tại)!");
+    }
+
+    private void handleUpdateAccount(HttpServletRequest request, HttpSession session) {
+        UpdateEmployeeAccountDTO dto = new UpdateEmployeeAccountDTO(
+                request.getParameter("employeeId"),
+                request.getParameter("userName"),
+                request.getParameter("newPassword"),
+                request.getParameter("role"),
+                request.getParameter("accountStatus")
+        );
+        boolean success = employeeService.updateEmployeeAccount(dto);
+        setFlashMessage(session, success, "Đã cập nhật thông tin tài khoản nhân viên thành công!",
+                "Không thể cập nhật tài khoản (Tên đăng nhập có thể đã tồn tại hoặc dữ liệu không hợp lệ)!");
     }
 
     private void setFlashMessage(HttpSession session, boolean success, String successMsg, String errorMsg) {
