@@ -17,46 +17,24 @@ import java.util.List;
  */
 public class HousekeeperTaskDAO extends BaseRepository<HousekeeperTaskDTO, String> {
 
-    private static final String SELECT_TASKS_SQL = "SELECT rct.RoomCleaningTaskId AS MaNhiemVu, r.RoomId AS MaPhong, r.RoomName AS SoPhong, "
-            + "rt.RoomTypeName AS TenLoaiPhong, r.HousekeepingStatus AS TrangThaiPhong, "
-            + "rct.RoomCleaningTaskStatus AS TrangThaiNhiemVu, "
-            + "ISNULL(rct.ReceivedBy, '') AS MaNhanVienDon, "
-            + "ISNULL(emp.FullName, acc.UserName) AS TenNhanVienDon, "
-            + "rct.StartTime AS ThoiGianNhan, rct.StartTime AS ThoiGianBatDau, "
-            + "rct.EndTime AS ThoiGianKetThuc, rct.Result AS KetQua "
-            + "FROM RoomCleaningTask rct "
-            + "INNER JOIN Room r ON rct.RoomId = r.RoomId "
-            + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
-            + "LEFT JOIN Account acc ON rct.ReceivedBy = acc.AccountId "
-            + "LEFT JOIN Employee emp ON acc.AccountId = emp.AccountId "
-            + "WHERE (? IS NULL OR rct.RoomCleaningTaskStatus = ?) "
-            + "ORDER BY CASE rct.RoomCleaningTaskStatus "
+    private static final String SELECT_TASKS_SQL = "SELECT * FROM v_HousekeeperTasks "
+            + "WHERE (? IS NULL OR TaskStatus = ?) "
+            + "ORDER BY CASE TaskStatus "
             + "WHEN 'InProgress' THEN 1 "
             + "WHEN 'Pending' THEN 2 "
-            + "ELSE 3 END, rct.RoomCleaningTaskId DESC";
+            + "ELSE 3 END, TaskId DESC";
 
-    private static final String SELECT_BY_ID_SQL = "SELECT rct.RoomCleaningTaskId AS MaNhiemVu, r.RoomId AS MaPhong, r.RoomName AS SoPhong, "
-            + "rt.RoomTypeName AS TenLoaiPhong, r.HousekeepingStatus AS TrangThaiPhong, "
-            + "rct.RoomCleaningTaskStatus AS TrangThaiNhiemVu, "
-            + "ISNULL(rct.ReceivedBy, '') AS MaNhanVienDon, "
-            + "ISNULL(emp.FullName, acc.UserName) AS TenNhanVienDon, "
-            + "rct.StartTime AS ThoiGianNhan, rct.StartTime AS ThoiGianBatDau, "
-            + "rct.EndTime AS ThoiGianKetThuc, rct.Result AS KetQua "
-            + "FROM RoomCleaningTask rct "
-            + "INNER JOIN Room r ON rct.RoomId = r.RoomId "
-            + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
-            + "LEFT JOIN Account acc ON rct.ReceivedBy = acc.AccountId "
-            + "LEFT JOIN Employee emp ON acc.AccountId = emp.AccountId "
-            + "WHERE rct.RoomCleaningTaskId = ?";
+    private static final String SELECT_BY_ID_SQL = "SELECT * FROM v_HousekeeperTasks "
+            + "WHERE TaskId = ?";
 
     @Override
     protected String getTableName() {
-        return "RoomCleaningTask";
+        return "v_HousekeeperTasks";
     }
 
     @Override
     protected String getPrimaryKeyColumnName() {
-        return "RoomCleaningTaskId";
+        return "TaskId";
     }
 
     @Override
@@ -70,13 +48,13 @@ public class HousekeeperTaskDAO extends BaseRepository<HousekeeperTaskDTO, Strin
 
     public List<HousekeeperTaskDTO> getTasks(String statusFilter, String maTK, String maNV) {
         if ("MyActive".equalsIgnoreCase(statusFilter)) {
-            String sql = SELECT_TASKS_SQL.replace("WHERE (? IS NULL OR rct.RoomCleaningTaskStatus = ?)",
-                    "WHERE rct.RoomCleaningTaskStatus = 'InProgress' AND (rct.ReceivedBy = ? OR rct.ReceivedBy = ?)");
+            String sql = SELECT_TASKS_SQL.replace("WHERE (? IS NULL OR TaskStatus = ?)",
+                    "WHERE TaskStatus = 'InProgress' AND (StaffId = ? OR StaffId = ?)");
             return query(sql, maTK, maNV);
         }
         if ("MyHistory".equalsIgnoreCase(statusFilter)) {
-            String sql = SELECT_TASKS_SQL.replace("WHERE (? IS NULL OR rct.RoomCleaningTaskStatus = ?)",
-                    "WHERE rct.RoomCleaningTaskStatus = 'Completed' AND (rct.ReceivedBy = ? OR rct.ReceivedBy = ?)");
+            String sql = SELECT_TASKS_SQL.replace("WHERE (? IS NULL OR TaskStatus = ?)",
+                    "WHERE TaskStatus = 'Completed' AND (StaffId = ? OR StaffId = ?)");
             return query(sql, maTK, maNV);
         }
         String filterVal = resolveFilterValue(statusFilter);
@@ -163,18 +141,18 @@ public class HousekeeperTaskDAO extends BaseRepository<HousekeeperTaskDTO, Strin
 
     private HousekeeperTaskDTO mapTaskRow(ResultSet rs) throws SQLException {
         HousekeeperTaskDTO dto = new HousekeeperTaskDTO();
-        dto.setMaNhiemVu(rs.getString("MaNhiemVu"));
-        dto.setMaPhong(rs.getString("MaPhong"));
-        dto.setSoPhong(rs.getString("SoPhong"));
-        dto.setTenLoaiPhong(rs.getString("TenLoaiPhong"));
-        dto.setTrangThaiPhong(rs.getString("TrangThaiPhong"));
-        dto.setTrangThaiNhiemVu(rs.getString("TrangThaiNhiemVu"));
-        dto.setMaNV(rs.getString("MaNhanVienDon"));
-        dto.setTenNV(rs.getString("TenNhanVienDon"));
-        dto.setThoiGianNhan(rs.getTimestamp("ThoiGianNhan"));
-        dto.setThoiGianBatDau(rs.getTimestamp("ThoiGianBatDau"));
-        dto.setThoiGianKetThuc(rs.getTimestamp("ThoiGianKetThuc"));
-        dto.setKetQua(rs.getString("KetQua"));
+        dto.setMaNhiemVu(rs.getString("TaskId"));
+        dto.setMaPhong(rs.getString("RoomId"));
+        dto.setSoPhong(rs.getString("RoomName"));
+        dto.setTenLoaiPhong(rs.getString("RoomTypeName"));
+        dto.setTrangThaiPhong(rs.getString("RoomStatus"));
+        dto.setTrangThaiNhiemVu(rs.getString("TaskStatus"));
+        dto.setMaNV(rs.getString("StaffId"));
+        dto.setTenNV(rs.getString("StaffName"));
+        dto.setThoiGianNhan(rs.getTimestamp("AssignedTime"));
+        dto.setThoiGianBatDau(rs.getTimestamp("StartTime"));
+        dto.setThoiGianKetThuc(rs.getTimestamp("EndTime"));
+        dto.setKetQua(rs.getString("Result"));
         return dto;
     }
 }

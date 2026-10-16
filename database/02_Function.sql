@@ -211,27 +211,6 @@ BEGIN
 END;
 GO
 
--- ----------------------------------------------------------------------------
--- Function 8: Thống kê tổng doanh thu thực tế đã thu trong khoảng thời gian
--- ----------------------------------------------------------------------------
-CREATE OR ALTER FUNCTION dbo.fn_DoanhThuTheoKhoangThoiGian
-(
-    @FromDate DATETIME,
-    @ToDate DATETIME
-)
-RETURNS DECIMAL(12, 2)
-AS
-BEGIN
-    DECLARE @TongThu DECIMAL(12, 2) = 0;
-
-    SELECT @TongThu = ISNULL(SUM(TotalAmount), 0)
-    FROM Payment
-    WHERE PaymentDate BETWEEN @FromDate AND @ToDate;
-
-    RETURN @TongThu;
-END;
-GO
-
 -- ============================================================================
 -- PHẦN 2: CÁC FUNCTION TRA CỨU BẢNG (INLINE TABLE-VALUED FUNCTIONS)
 -- ============================================================================

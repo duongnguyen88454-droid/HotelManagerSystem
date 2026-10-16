@@ -13,7 +13,12 @@ import java.io.IOException;
 @WebServlet(name = "ManagerPortalServlet", urlPatterns = {"/manager/dashboard"})
 public class ManagerPortalServlet extends HttpServlet {
 
-    private final ManagerDashboardService dashboardService = new ManagerDashboardService();
+    private ManagerDashboardService dashboardService;
+
+    @Override
+    public void init() {
+        this.dashboardService = new ManagerDashboardService();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -23,3 +28,4 @@ public class ManagerPortalServlet extends HttpServlet {
         request.getRequestDispatcher("/views/manager/dashboard.jsp").forward(request, response);
     }
 }
+

@@ -11,17 +11,17 @@ import java.sql.SQLException;
 public class ManagerDashboardDAO extends BaseRepository<RoomOccupancyDTO, Integer> {
 
     private static final String SELECT_OCCUPANCY_SQL =
-            "SELECT TongSoPhong, SoPhongDangCoKhach, SoPhongTrong, SoPhongDangDon, "
-                    + "SoPhongHuHai, TyLeLapDayPhanTram FROM v_TyLeLapDayPhong";
+            "SELECT TotalRooms, OccupiedRooms, AvailableRooms, CleaningRooms, "
+                    + "MaintenanceRooms, OccupancyRatePercentage FROM v_RoomOccupancyRate";
 
     @Override
     protected String getTableName() {
-        return "v_TyLeLapDayPhong";
+        return "v_RoomOccupancyRate";
     }
 
     @Override
     protected String getPrimaryKeyColumnName() {
-        return "TongSoPhong";
+        return "TotalRooms";
     }
 
     @Override
@@ -34,12 +34,12 @@ public class ManagerDashboardDAO extends BaseRepository<RoomOccupancyDTO, Intege
     }
 
     private RoomOccupancyDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
-        int tong = rs.getInt("TongSoPhong");
-        int coKhach = rs.getInt("SoPhongDangCoKhach");
-        int trong = rs.getInt("SoPhongTrong");
-        int dangDon = rs.getInt("SoPhongDangDon");
-        int huHai = rs.getInt("SoPhongHuHai");
-        BigDecimal tyLe = rs.getBigDecimal("TyLeLapDayPhanTram");
+        int tong = rs.getInt("TotalRooms");
+        int coKhach = rs.getInt("OccupiedRooms");
+        int trong = rs.getInt("AvailableRooms");
+        int dangDon = rs.getInt("CleaningRooms");
+        int huHai = rs.getInt("MaintenanceRooms");
+        BigDecimal tyLe = rs.getBigDecimal("OccupancyRatePercentage");
         if (tyLe == null) {
             tyLe = BigDecimal.ZERO;
         }

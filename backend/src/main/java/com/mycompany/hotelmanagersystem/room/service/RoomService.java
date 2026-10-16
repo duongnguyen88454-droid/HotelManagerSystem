@@ -3,7 +3,6 @@ package com.mycompany.hotelmanagersystem.room.service;
 import com.mycompany.hotelmanagersystem.room.dao.RoomDAO;
 import com.mycompany.hotelmanagersystem.room.dao.RoomAmenityDAO;
 import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
-import com.mycompany.hotelmanagersystem.room.dto.RoomMapKpiDTO;
 import com.mycompany.hotelmanagersystem.room.dto.RoomTimelineDTO;
 import com.mycompany.hotelmanagersystem.room.model.BedType;
 import com.mycompany.hotelmanagersystem.room.model.RoomAmenity;
@@ -77,13 +76,6 @@ public class RoomService {
             room.setTrangThaiPhong(RoomUtil.resolveTimelineStatus(room.getTrangThaiPhong()));
         }
         return list;
-    }
-
-    /**
-     * FN-3.1: Lấy các chỉ số thống kê buồng phòng thời gian thực (KPI)
-     */
-    public RoomMapKpiDTO getRoomMapKpi() {
-        return roomDAO.getRoomMapKpi();
     }
 
     /**

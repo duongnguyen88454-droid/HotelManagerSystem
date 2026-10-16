@@ -31,10 +31,10 @@
                                 <span>Đặt Phòng Mới</span>
                             </a>
 
-                            <div class="nav-group-title">Thu Ngân</div>
-                            <a href="${pageContext.request.contextPath}/cashier/dashboard"
-                                class="portal-nav-item ${param.activeMenu eq 'cashier' ? 'active' : ''}">
-                                <span>Quầy Thu Ngân</span>
+                            <div class="nav-group-title">Giao Dịch</div>
+                            <a href="${pageContext.request.contextPath}/receptionist/refunds"
+                                class="portal-nav-item ${param.activeMenu eq 'refunds' ? 'active' : ''}">
+                                <span>Xét Duyệt Hoàn Cọc</span>
                             </a>
                         </c:when>
 
@@ -49,12 +49,6 @@
 
                             <%-- VAI TRÒ 3: QUẢN LÝ (MANAGER) --%>
                                 <c:when test="${sessionScope.CURRENT_USER.manager}">
-                                    <div class="nav-group-title">Tổng Quan</div>
-                                    <a href="${pageContext.request.contextPath}/manager/dashboard"
-                                        class="portal-nav-item ${param.activeMenu eq 'dashboard' ? 'active' : ''}">
-                                        <span>Dashboard Quản Trị</span>
-                                    </a>
-
                                     <div class="nav-group-title">Vận Hành</div>
                                     <a href="${pageContext.request.contextPath}/manager/damages"
                                         class="portal-nav-item ${param.activeMenu eq 'damages' ? 'active' : ''}">
@@ -69,27 +63,27 @@
                                     </a>
 
                                     <div class="nav-group-title">Tài Chính</div>
-                                    <a href="${pageContext.request.contextPath}/manager/revenue"
-                                        class="portal-nav-item ${param.activeMenu eq 'revenue' ? 'active' : ''}">
-                                        <span>Báo Cáo Doanh Thu</span>
+                                    <a href="${pageContext.request.contextPath}/manager/revenue?type=invoice"
+                                        class="portal-nav-item ${param.activeMenu eq 'revenue' and (empty param.activeSubMenu or param.activeSubMenu eq 'invoice') ? 'active' : ''}">
+                                        <span>Doanh Thu Hóa Đơn</span>
                                     </a>
-                                    <a href="${pageContext.request.contextPath}/manager/services"
-                                        class="portal-nav-item ${param.activeMenu eq 'services' ? 'active' : ''}">
-                                        <span>Phân Tích Dịch Vụ</span>
+                                    <a href="${pageContext.request.contextPath}/manager/revenue?type=room"
+                                        class="portal-nav-item ${param.activeMenu eq 'revenue' and param.activeSubMenu eq 'room' ? 'active' : ''}">
+                                        <span>Doanh Thu Tiền Phòng</span>
                                     </a>
-                                    <a href="${pageContext.request.contextPath}/manager/refunds"
-                                        class="portal-nav-item ${param.activeMenu eq 'refunds' ? 'active' : ''}">
-                                        <span>Xét Duyệt Hoàn Cọc</span>
+                                    <a href="${pageContext.request.contextPath}/manager/revenue?type=product"
+                                        class="portal-nav-item ${param.activeMenu eq 'revenue' and param.activeSubMenu eq 'product' ? 'active' : ''}">
+                                        <span>Doanh Thu Sản Phẩm</span>
+                                    </a>
+                                    <a href="${pageContext.request.contextPath}/manager/revenue?type=overall"
+                                        class="portal-nav-item ${param.activeMenu eq 'revenue' and param.activeSubMenu eq 'overall' ? 'active' : ''}">
+                                        <span>Tổng Quan Doanh Thu</span>
                                     </a>
 
-                                    <div class="nav-group-title">Nhân Sự & Thu Ngân</div>
+                                    <div class="nav-group-title">Nhân Sự</div>
                                     <a href="${pageContext.request.contextPath}/manager/employees"
                                         class="portal-nav-item ${param.activeMenu eq 'employees' ? 'active' : ''}">
                                         <span>Quản Lý Nhân Sự</span>
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/cashier/dashboard"
-                                        class="portal-nav-item ${param.activeMenu eq 'cashier' ? 'active' : ''}">
-                                        <span>Quầy Thu Ngân</span>
                                     </a>
                                 </c:when>
 

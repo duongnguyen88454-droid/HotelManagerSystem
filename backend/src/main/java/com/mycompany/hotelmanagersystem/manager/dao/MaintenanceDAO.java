@@ -16,9 +16,9 @@ import java.util.List;
 public class MaintenanceDAO extends BaseRepository<DamagedRoomItemDTO, String> {
 
     private static final String SELECT_PENDING_DAMAGES_SQL =
-            "SELECT MaBaoCao, MaPhong, SoPhong, TenLoaiPhong, NgayPhatHien, "
-                    + "TenLoaiHuHai, MoTaChiTiet, TrangThaiBaoCao, NhanVienPhatHien "
-                    + "FROM v_DanhSachPhongHuHaiCanBaoTri ORDER BY NgayPhatHien DESC";
+            "SELECT ReportId, RoomId, RoomName, RoomTypeName, DetectedAt, "
+                    + "DamageTypeName, DamageDescription, ReportStatus, ReportedBy "
+                    + "FROM v_MaintenancePendingRooms ORDER BY DetectedAt DESC";
 
     private static final String UPDATE_REPORT_STATUS_SQL =
             "UPDATE DamageReport SET DamageReportStatus = 'Resolved' WHERE DamageReportId = ?";
@@ -28,12 +28,12 @@ public class MaintenanceDAO extends BaseRepository<DamagedRoomItemDTO, String> {
 
     @Override
     protected String getTableName() {
-        return "v_DanhSachPhongHuHaiCanBaoTri";
+        return "v_MaintenancePendingRooms";
     }
 
     @Override
     protected String getPrimaryKeyColumnName() {
-        return "MaBaoCao";
+        return "ReportId";
     }
 
     @Override
@@ -75,18 +75,18 @@ public class MaintenanceDAO extends BaseRepository<DamagedRoomItemDTO, String> {
     }
 
     private DamagedRoomItemDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
-        Timestamp ts = rs.getTimestamp("NgayPhatHien");
+        Timestamp ts = rs.getTimestamp("DetectedAt");
         LocalDateTime ldt = (ts != null) ? ts.toLocalDateTime() : null;
         return new DamagedRoomItemDTO(
-                rs.getString("MaBaoCao"),
-                rs.getString("MaPhong"),
-                rs.getString("SoPhong"),
-                rs.getString("TenLoaiPhong"),
+                rs.getString("ReportId"),
+                rs.getString("RoomId"),
+                rs.getString("RoomName"),
+                rs.getString("RoomTypeName"),
                 ldt,
-                rs.getString("TenLoaiHuHai"),
-                rs.getString("MoTaChiTiet"),
-                rs.getString("TrangThaiBaoCao"),
-                rs.getString("NhanVienPhatHien")
+                rs.getString("DamageTypeName"),
+                rs.getString("DamageDescription"),
+                rs.getString("ReportStatus"),
+                rs.getString("ReportedBy")
         );
     }
 

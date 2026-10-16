@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -65,10 +66,16 @@ public class ManagerHotelConfigServlet extends HttpServlet {
                     Double.parseDouble(request.getParameter("depositPercent")),
                     "true".equalsIgnoreCase(request.getParameter("isActive"))
             );
+            dto.setRoomTypeName(request.getParameter("roomTypeName"));
+            dto.setCapacity(parsePositiveInt(request.getParameter("capacity"), 2));
+            dto.setBedTypes(extractBedTypes(request));
+            dto.setAmenityIds(extractAmenities(request));
+
             boolean success = configService.updateRoomTypePricing(dto);
-            setFlash(session, success, "Đã cập nhật biểu phí hạng phòng thành công!", "Lỗi cập nhật biểu phí hạng phòng!");
+            setFlash(session, success, "Đã cập nhật thông tin và cấu hình hạng phòng thành công!",
+                    "Lỗi cập nhật cấu hình hạng phòng!");
         } catch (NumberFormatException e) {
-            session.setAttribute("flashError", "Dữ liệu biểu phí không hợp lệ!");
+            session.setAttribute("flashError", "Dữ liệu cấu hình hạng phòng không hợp lệ!");
         }
     }
 
@@ -83,21 +90,8 @@ public class ManagerHotelConfigServlet extends HttpServlet {
                     Double.parseDouble(request.getParameter("lateFee")),
                     Double.parseDouble(request.getParameter("depositPercent"))
             );
-
-            String[] selectedBedTypes = request.getParameterValues("selectedBedTypes");
-            if (selectedBedTypes != null) {
-                Map<String, Integer> bedMap = new HashMap<>();
-                for (String bedId : selectedBedTypes) {
-                    int qty = parsePositiveInt(request.getParameter("bedQty_" + bedId), 1);
-                    bedMap.put(bedId, qty);
-                }
-                dto.setBedTypes(bedMap);
-            }
-
-            String[] selectedAmenities = request.getParameterValues("selectedAmenities");
-            if (selectedAmenities != null) {
-                dto.setAmenityIds(Arrays.asList(selectedAmenities));
-            }
+            dto.setBedTypes(extractBedTypes(request));
+            dto.setAmenityIds(extractAmenities(request));
 
             boolean success = configService.addRoomType(dto);
             setFlash(session, success, "Đã thêm loại phòng mới thành công!",
@@ -105,6 +99,23 @@ public class ManagerHotelConfigServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             session.setAttribute("flashError", "Dữ liệu nhập loại phòng không hợp lệ!");
         }
+    }
+
+    private Map<String, Integer> extractBedTypes(HttpServletRequest request) {
+        String[] selected = request.getParameterValues("selectedBedTypes");
+        if (selected == null) {
+            return null;
+        }
+        Map<String, Integer> bedMap = new HashMap<>();
+        for (String bedId : selected) {
+            bedMap.put(bedId, parsePositiveInt(request.getParameter("bedQty_" + bedId), 1));
+        }
+        return bedMap;
+    }
+
+    private List<String> extractAmenities(HttpServletRequest request) {
+        String[] selected = request.getParameterValues("selectedAmenities");
+        return (selected != null) ? Arrays.asList(selected) : null;
     }
 
     private int parsePositiveInt(String value, int defaultValue) {

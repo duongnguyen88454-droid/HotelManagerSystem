@@ -37,6 +37,14 @@ public class RoomAmenity implements Serializable {
         this.roomServiceName = roomServiceName;
     }
 
+    public String getAmenityId() {
+        return roomServiceId;
+    }
+
+    public String getAmenityName() {
+        return roomServiceName;
+    }
+
     public boolean isActive() {
         return isActive;
     }

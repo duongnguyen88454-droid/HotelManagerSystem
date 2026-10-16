@@ -17,7 +17,7 @@
     --portal-primary: #1e3a8a;
     --portal-primary-hover: #1d4ed8;
     --portal-primary-light: #eff6ff;
-    
+
     /* Trạng thái phòng & nhiệm vụ */
     --status-occupied-bg: #fef2f2;
     --status-occupied-color: #dc2626;
@@ -32,10 +32,10 @@
 }
 
 /* Ẩn navbar công khai và footer mặc định khi nằm trong portal */
-body:has(.portal-wrapper) > .navbar,
-body:has(.portal-wrapper) > .footer,
-body:has(.portal-wrapper) > .content-wrapper > .navbar,
-body:has(.portal-wrapper) > .content-wrapper > .footer {
+body:has(.portal-wrapper)>.navbar,
+body:has(.portal-wrapper)>.footer,
+body:has(.portal-wrapper)>.content-wrapper>.navbar,
+body:has(.portal-wrapper)>.content-wrapper>.footer {
     display: none !important;
 }
 
@@ -245,7 +245,7 @@ body {
     font-size: 13px;
     font-weight: 600;
     color: var(--portal-text-secondary);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 /* ==========================================================================
@@ -333,10 +333,21 @@ body {
     background: #e2e8f0;
 }
 
-.dist-occupied { background: var(--status-occupied-color); }
-.dist-available { background: var(--status-available-color); }
-.dist-cleaning { background: var(--status-cleaning-color); }
-.dist-damaged { background: var(--status-damaged-color); }
+.dist-occupied {
+    background: var(--status-occupied-color);
+}
+
+.dist-available {
+    background: var(--status-available-color);
+}
+
+.dist-cleaning {
+    background: var(--status-cleaning-color);
+}
+
+.dist-damaged {
+    background: var(--status-damaged-color);
+}
 
 .room-dist-legend {
     display: flex;
@@ -510,6 +521,18 @@ body {
 
 .portal-input:focus {
     border-color: var(--portal-primary);
+}
+
+/* Ẩn nút tăng giảm (spin buttons) mặc định của input type="number" */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .portal-tabs {

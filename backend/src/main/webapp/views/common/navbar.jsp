@@ -58,18 +58,16 @@
                         style="color: #edf2f7; text-decoration: none;">Sơ Đồ Phòng</a>
                     <a href="${pageContext.request.contextPath}/receptionist/checkin"
                         style="color: #edf2f7; text-decoration: none;">Quầy Tiếp Đón</a>
-                    <a href="${pageContext.request.contextPath}/cashier/dashboard"
-                        style="color: #edf2f7; text-decoration: none;">Thu Ngân</a>
+                    <a href="${pageContext.request.contextPath}/receptionist/refunds"
+                        style="color: #edf2f7; text-decoration: none;">Hoàn Cọc</a>
                 </c:if>
                 <c:if test="${sessionScope.CURRENT_USER.housekeeper}">
                     <a href="${pageContext.request.contextPath}/housekeeper/tasks"
                         style="color: #edf2f7; text-decoration: none;">Buồng Phòng</a>
                 </c:if>
                 <c:if test="${sessionScope.CURRENT_USER.manager}">
-                    <a href="${pageContext.request.contextPath}/manager/dashboard"
+                    <a href="${pageContext.request.contextPath}/manager/hotel-config"
                         style="color: #edf2f7; text-decoration: none;">Quản Trị</a>
-                    <a href="${pageContext.request.contextPath}/cashier/dashboard"
-                        style="color: #edf2f7; text-decoration: none;">Thu Ngân</a>
                 </c:if>
 
                 <span style="color: #cbd5e0; margin-left: 10px;">|</span>

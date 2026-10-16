@@ -24,15 +24,6 @@ public class Account implements Serializable {
         this.email = email;
     }
 
-    // Constructor cũ tương thích ngược (nếu cần)
-    public Account(String maTaiKhoan, String email, String matKhau, String role, String trangThai) {
-        this.maTaiKhoan = maTaiKhoan;
-        this.email = email;
-        this.matKhau = matKhau;
-        this.role = role;
-        this.trangThai = trangThai;
-    }
-
     public String getMaTaiKhoan() {
         return maTaiKhoan;
     }
@@ -84,10 +75,6 @@ public class Account implements Serializable {
     // Alias tương thích ngược cho TenDangNhap (Email đóng vai trò tên đăng nhập)
     public String getTenDangNhap() {
         return email;
-    }
-
-    public void setTenDangNhap(String tenDangNhap) {
-        this.email = tenDangNhap;
     }
 
     public String getHoTen() {

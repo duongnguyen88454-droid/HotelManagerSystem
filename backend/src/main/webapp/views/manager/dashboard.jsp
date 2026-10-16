@@ -39,80 +39,43 @@
             <!-- Tổng số phòng -->
             <div class="portal-kpi-card" style="border-top: 4px solid #3b82f6;">
                 <div class="portal-kpi-label">Tổng Số Phòng</div>
-                <div class="portal-kpi-value">${occupancy.tongSoPhong} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
+                <div class="portal-kpi-value">${not empty occupancy ? occupancy.tongSoPhong : 0} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
                 <div class="portal-kpi-desc">Toàn bộ tài nguyên phòng</div>
             </div>
 
             <!-- Tỷ lệ lấp đầy -->
             <div class="portal-kpi-card" style="border-top: 4px solid #8b5cf6;">
                 <div class="portal-kpi-label">Tỷ Lệ Lấp Đầy</div>
-                <div class="portal-kpi-value" style="color: #6d28d9;">${occupancy.tyLeLapDayPhanTram}%</div>
+                <div class="portal-kpi-value" style="color: #6d28d9;">${not empty occupancy ? occupancy.tyLeLapDayPhanTram : 0}%</div>
                 <div class="portal-kpi-desc">Tỷ lệ phòng đang có khách</div>
             </div>
 
             <!-- Đang có khách -->
             <div class="portal-kpi-card" style="border-top: 4px solid #10b981;">
                 <div class="portal-kpi-label">Đang Có Khách (Occupied)</div>
-                <div class="portal-kpi-value" style="color: #047857;">${occupancy.soPhongDangCoKhach} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
+                <div class="portal-kpi-value" style="color: #047857;">${not empty occupancy ? occupancy.soPhongDangCoKhach : 0} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
                 <div class="portal-kpi-desc">Đang lưu trú tại khách sạn</div>
             </div>
 
             <!-- Phòng trống sẵn sàng -->
             <div class="portal-kpi-card" style="border-top: 4px solid #06b6d4;">
                 <div class="portal-kpi-label">Phòng Trống (Available)</div>
-                <div class="portal-kpi-value" style="color: #0e7490;">${occupancy.soPhongTrong} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
+                <div class="portal-kpi-value" style="color: #0e7490;">${not empty occupancy ? occupancy.soPhongTrong : 0} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
                 <div class="portal-kpi-desc">Sẵn sàng tiếp đón khách mới</div>
             </div>
 
             <!-- Phòng đang dọn -->
             <div class="portal-kpi-card" style="border-top: 4px solid #f59e0b;">
                 <div class="portal-kpi-label">Đang Dọn (Cleaning)</div>
-                <div class="portal-kpi-value" style="color: #b45309;">${occupancy.soPhongDangDon} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
+                <div class="portal-kpi-value" style="color: #b45309;">${not empty occupancy ? occupancy.soPhongDangDon : 0} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
                 <div class="portal-kpi-desc">Buồng phòng đang phụ trách</div>
             </div>
 
             <!-- Phòng hư hại -->
             <div class="portal-kpi-card" style="border-top: 4px solid #ef4444;">
                 <div class="portal-kpi-label">Bảo Trì (Damaged)</div>
-                <div class="portal-kpi-value" style="color: #b91c1c;">${occupancy.soPhongHuHai} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
+                <div class="portal-kpi-value" style="color: #b91c1c;">${not empty occupancy ? occupancy.soPhongHuHai : 0} <span style="font-size: 14px; font-weight: 600; color: #64748b;">phòng</span></div>
                 <div class="portal-kpi-desc">Chờ sửa chữa và nghiệm thu</div>
-            </div>
-        </div>
-
-        <!-- Thẻ phân bổ trạng thái buồng phòng -->
-        <div class="portal-card">
-            <div class="portal-card-header">
-                <div>
-                    <h3 class="portal-card-title">Phân Bổ Tài Nguyên Phòng</h3>
-                    <div class="portal-card-subtitle">Biểu đồ thanh phân bổ trạng thái toàn bộ buồng phòng hiện tại</div>
-                </div>
-            </div>
-
-            <div class="room-dist-bar">
-                <c:set var="totalRooms" value="${occupancy.tongSoPhong > 0 ? occupancy.tongSoPhong : 1}" />
-                <div class="dist-occupied" style="width: ${(occupancy.soPhongDangCoKhach * 100.0) / totalRooms}%;" title="Đang có khách: ${occupancy.soPhongDangCoKhach}"></div>
-                <div class="dist-available" style="width: ${(occupancy.soPhongTrong * 100.0) / totalRooms}%;" title="Trống sạch: ${occupancy.soPhongTrong}"></div>
-                <div class="dist-cleaning" style="width: ${(occupancy.soPhongDangDon * 100.0) / totalRooms}%;" title="Đang dọn: ${occupancy.soPhongDangDon}"></div>
-                <div class="dist-damaged" style="width: ${(occupancy.soPhongHuHai * 100.0) / totalRooms}%;" title="Hư hại: ${occupancy.soPhongHuHai}"></div>
-            </div>
-
-            <div class="room-dist-legend">
-                <div class="dist-legend-item">
-                    <span class="dist-legend-dot" style="background: var(--status-occupied-color);"></span>
-                    <span>Đang Có Khách: <strong>${occupancy.soPhongDangCoKhach}</strong></span>
-                </div>
-                <div class="dist-legend-item">
-                    <span class="dist-legend-dot" style="background: var(--status-available-color);"></span>
-                    <span>Trống Sẵn Sàng: <strong>${occupancy.soPhongTrong}</strong></span>
-                </div>
-                <div class="dist-legend-item">
-                    <span class="dist-legend-dot" style="background: var(--status-cleaning-color);"></span>
-                    <span>Đang Dọn Dẹp: <strong>${occupancy.soPhongDangDon}</strong></span>
-                </div>
-                <div class="dist-legend-item">
-                    <span class="dist-legend-dot" style="background: var(--status-damaged-color);"></span>
-                    <span>Hư Hại / Bảo Trì: <strong>${occupancy.soPhongHuHai}</strong></span>
-                </div>
             </div>
         </div>
 
@@ -136,20 +99,7 @@
                     </a>
                 </div>
 
-                <!-- Thẻ 2: Phân tích dịch vụ -->
-                <div class="portal-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div>
-                        <h4 style="margin: 0 0 8px 0; color: var(--portal-text-primary); font-size: 17px; font-weight: 700;">Phân Tích Tiêu Dùng Dịch Vụ</h4>
-                        <p style="color: var(--portal-text-muted); font-size: 13.5px; line-height: 1.5; margin: 0 0 16px 0;">
-                            Xem bảng xếp hạng các dịch vụ khách sạn bán chạy nhất, số lượt khách sử dụng và tổng doanh thu sinh lời của từng dịch vụ.
-                        </p>
-                    </div>
-                    <a href="${pageContext.request.contextPath}/manager/services" class="portal-btn portal-btn-secondary">
-                        Xem Phân Tích Dịch Vụ
-                    </a>
-                </div>
-
-                <!-- Thẻ 3: Xử lý hư hại & bảo trì -->
+                <!-- Thẻ 2: Xử lý hư hại & bảo trì -->
                 <div class="portal-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
                         <h4 style="margin: 0 0 8px 0; color: var(--portal-text-primary); font-size: 17px; font-weight: 700;">Nghiệm Thu Khắc Phục Hư Hại</h4>
@@ -158,11 +108,11 @@
                         </p>
                     </div>
                     <a href="${pageContext.request.contextPath}/manager/damages" class="portal-btn portal-btn-danger">
-                        Xử Lý Hư Hại Phòng (${occupancy.soPhongHuHai})
+                        Xử Lý Hư Hại Phòng (${not empty occupancy ? occupancy.soPhongHuHai : 0})
                     </a>
                 </div>
 
-                <!-- Thẻ 4: Quản lý nhân sự & khóa tài khoản -->
+                <!-- Thẻ 3: Quản lý nhân sự & khóa tài khoản -->
                 <div class="portal-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
                         <h4 style="margin: 0 0 8px 0; color: var(--portal-text-primary); font-size: 17px; font-weight: 700;">Quản Lý Nhân Sự & Tài Khoản</h4>

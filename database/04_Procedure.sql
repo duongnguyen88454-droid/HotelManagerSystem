@@ -538,68 +538,7 @@ END
 
 GO
 -- ============================================================================
--- PROCEDURE 9: BÁO CÁO TỔNG KẾT KINH DOANH CHỐT CA THEO NGÀY (NIGHT AUDIT)
--- ============================================================================
-CREATE OR ALTER PROCEDURE dbo.sp_BaoCaoDoanhThuTheoNgay
-@ReportDate DATE=NULL
-AS
-BEGIN
-    SET NOCOUNT ON;
-    IF @ReportDate IS NULL
-        SET @ReportDate = CAST (GETDATE() AS DATE);
-    SELECT @ReportDate AS ReportDate,
-           -- Hoạt động đặt phòng & lưu trú trong ngày
-           (SELECT COUNT(*)
-            FROM   Booking
-            WHERE  CAST (CreateDate AS DATE) = @ReportDate) AS TotalNewBookings,
-           (SELECT COUNT(*)
-            FROM   Booking_Room
-            WHERE  CAST (ActualCheckInDate AS DATE) = @ReportDate) AS TotalRoomsCheckedIn,
-           (SELECT COUNT(*)
-            FROM   Booking_Room
-            WHERE  CAST (ActualCheckOutDate AS DATE) = @ReportDate) AS TotalRoomsCheckedOut,
-           -- Thống kê dòng tiền thực thu trong ngày
-           ISNULL(SUM(p.TotalAmount), 0) AS TotalRevenue,
-           ISNULL(SUM(CASE WHEN p.PaymentMethod = 'Cash' THEN p.TotalAmount END), 0) AS RevenueCash,
-           ISNULL(SUM(CASE WHEN p.PaymentMethod = 'CreditCard' THEN p.TotalAmount END), 0) AS RevenueCreditCard,
-           ISNULL(SUM(CASE WHEN p.PaymentMethod = 'BankTransfer' THEN p.TotalAmount END), 0) AS RevenueBankTransfer,
-           ISNULL(SUM(CASE WHEN p.PaymentMethod = 'Momo' THEN p.TotalAmount END), 0) AS RevenueMomo,
-           ISNULL(SUM(CASE WHEN p.PaymentMethod = 'VNPay' THEN p.TotalAmount END), 0) AS RevenueVNPay
-    FROM   Payment AS p
-    WHERE  CAST (p.PaymentDate AS DATE) = @ReportDate;
-END
-
-
-GO
--- ============================================================================
--- PROCEDURE 10: BÁO CÁO TỔNG HỢP KINH DOANH THÁNG (BAN QUẢN LÝ / GIÁM ĐỐC)
--- ============================================================================
-CREATE OR ALTER PROCEDURE dbo.sp_BaoCaoDoanhThuTheoThang
-@Month INT, @Year INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    SELECT @Month AS ReportMonth,
-           @Year AS ReportYear,
-           COUNT(DISTINCT b.BookingId) AS TotalBookings,
-           COUNT(DISTINCT CASE WHEN br.BookingStatus = 'CheckedOut' THEN b.BookingId END) AS CompletedBookings,
-           COUNT(DISTINCT CASE WHEN br.BookingStatus = 'Cancelled' THEN b.BookingId END) AS CancelledBookings,
-           (SELECT ISNULL(SUM(p.TotalAmount), 0)
-            FROM   Payment AS p
-            WHERE  MONTH(p.PaymentDate) = @Month
-                   AND YEAR(p.PaymentDate) = @Year) AS TotalRevenue
-    FROM   Booking AS b
-           LEFT OUTER JOIN
-           Booking_Room AS br
-           ON b.BookingId = br.BookingId
-    WHERE  MONTH(b.CreateDate) = @Month
-           AND YEAR(b.CreateDate) = @Year;
-END
-
-
-GO
--- ============================================================================
--- PROCEDURE 11: TẠO TÀI KHOẢN ĐĂNG NHẬP MỚI (ÁP DỤNG fn_SinhMaAccount)
+-- PROCEDURE 9: TẠO TÀI KHOẢN ĐĂNG NHẬP MỚI (ÁP DỤNG fn_SinhMaAccount)
 -- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_ThemTaiKhoan
 @Email VARCHAR (100), @Role VARCHAR (20), @UserName VARCHAR (50), @Password VARCHAR (255), @NewAccountId VARCHAR (10) OUTPUT
@@ -607,10 +546,6 @@ AS
 BEGIN
     SET NOCOUNT ON;
     BEGIN TRY
-        IF EXISTS (SELECT 1
-                   FROM   Account
-                   WHERE  UserName = @UserName)
-            THROW 50053, N'Tên đăng nhập đã được sử dụng!', 1;
         IF EXISTS (SELECT 1
                    FROM   Account
                    WHERE  Email = @Email)

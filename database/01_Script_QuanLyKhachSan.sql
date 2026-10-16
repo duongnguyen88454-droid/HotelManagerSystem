@@ -39,7 +39,6 @@ CREATE TABLE Account (
     Password      VARCHAR (255) NOT NULL,
     AccountStatus VARCHAR (20)  CONSTRAINT DF_Account_Status DEFAULT 'Active' NOT NULL,
     CONSTRAINT PK_Account PRIMARY KEY (AccountId),
-    CONSTRAINT UQ_Account_UserName UNIQUE (UserName),
     CONSTRAINT UQ_Account_Email UNIQUE (Email),
     CONSTRAINT CK_Account_Role CHECK (Role IN ('Customer', 'Receptionist', 'Housekeeper', 'Manager')),
     CONSTRAINT CK_Account_Status CHECK (AccountStatus IN ('Active', 'Locked'))
@@ -59,7 +58,6 @@ CREATE TABLE Employee (
     EmployeeStatus  VARCHAR (20)   CONSTRAINT DF_Employee_Status DEFAULT 'Working' NOT NULL,
     CONSTRAINT PK_Employee PRIMARY KEY (EmployeeId),
     CONSTRAINT FK_Employee_Account FOREIGN KEY (AccountId) REFERENCES Account (AccountId),
-    CONSTRAINT UQ_Employee_Phone UNIQUE (Phone),
     CONSTRAINT CK_Employee_Status CHECK (EmployeeStatus IN ('Working', 'Resigned')),
     CONSTRAINT CK_Employee_Dates CHECK (ResignationDate IS NULL
                                         OR ResignationDate >= HireDate)
@@ -76,7 +74,6 @@ CREATE TABLE Customer (
     Email       VARCHAR (100)  NOT NULL,
     CONSTRAINT PK_Customer PRIMARY KEY (CustomerId),
     CONSTRAINT UQ_Customer_CCCD UNIQUE (CCCD),
-    CONSTRAINT UQ_Customer_PhoneNumber UNIQUE (PhoneNumber),
     CONSTRAINT CK_Customer_CCCD CHECK (LEN(CCCD) = 12
                                        AND CCCD NOT LIKE '%[^0-9]%')
 );

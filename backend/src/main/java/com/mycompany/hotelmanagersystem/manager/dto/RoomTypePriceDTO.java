@@ -1,19 +1,25 @@
 package com.mycompany.hotelmanagersystem.manager.dto;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
- * DTO chứa thông tin cập nhật biểu phí hạng phòng cho Ban Quản Lý.
+ * DTO chứa thông tin cập nhật biểu phí và cấu hình hạng phòng cho Ban Quản Lý.
  */
 public class RoomTypePriceDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String roomTypeId;
+    private String roomTypeName;
+    private int capacity;
     private double basePrice;
     private double earlyCheckInFee;
     private double lateCheckOutFee;
     private double depositPercent;
     private boolean active;
+    private Map<String, Integer> bedTypes;
+    private List<String> amenityIds;
 
     public RoomTypePriceDTO() {
     }
@@ -74,5 +80,37 @@ public class RoomTypePriceDTO implements Serializable {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getRoomTypeName() {
+        return roomTypeName;
+    }
+
+    public void setRoomTypeName(String roomTypeName) {
+        this.roomTypeName = roomTypeName;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public Map<String, Integer> getBedTypes() {
+        return bedTypes;
+    }
+
+    public void setBedTypes(Map<String, Integer> bedTypes) {
+        this.bedTypes = bedTypes;
+    }
+
+    public List<String> getAmenityIds() {
+        return amenityIds;
+    }
+
+    public void setAmenityIds(List<String> amenityIds) {
+        this.amenityIds = amenityIds;
     }
 }

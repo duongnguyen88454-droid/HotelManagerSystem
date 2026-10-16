@@ -3,7 +3,6 @@ package com.mycompany.hotelmanagersystem.room.dao;
 import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
 import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
-import com.mycompany.hotelmanagersystem.room.dto.RoomMapKpiDTO;
 import com.mycompany.hotelmanagersystem.room.dto.RoomTimelineDTO;
 import com.mycompany.hotelmanagersystem.room.model.RoomType;
 
@@ -21,7 +20,7 @@ public class RoomDAO extends BaseRepository<AvailableRoomDTO, String> {
 
     @Override
     protected String getTableName() {
-        return "Room";
+        return "v_RoomDetails";
     }
 
     @Override
@@ -55,25 +54,13 @@ public class RoomDAO extends BaseRepository<AvailableRoomDTO, String> {
      */
     public List<AvailableRoomDTO> searchAvailableRooms(LocalDate checkIn, LocalDate checkOut, Integer guests,
             String roomTypeId) {
-        String sql = "SELECT r.RoomId AS MaPhong, r.RoomName AS SoPhong, rt.RoomTypeId AS MaLoaiPhong, "
-                + "       rt.RoomTypeName AS TenLoaiPhong, rt.Capacity AS SoNguoiToiDa, rt.BasePrice AS GiaPhong, "
-                + "       rt.DepositPercent, "
-                + "       ISNULL((SELECT STRING_AGG(rs.RoomServiceName, ', ') "
-                + "               FROM RoomType_RoomService rtrs "
-                + "               JOIN RoomService rs ON rtrs.RoomServiceId = rs.RoomServiceId "
-                + "               WHERE rtrs.RoomTypeId = rt.RoomTypeId AND rs.IsActive = 1), N'Đầy đủ tiện nghi cơ bản') AS MoTaPhong, "
-                + "       ISNULL((SELECT STRING_AGG(CONCAT(rtbt.Quantity, ' ', bt.BedTypeName), ', ') "
-                + "               FROM RoomType_BedType rtbt "
-                + "               JOIN BedType bt ON rtbt.BedTypeId = bt.BedTypeId "
-                + "               WHERE rtbt.RoomTypeId = rt.RoomTypeId AND bt.IsActive = 1), N'Tiêu chuẩn') AS LoaiGiuong "
-                + "FROM Room r "
-                + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
-                + "WHERE rt.IsActive = 1 "
-                + "  AND r.RoomStatus = 'Available' "
-                + "  AND (? IS NULL OR rt.RoomTypeId = ?) "
-                + "  AND (? IS NULL OR rt.Capacity >= ?) "
-                + "  AND dbo.fn_KiemTraPhongTrongTrongKhoang(r.RoomId, ?, ?, NULL) = 1 "
-                + "ORDER BY rt.BasePrice ASC, r.RoomName ASC";
+        String sql = "SELECT * FROM v_RoomDetails "
+                + "WHERE RoomTypeIsActive = 1 "
+                + "  AND RoomStatus = 'Available' "
+                + "  AND (? IS NULL OR RoomTypeId = ?) "
+                + "  AND (? IS NULL OR Capacity >= ?) "
+                + "  AND dbo.fn_KiemTraPhongTrongTrongKhoang(RoomId, ?, ?, NULL) = 1 "
+                + "ORDER BY BasePrice ASC, RoomName ASC";
 
         boolean hasRoomType = (roomTypeId != null && !roomTypeId.trim().isEmpty() && !"ALL".equalsIgnoreCase(roomTypeId));
         Object typeParam = hasRoomType ? roomTypeId.trim() : null;
@@ -88,20 +75,7 @@ public class RoomDAO extends BaseRepository<AvailableRoomDTO, String> {
      * Lấy thông tin chi tiết của một phòng cụ thể
      */
     public AvailableRoomDTO getRoomDetailById(String maPhong) {
-        String sql = "SELECT r.RoomId AS MaPhong, r.RoomName AS SoPhong, rt.RoomTypeId AS MaLoaiPhong, "
-                + "       rt.RoomTypeName AS TenLoaiPhong, rt.Capacity AS SoNguoiToiDa, rt.BasePrice AS GiaPhong, "
-                + "       rt.DepositPercent, "
-                + "       ISNULL((SELECT STRING_AGG(rs.RoomServiceName, ', ') "
-                + "               FROM RoomType_RoomService rtrs "
-                + "               JOIN RoomService rs ON rtrs.RoomServiceId = rs.RoomServiceId "
-                + "               WHERE rtrs.RoomTypeId = rt.RoomTypeId AND rs.IsActive = 1), N'Đầy đủ tiện nghi cơ bản') AS MoTaPhong, "
-                + "       ISNULL((SELECT STRING_AGG(CONCAT(rtbt.Quantity, ' ', bt.BedTypeName), ', ') "
-                + "               FROM RoomType_BedType rtbt "
-                + "               JOIN BedType bt ON rtbt.BedTypeId = bt.BedTypeId "
-                + "               WHERE rtbt.RoomTypeId = rt.RoomTypeId AND bt.IsActive = 1), N'Tiêu chuẩn') AS LoaiGiuong "
-                + "FROM Room r "
-                + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
-                + "WHERE r.RoomId = ?";
+        String sql = "SELECT * FROM v_RoomDetails WHERE RoomId = ?";
         return queryOne(sql, maPhong).orElse(null);
     }
 
@@ -120,42 +94,21 @@ public class RoomDAO extends BaseRepository<AvailableRoomDTO, String> {
      * FN-3.1: Lấy toàn bộ danh sách phòng thực tế theo tầng để hiển thị trên PMS Gantt Timeline
      */
     public List<RoomTimelineDTO> getAllRoomsForTimeline() {
-        String sql = "SELECT r.RoomId AS MaPhong, r.RoomName AS SoPhong, rt.RoomTypeId AS MaLoaiPhong, "
-                + "       rt.RoomTypeName AS TenLoaiPhong, rt.BasePrice AS GiaPhong, "
-                + "       r.RoomStatus, r.OccupancyStatus, r.HousekeepingStatus, r.RoomName AS MoTa "
-                + "FROM Room r "
-                + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
-                + "ORDER BY r.RoomName ASC";
+        String sql = "SELECT * FROM v_RoomDetails ORDER BY RoomName ASC";
         return queryCustom(sql, this::mapRoomTimeline);
-    }
-
-    /**
-     * FN-3.1: Tính toán các chỉ số thống kê buồng phòng thời gian thực (KPI)
-     */
-    public RoomMapKpiDTO getRoomMapKpi() {
-        String sql = "SELECT "
-                + "    COUNT(*) AS TongSoPhong, "
-                + "    SUM(CASE WHEN RoomStatus = 'Available' AND OccupancyStatus = 'Vacant' AND HousekeepingStatus = 'Clean' THEN 1 ELSE 0 END) AS SoAvailable, "
-                + "    SUM(CASE WHEN OccupancyStatus = 'Occupied' THEN 1 ELSE 0 END) AS SoOccupied, "
-                + "    SUM(CASE WHEN HousekeepingStatus = 'Dirty' THEN 1 ELSE 0 END) AS SoDirty, "
-                + "    SUM(CASE WHEN HousekeepingStatus = 'Cleaning' THEN 1 ELSE 0 END) AS SoCleaning, "
-                + "    SUM(CASE WHEN RoomStatus IN ('Maintenance', 'OutOfService') THEN 1 ELSE 0 END) AS SoDamaged, "
-                + "    0 AS SoBooked "
-                + "FROM Room";
-        return queryOneCustom(sql, this::mapRoomMapKpi).orElseGet(() -> new RoomMapKpiDTO(0, 0, 0, 0, 0, 0, 0));
     }
 
     private AvailableRoomDTO mapAvailableRoom(ResultSet rs) throws SQLException {
         AvailableRoomDTO dto = new AvailableRoomDTO(
-                rs.getString("MaPhong"),
-                rs.getString("SoPhong"),
-                rs.getString("MaLoaiPhong"),
-                rs.getNString("TenLoaiPhong"),
+                rs.getString("RoomId"),
+                rs.getString("RoomName"),
+                rs.getString("RoomTypeId"),
+                rs.getNString("RoomTypeName"),
                 0.0,
-                rs.getNString("LoaiGiuong"),
-                rs.getInt("SoNguoiToiDa"),
-                rs.getDouble("GiaPhong"),
-                rs.getNString("MoTaPhong"));
+                rs.getNString("BedTypesDescription"),
+                rs.getInt("Capacity"),
+                rs.getDouble("BasePrice"),
+                rs.getNString("AmenitiesDescription"));
         dto.setDepositPercent(rs.getDouble("DepositPercent"));
         return dto;
     }
@@ -176,24 +129,13 @@ public class RoomDAO extends BaseRepository<AvailableRoomDTO, String> {
                 + rs.getString("OccupancyStatus") + "|"
                 + rs.getString("HousekeepingStatus");
         return new RoomTimelineDTO(
-                rs.getString("MaPhong"),
-                rs.getString("SoPhong"),
+                rs.getString("RoomId"),
+                rs.getString("RoomName"),
                 1,
-                rs.getString("MaLoaiPhong"),
-                rs.getNString("TenLoaiPhong"),
-                rs.getDouble("GiaPhong"),
+                rs.getString("RoomTypeId"),
+                rs.getNString("RoomTypeName"),
+                rs.getDouble("BasePrice"),
                 rawStatus,
-                rs.getNString("MoTa"));
-    }
-
-    private RoomMapKpiDTO mapRoomMapKpi(ResultSet rs) throws SQLException {
-        int total = rs.getInt("TongSoPhong");
-        int avail = rs.getInt("SoAvailable");
-        int occ = rs.getInt("SoOccupied");
-        int dirty = rs.getInt("SoDirty");
-        int clean = rs.getInt("SoCleaning");
-        int dmg = rs.getInt("SoDamaged");
-        int booked = rs.getInt("SoBooked");
-        return new RoomMapKpiDTO(total, avail, occ, dirty, clean, dmg, booked);
+                rs.getNString("RoomDescription"));
     }
 }

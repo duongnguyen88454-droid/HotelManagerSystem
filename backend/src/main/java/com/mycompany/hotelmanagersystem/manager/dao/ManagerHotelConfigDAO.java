@@ -49,24 +49,93 @@ public class ManagerHotelConfigDAO extends BaseRepository<RoomType, String> {
     }
 
     public List<RoomType> getAllRoomTypes() {
-        String sql = "SELECT RoomTypeId, RoomTypeName, BasePrice, Capacity, EarlyCheckInFee, "
-                + "LateCheckOutFee, DepositPercent, IsActive FROM RoomType ORDER BY RoomTypeId";
-        return query(sql);
+        String sql = "SELECT rt.RoomTypeId, rt.RoomTypeName, rt.BasePrice, rt.Capacity, rt.EarlyCheckInFee, "
+                + "rt.LateCheckOutFee, rt.DepositPercent, rt.IsActive, "
+                + "(SELECT STRING_AGG(CONCAT(rtbt.Quantity, 'x ', bt.BedTypeName), ', ') "
+                + " FROM RoomType_BedType rtbt JOIN BedType bt ON rtbt.BedTypeId = bt.BedTypeId "
+                + " WHERE rtbt.RoomTypeId = rt.RoomTypeId) AS BedSummary, "
+                + "(SELECT STRING_AGG(CONCAT(rtbt.BedTypeId, ':', rtbt.Quantity), ',') "
+                + " FROM RoomType_BedType rtbt WHERE rtbt.RoomTypeId = rt.RoomTypeId) AS BedIds, "
+                + "(SELECT STRING_AGG(rs.RoomServiceName, ', ') "
+                + " FROM RoomType_RoomService rtrs JOIN RoomService rs ON rtrs.RoomServiceId = rs.RoomServiceId "
+                + " WHERE rtrs.RoomTypeId = rt.RoomTypeId) AS AmenitySummary, "
+                + "(SELECT STRING_AGG(rtrs.RoomServiceId, ',') "
+                + " FROM RoomType_RoomService rtrs WHERE rtrs.RoomTypeId = rt.RoomTypeId) AS AmenityIds "
+                + "FROM RoomType rt "
+                + "ORDER BY rt.RoomTypeId";
+
+        RowMapper<RoomType> mapper = rs -> {
+            RoomType rt = new RoomType();
+            rt.setMaLoaiPhong(rs.getString("RoomTypeId"));
+            rt.setTenLoaiPhong(rs.getNString("RoomTypeName"));
+            rt.setGiaPhong(rs.getDouble("BasePrice"));
+            rt.setSoNguoiToiDa(rs.getInt("Capacity"));
+            rt.setEarlyCheckInFee(rs.getDouble("EarlyCheckInFee"));
+            rt.setLateCheckOutFee(rs.getDouble("LateCheckOutFee"));
+            rt.setDepositPercent(rs.getDouble("DepositPercent"));
+            rt.setTrangThai(rs.getBoolean("IsActive") ? "Active" : "Inactive");
+            rt.setLoaiGiuong(rs.getString("BedSummary"));
+            rt.setBedTypeIdsWithQty(rs.getString("BedIds"));
+            rt.setTienNghi(rs.getString("AmenitySummary"));
+            rt.setAmenityIds(rs.getString("AmenityIds"));
+            return rt;
+        };
+        return queryCustom(sql, mapper);
     }
 
     public boolean updateRoomTypePricing(RoomTypePriceDTO dto) {
         if (dto == null || dto.getRoomTypeId() == null) {
             return false;
         }
-        String sql = "UPDATE RoomType SET BasePrice = ?, EarlyCheckInFee = ?, LateCheckOutFee = ?, "
+        String sql = "UPDATE RoomType SET RoomTypeName = COALESCE(?, RoomTypeName), "
+                + "Capacity = CASE WHEN ? > 0 THEN ? ELSE Capacity END, "
+                + "BasePrice = ?, EarlyCheckInFee = ?, LateCheckOutFee = ?, "
                 + "DepositPercent = ?, IsActive = ? WHERE RoomTypeId = ?";
-        return executeUpdate(sql,
-                BigDecimal.valueOf(dto.getBasePrice()),
-                BigDecimal.valueOf(dto.getEarlyCheckInFee()),
-                BigDecimal.valueOf(dto.getLateCheckOutFee()),
-                BigDecimal.valueOf(dto.getDepositPercent()),
-                dto.isActive(),
-                dto.getRoomTypeId()) > 0;
+
+        try (Connection conn = DBContext.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setNString(1, dto.getRoomTypeName());
+                    ps.setInt(2, dto.getCapacity());
+                    ps.setInt(3, dto.getCapacity());
+                    ps.setBigDecimal(4, BigDecimal.valueOf(dto.getBasePrice()));
+                    ps.setBigDecimal(5, BigDecimal.valueOf(dto.getEarlyCheckInFee()));
+                    ps.setBigDecimal(6, BigDecimal.valueOf(dto.getLateCheckOutFee()));
+                    ps.setBigDecimal(7, BigDecimal.valueOf(dto.getDepositPercent()));
+                    ps.setBoolean(8, dto.isActive());
+                    ps.setString(9, dto.getRoomTypeId());
+                    ps.executeUpdate();
+                }
+
+                updateRoomTypeRelations(conn, dto);
+
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    private void updateRoomTypeRelations(Connection conn, RoomTypePriceDTO dto) throws SQLException {
+        if (dto.getBedTypes() != null) {
+            try (PreparedStatement psDel = conn.prepareStatement("DELETE FROM RoomType_BedType WHERE RoomTypeId = ?")) {
+                psDel.setString(1, dto.getRoomTypeId());
+                psDel.executeUpdate();
+            }
+            insertRoomTypeBeds(conn, dto.getRoomTypeId(), dto.getBedTypes());
+        }
+        if (dto.getAmenityIds() != null) {
+            try (PreparedStatement psDel = conn.prepareStatement("DELETE FROM RoomType_RoomService WHERE RoomTypeId = ?")) {
+                psDel.setString(1, dto.getRoomTypeId());
+                psDel.executeUpdate();
+            }
+            insertRoomTypeAmenities(conn, dto.getRoomTypeId(), dto.getAmenityIds());
+        }
     }
 
     public boolean addRoomType(CreateRoomTypeDTO dto) {

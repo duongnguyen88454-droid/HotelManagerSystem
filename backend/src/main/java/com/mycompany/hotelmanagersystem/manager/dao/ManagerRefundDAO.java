@@ -17,21 +17,15 @@ import java.util.List;
 public class ManagerRefundDAO extends BaseRepository<CancellationRecordDTO, String> {
 
     private static final String SELECT_CANCELLATIONS_SQL =
-            "SELECT ch.CancellationId, ch.BookingId, ch.RoomId, r.RoomName, "
-                    + "ISNULL(acc.UserName, ch.CancelledBy) AS CancelledBy, ch.DepositAtCancellation, "
-                    + "ch.CancellationDate, ch.CancellationFee, ch.RefundStatus, ch.Reason, "
-                    + "dbo.fn_TinhTienHoanTraHuyPhong(ch.CancellationId) AS RefundAmount "
-                    + "FROM CancellationHistory ch "
-                    + "INNER JOIN Room r ON ch.RoomId = r.RoomId "
-                    + "LEFT JOIN Account acc ON ch.CancelledBy = acc.AccountId "
-                    + "ORDER BY CASE ch.RefundStatus WHEN 'Pending' THEN 1 ELSE 2 END, ch.CancellationDate DESC";
+            "SELECT * FROM v_RefundRequests "
+                    + "ORDER BY CASE RefundStatus WHEN 'Pending' THEN 1 ELSE 2 END, CancellationDate DESC";
 
     private static final String UPDATE_REFUND_STATUS_SQL =
             "UPDATE CancellationHistory SET RefundStatus = ? WHERE CancellationId = ?";
 
     @Override
     protected String getTableName() {
-        return "CancellationHistory";
+        return "v_RefundRequests";
     }
 
     @Override

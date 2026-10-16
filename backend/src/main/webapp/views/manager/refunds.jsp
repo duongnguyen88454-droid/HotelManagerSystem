@@ -20,9 +20,6 @@
                 <p>Quản lý lịch sử hủy phòng và thẩm định tiền hoàn trả tính toán tự động qua hàm nghiệp vụ CSDL</p>
             </div>
             <div class="portal-header-right">
-                <a href="${pageContext.request.contextPath}/manager/dashboard" class="portal-btn portal-btn-secondary">
-                    Quay Lại Dashboard
-                </a>
             </div>
         </header>
 

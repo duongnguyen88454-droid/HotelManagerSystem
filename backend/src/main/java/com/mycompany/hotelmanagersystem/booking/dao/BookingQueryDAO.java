@@ -15,7 +15,8 @@ import java.util.List;
 
 /**
  * DAO chuyên trách các truy vấn chỉ đọc (Read-only / Query) cho Booking.
- * Áp dụng nguyên lý CQS (Command Query Separation) theo QT 2.1 và QT 2.3 trong ARCHITECTURE_RULES.md.
+ * Áp dụng nguyên lý CQS (Command Query Separation) theo QT 2.1 và QT 2.3 trong
+ * ARCHITECTURE_RULES.md.
  */
 public class BookingQueryDAO extends BaseRepository<CustomerBookingHistoryDTO, String> {
 
@@ -38,18 +39,7 @@ public class BookingQueryDAO extends BaseRepository<CustomerBookingHistoryDTO, S
      * Lấy danh sách lịch sử đặt phòng của một khách hàng (MaKH)
      */
     public List<CustomerBookingHistoryDTO> getBookingHistoryByCustomer(String maKH) {
-        String sql = "SELECT b.BookingId AS MaBooking, CAST(COUNT(br.RoomId) AS VARCHAR) + N' phòng' AS SoPhong, "
-                + "       N'' AS TenLoaiPhong, b.CreateDate AS NgayDat, "
-                + "       MIN(br.ExpectedCheckInDate) AS NgayNhanDuKien, MAX(br.ExpectedCheckOutDate) AS NgayTraDuKien, "
-                + "       ISNULL(inv.FinalTotalAmount, 0) AS ChiPhiDuKien, "
-                + "       ISNULL(MIN(br.BookingStatus), 'Confirmed') AS TrangThaiBooking, "
-                + "       inv.InvoiceId AS MaHoaDon, inv.InvoiceStatus AS TrangThaiHoaDon "
-                + "FROM Booking b "
-                + "LEFT JOIN Booking_Room br ON b.BookingId = br.BookingId "
-                + "LEFT JOIN Invoice inv ON b.BookingId = inv.BookingId "
-                + "WHERE b.CustomerId = ? "
-                + "GROUP BY b.BookingId, b.CreateDate, inv.FinalTotalAmount, inv.InvoiceId, inv.InvoiceStatus "
-                + "ORDER BY b.CreateDate DESC";
+        String sql = "SELECT * FROM v_CustomerBookingHistory WHERE CustomerId = ? ORDER BY CreateDate DESC";
         return query(sql, maKH);
     }
 
@@ -60,18 +50,7 @@ public class BookingQueryDAO extends BaseRepository<CustomerBookingHistoryDTO, S
         if (maTaiKhoan == null || maTaiKhoan.trim().isEmpty()) {
             return new ArrayList<>();
         }
-        String sql = "SELECT b.BookingId AS MaBooking, CAST(COUNT(br.RoomId) AS VARCHAR) + N' phòng' AS SoPhong, "
-                + "       N'' AS TenLoaiPhong, b.CreateDate AS NgayDat, "
-                + "       MIN(br.ExpectedCheckInDate) AS NgayNhanDuKien, MAX(br.ExpectedCheckOutDate) AS NgayTraDuKien, "
-                + "       ISNULL(inv.FinalTotalAmount, 0) AS ChiPhiDuKien, "
-                + "       ISNULL(MIN(br.BookingStatus), 'Confirmed') AS TrangThaiBooking, "
-                + "       inv.InvoiceId AS MaHoaDon, inv.InvoiceStatus AS TrangThaiHoaDon "
-                + "FROM Booking b "
-                + "LEFT JOIN Booking_Room br ON b.BookingId = br.BookingId "
-                + "LEFT JOIN Invoice inv ON b.BookingId = inv.BookingId "
-                + "WHERE b.CreateBy = ? "
-                + "GROUP BY b.BookingId, b.CreateDate, inv.FinalTotalAmount, inv.InvoiceId, inv.InvoiceStatus "
-                + "ORDER BY b.CreateDate DESC";
+        String sql = "SELECT * FROM v_CustomerBookingHistory WHERE AccountId = ? ORDER BY CreateDate DESC";
         return query(sql, maTaiKhoan.trim());
     }
 
@@ -91,22 +70,22 @@ public class BookingQueryDAO extends BaseRepository<CustomerBookingHistoryDTO, S
     }
 
     private CustomerBookingHistoryDTO mapRowToBookingHistoryDTO(ResultSet rs) throws SQLException {
-        Date nhan = rs.getDate("NgayNhanDuKien");
-        Date tra = rs.getDate("NgayTraDuKien");
+        Date nhan = rs.getDate("ExpectedCheckInDate");
+        Date tra = rs.getDate("ExpectedCheckOutDate");
         int soDem = calculateNights(nhan, tra);
 
         return new CustomerBookingHistoryDTO(
-                rs.getString("MaBooking"),
-                rs.getString("SoPhong"),
-                rs.getNString("TenLoaiPhong"),
-                rs.getTimestamp("NgayDat"),
+                rs.getString("BookingId"),
+                rs.getString("RoomSummary"),
+                rs.getNString("RoomTypeName"),
+                rs.getTimestamp("CreateDate"),
                 nhan,
                 tra,
                 soDem,
-                rs.getDouble("ChiPhiDuKien"),
-                rs.getString("TrangThaiBooking"),
-                rs.getString("MaHoaDon"),
-                rs.getString("TrangThaiHoaDon"));
+                rs.getDouble("EstimatedTotal"),
+                rs.getString("BookingStatus"),
+                rs.getString("InvoiceId"),
+                rs.getString("InvoiceStatus"));
     }
 
     private BookingDetailDTO fetchBookingHeader(String maBooking) {

@@ -11,7 +11,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * DAO phụ trách tạo hóa đơn (sp_TaoHoaDon) và truy vấn chi tiết hóa đơn quyết toán.
+ * DAO phụ trách tạo hóa đơn (sp_TaoHoaDon) và truy vấn chi tiết hóa đơn quyết
+ * toán.
  */
 public class InvoiceDAO extends BaseRepository<InvoiceDetailDTO, String> {
 
@@ -42,15 +43,15 @@ public class InvoiceDAO extends BaseRepository<InvoiceDetailDTO, String> {
      */
     public InvoiceDetailDTO getInvoiceHeader(String maHoaDon) throws SQLException, ClassNotFoundException {
         String sql = "SELECT inv.InvoiceId AS MaHoaDon, inv.BookingId AS MaBooking, inv.CreateDate AS NgayLap, "
-                     + "       inv.TotalRoomCharge, inv.TotalServiceCharge, inv.EarlyCheckInFee, inv.LateCheckOutFee, "
-                     + "       inv.FinalTotalAmount AS TongTienCuoiCung, inv.InvoiceStatus AS TrangThaiHoaDon, "
-                     + "       b.CustomerId AS MaKH, c.FullName AS TenKhachHang, "
-                     + "       c.PhoneNumber AS SoDT, c.CCCD, ISNULL(acc.Username, N'Hệ Thống') AS TenNVLap "
-                     + "FROM Invoice inv "
-                     + "INNER JOIN Booking b ON inv.BookingId = b.BookingId "
-                     + "INNER JOIN Customer c ON b.CustomerId = c.CustomerId "
-                     + "LEFT JOIN Account acc ON b.CreateBy = acc.AccountId "
-                     + "WHERE inv.InvoiceId = ?";
+                + "       inv.TotalRoomCharge, inv.TotalServiceCharge, inv.EarlyCheckInFee, inv.LateCheckOutFee, "
+                + "       inv.FinalTotalAmount AS TongTienCuoiCung, inv.InvoiceStatus AS TrangThaiHoaDon, "
+                + "       b.CustomerId AS MaKH, c.FullName AS TenKhachHang, "
+                + "       c.PhoneNumber AS SoDT, c.CCCD, ISNULL(acc.Username, N'Hệ Thống') AS TenNVLap "
+                + "FROM Invoice inv "
+                + "INNER JOIN Booking b ON inv.BookingId = b.BookingId "
+                + "INNER JOIN Customer c ON b.CustomerId = c.CustomerId "
+                + "LEFT JOIN Account acc ON b.CreateBy = acc.AccountId "
+                + "WHERE inv.InvoiceId = ?";
         return queryOneCustom(sql, this::mapRowToInvoiceDetail, maHoaDon).orElse(null);
     }
 
@@ -58,15 +59,14 @@ public class InvoiceDAO extends BaseRepository<InvoiceDetailDTO, String> {
      * Truy vấn danh sách tiền phòng trong hóa đơn theo mã Booking.
      */
     public List<InvoiceRoomItemDTO> getInvoiceRooms(String maBooking) throws SQLException, ClassNotFoundException {
-        String sql = "SELECT br.RoomId AS MaPhong, rt.RoomTypeName AS TenLoaiPhong, br.Price AS DonGiaPhong, "
-                     + "       br.ExpectedCheckInDate AS NgayNhanDuKien, br.ExpectedCheckOutDate AS NgayTraDuKien, "
-                     + "       br.ActualCheckInDate AS NgayCheckInThucTe, br.ActualCheckOutDate AS NgayCheckOutThucTe, "
-                     + "       DATEDIFF(DAY, br.ExpectedCheckInDate, "
-                     + "                ISNULL(CAST(br.ActualCheckOutDate AS DATE), br.ExpectedCheckOutDate)) AS SoDem "
-                     + "FROM Booking_Room br "
-                     + "INNER JOIN Room r ON br.RoomId = r.RoomId "
-                     + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
-                     + "WHERE br.BookingId = ?";
+        String sql = "SELECT br.RoomId AS MaPhong, rd.RoomTypeName AS TenLoaiPhong, br.Price AS DonGiaPhong, "
+                + "       br.ExpectedCheckInDate AS NgayNhanDuKien, br.ExpectedCheckOutDate AS NgayTraDuKien, "
+                + "       br.ActualCheckInDate AS NgayCheckInThucTe, br.ActualCheckOutDate AS NgayCheckOutThucTe, "
+                + "       DATEDIFF(DAY, br.ExpectedCheckInDate, "
+                + "                ISNULL(CAST(br.ActualCheckOutDate AS DATE), br.ExpectedCheckOutDate)) AS SoDem "
+                + "FROM Booking_Room br "
+                + "INNER JOIN v_RoomDetails rd ON br.RoomId = rd.RoomId "
+                + "WHERE br.BookingId = ?";
         return queryCustom(sql, this::mapRowToInvoiceRoom, maBooking);
     }
 
@@ -76,12 +76,12 @@ public class InvoiceDAO extends BaseRepository<InvoiceDetailDTO, String> {
     public List<InvoiceServiceItemDTO> getInvoiceServices(String maBooking)
             throws SQLException, ClassNotFoundException {
         String sql = "SELECT (brs.BookingId + '_' + brs.RoomId + '_' + brs.ServiceId) AS MaBookingDichVu, "
-                     + "       brs.RoomId AS MaPhong, s.ServiceName AS TenDichVu, "
-                     + "       brs.UnitPrice AS DonGia, brs.Quantity AS SoLuong, "
-                     + "       (brs.UnitPrice * brs.Quantity) AS ThanhTien, GETDATE() AS ThoiDiemThem "
-                     + "FROM Booking_Room_Service brs "
-                     + "INNER JOIN Service s ON brs.ServiceId = s.ServiceId "
-                     + "WHERE brs.BookingId = ?";
+                + "       brs.RoomId AS MaPhong, s.ServiceName AS TenDichVu, "
+                + "       brs.UnitPrice AS DonGia, brs.Quantity AS SoLuong, "
+                + "       (brs.UnitPrice * brs.Quantity) AS ThanhTien, GETDATE() AS ThoiDiemThem "
+                + "FROM Booking_Room_Service brs "
+                + "INNER JOIN Service s ON brs.ServiceId = s.ServiceId "
+                + "WHERE brs.BookingId = ?";
         return queryCustom(sql, this::mapRowToInvoiceService, maBooking);
     }
 
@@ -98,15 +98,20 @@ public class InvoiceDAO extends BaseRepository<InvoiceDetailDTO, String> {
         dto.setMaBooking(rs.getString("MaBooking"));
         dto.setNgayLap(rs.getTimestamp("NgayLap"));
         dto.setTongTienCuoiCung(rs.getObject("TongTienCuoiCung") != null
-                ? rs.getDouble("TongTienCuoiCung") : null);
+                ? rs.getDouble("TongTienCuoiCung")
+                : null);
         dto.setTotalRoomCharge(rs.getObject("TotalRoomCharge") != null
-                ? rs.getDouble("TotalRoomCharge") : 0.0);
+                ? rs.getDouble("TotalRoomCharge")
+                : 0.0);
         dto.setTotalServiceCharge(rs.getObject("TotalServiceCharge") != null
-                ? rs.getDouble("TotalServiceCharge") : 0.0);
+                ? rs.getDouble("TotalServiceCharge")
+                : 0.0);
         dto.setEarlyCheckInFee(rs.getObject("EarlyCheckInFee") != null
-                ? rs.getDouble("EarlyCheckInFee") : 0.0);
+                ? rs.getDouble("EarlyCheckInFee")
+                : 0.0);
         dto.setLateCheckOutFee(rs.getObject("LateCheckOutFee") != null
-                ? rs.getDouble("LateCheckOutFee") : 0.0);
+                ? rs.getDouble("LateCheckOutFee")
+                : 0.0);
         dto.setTrangThaiHoaDon(rs.getString("TrangThaiHoaDon"));
         dto.setMaKH(rs.getString("MaKH"));
         dto.setTenKhachHang(rs.getString("TenKhachHang"));
@@ -131,8 +136,7 @@ public class InvoiceDAO extends BaseRepository<InvoiceDetailDTO, String> {
                 rs.getTimestamp("NgayCheckInThucTe"),
                 rs.getTimestamp("NgayCheckOutThucTe"),
                 soDem,
-                donGia * soDem
-        );
+                donGia * soDem);
     }
 
     private InvoiceServiceItemDTO mapRowToInvoiceService(ResultSet rs) throws SQLException {
@@ -143,7 +147,6 @@ public class InvoiceDAO extends BaseRepository<InvoiceDetailDTO, String> {
                 rs.getDouble("DonGia"),
                 rs.getInt("SoLuong"),
                 rs.getDouble("ThanhTien"),
-                rs.getTimestamp("ThoiDiemThem")
-        );
+                rs.getTimestamp("ThoiDiemThem"));
     }
 }

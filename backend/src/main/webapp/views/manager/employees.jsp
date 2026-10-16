@@ -20,9 +20,6 @@
                 <p>Quản lý hồ sơ nhân viên, theo dõi ngày vào/nghỉ việc và kiểm soát khóa tài khoản</p>
             </div>
             <div class="portal-header-right">
-                <a href="${pageContext.request.contextPath}/manager/dashboard" class="portal-btn portal-btn-secondary">
-                    Quay Lại Dashboard
-                </a>
             </div>
         </header>
 

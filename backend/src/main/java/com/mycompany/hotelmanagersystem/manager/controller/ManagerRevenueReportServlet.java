@@ -1,7 +1,6 @@
 package com.mycompany.hotelmanagersystem.manager.controller;
 
-import com.mycompany.hotelmanagersystem.manager.dto.DailyAuditReportDTO;
-import com.mycompany.hotelmanagersystem.manager.dto.MonthlyRevenueDTO;
+import com.mycompany.hotelmanagersystem.manager.service.ManagerEmployeeService;
 import com.mycompany.hotelmanagersystem.manager.service.ManagerReportService;
 
 import jakarta.servlet.ServletException;
@@ -10,43 +9,51 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 
 @WebServlet(name = "ManagerRevenueReportServlet", urlPatterns = {"/manager/revenue"})
 public class ManagerRevenueReportServlet extends HttpServlet {
 
     private final ManagerReportService reportService = new ManagerReportService();
+    private final ManagerEmployeeService employeeService = new ManagerEmployeeService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        LocalDate reportDate = parseDate(request.getParameter("date"), LocalDate.now());
-        DailyAuditReportDTO dailyReport = reportService.getDailyAuditReport(reportDate);
-        List<MonthlyRevenueDTO> monthlyList = reportService.getMonthlyRevenueList();
+        String reportType = request.getParameter("type");
+        if (reportType == null || reportType.trim().isEmpty()) {
+            reportType = "invoice";
+        }
+        LocalDate fromDate = parseDate(request.getParameter("fromDate"), LocalDate.now().withDayOfMonth(1));
+        LocalDate toDate = parseDate(request.getParameter("toDate"), LocalDate.now());
+        String employeeId = request.getParameter("employeeId");
 
-        handleRangeFilter(request);
+        request.setAttribute("employeeList", employeeService.getAllEmployees());
+        request.setAttribute("reportType", reportType);
+        request.setAttribute("fromDate", fromDate);
+        request.setAttribute("toDate", toDate);
+        request.setAttribute("selectedEmployeeId", employeeId);
 
-        request.setAttribute("reportDate", reportDate);
-        request.setAttribute("dailyReport", dailyReport);
-        request.setAttribute("monthlyList", monthlyList);
+        loadReportData(request, reportType, fromDate, toDate, employeeId);
         request.getRequestDispatcher("/views/manager/revenue_report.jsp").forward(request, response);
     }
 
-    private void handleRangeFilter(HttpServletRequest request) {
-        String fromStr = request.getParameter("fromDate");
-        String toStr = request.getParameter("toDate");
-        if (fromStr != null && toStr != null && !fromStr.isEmpty() && !toStr.isEmpty()) {
-            LocalDate fromDate = parseDate(fromStr, null);
-            LocalDate toDate = parseDate(toStr, null);
-            if (fromDate != null && toDate != null && !fromDate.isAfter(toDate)) {
-                BigDecimal rangeRev = reportService.getRevenueByRange(fromDate, toDate);
-                request.setAttribute("rangeRevenue", rangeRev);
-                request.setAttribute("filterFromDate", fromDate);
-                request.setAttribute("filterToDate", toDate);
-            }
+    private void loadReportData(HttpServletRequest req, String type, LocalDate from, LocalDate to, String empId) {
+        switch (type) {
+            case "room":
+                req.setAttribute("roomReport", reportService.getRoomRevenueReport(from, to, empId));
+                break;
+            case "product":
+                req.setAttribute("productReport", reportService.getProductRevenueReport(from, to));
+                break;
+            case "overall":
+                req.setAttribute("overallReport", reportService.getPaymentReceiptReport(from, to, empId));
+                break;
+            case "invoice":
+            default:
+                req.setAttribute("invoiceReport", reportService.getInvoiceRevenueReport(from, to, empId));
+                break;
         }
     }
 
@@ -61,3 +68,4 @@ public class ManagerRevenueReportServlet extends HttpServlet {
         }
     }
 }
+

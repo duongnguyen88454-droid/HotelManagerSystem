@@ -18,13 +18,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * DAO chuyên trách các truy vấn đọc dữ liệu phục vụ Quầy Tiếp Đón Check-in (QT 2.1).
+ * DAO chuyên trách các truy vấn đọc dữ liệu phục vụ Quầy Tiếp Đón Check-in (QT
+ * 2.1).
  */
 public class BookingCheckInQueryDAO extends BaseRepository<CheckInArrivalItemDTO, String> {
 
     @Override
     protected String getTableName() {
-        return "Booking";
+        return "v_ArrivalCheckInBookings";
     }
 
     @Override
@@ -69,51 +70,43 @@ public class BookingCheckInQueryDAO extends BaseRepository<CheckInArrivalItemDTO
     }
 
     private String buildArrivalQuerySql(boolean hasHoTen, boolean hasCccd, boolean hasMaBK, boolean hasKeyword) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT b.BookingId AS MaBooking, c.FullName AS HoTen, c.PhoneNumber AS SoDT, c.CCCD, ");
-        sb.append("       MIN(br.ExpectedCheckInDate) AS NgayNhan, MAX(br.ExpectedCheckOutDate) AS NgayTra, ");
-        sb.append("       COUNT(br.RoomId) AS TongSoPhong, ");
-        sb.append("       COUNT(CASE WHEN br.ActualCheckInDate IS NOT NULL THEN 1 END) AS SoPhongDaNhan ");
-        sb.append("FROM Booking b ");
-        sb.append("INNER JOIN Customer c ON b.CustomerId = c.CustomerId ");
-        sb.append("INNER JOIN Booking_Room br ON b.BookingId = br.BookingId ");
-        sb.append("WHERE br.BookingStatus IN ('Confirmed', 'CheckedIn') ");
+        StringBuilder sb = new StringBuilder("SELECT * FROM v_ArrivalCheckInBookings WHERE 1=1 ");
         if (hasKeyword) {
-            sb.append("AND (c.FullName LIKE ? OR c.CCCD LIKE ? OR b.BookingId LIKE ? OR c.PhoneNumber LIKE ?) ");
+            sb.append("AND (CustomerName LIKE ? OR CCCD LIKE ? OR BookingId LIKE ? OR PhoneNumber LIKE ?) ");
         }
         if (hasHoTen) {
-            sb.append("AND c.FullName LIKE ? ");
+            sb.append("AND CustomerName LIKE ? ");
         }
         if (hasCccd) {
-            sb.append("AND c.CCCD = ? ");
+            sb.append("AND CCCD = ? ");
         }
         if (hasMaBK) {
-            sb.append("AND b.BookingId LIKE ? ");
+            sb.append("AND BookingId LIKE ? ");
         }
-        sb.append("GROUP BY b.BookingId, c.FullName, c.PhoneNumber, c.CCCD ");
-        sb.append("ORDER BY MIN(br.ExpectedCheckInDate) ASC, b.BookingId ASC");
+        sb.append("ORDER BY ExpectedCheckInDate ASC, BookingId ASC");
         return sb.toString();
     }
 
     private CheckInArrivalItemDTO mapRowToArrivalDTO(ResultSet rs) throws SQLException {
-        Date inSql = rs.getDate("NgayNhan");
-        Date outSql = rs.getDate("NgayTra");
+        Date inSql = rs.getDate("ExpectedCheckInDate");
+        Date outSql = rs.getDate("ExpectedCheckOutDate");
         LocalDate inDate = inSql != null ? inSql.toLocalDate() : null;
         LocalDate outDate = outSql != null ? outSql.toLocalDate() : null;
 
         return new CheckInArrivalItemDTO(
-                rs.getString("MaBooking"),
-                rs.getString("HoTen"),
-                rs.getString("SoDT"),
+                rs.getString("BookingId"),
+                rs.getString("CustomerName"),
+                rs.getString("PhoneNumber"),
                 rs.getString("CCCD"),
                 inDate,
                 outDate,
-                rs.getInt("TongSoPhong"),
-                rs.getInt("SoPhongDaNhan"));
+                rs.getInt("TotalRooms"),
+                rs.getInt("ReceivedRooms"));
     }
 
     /**
-     * Lấy thông tin chi tiết một đơn đặt phòng kèm các phòng và dịch vụ đã đặt trước.
+     * Lấy thông tin chi tiết một đơn đặt phòng kèm các phòng và dịch vụ đã đặt
+     * trước.
      */
     public CheckInDetailDTO getBookingCheckInDetail(String maBooking) {
         if (maBooking == null || maBooking.trim().isEmpty()) {

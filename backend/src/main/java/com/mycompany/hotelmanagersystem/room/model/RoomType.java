@@ -19,6 +19,9 @@ public class RoomType implements Serializable {
     private double earlyCheckInFee;
     private double lateCheckOutFee;
     private double depositPercent;
+    private String tienNghi;
+    private String bedTypeIdsWithQty;
+    private String amenityIds;
 
     public RoomType() {
     }
@@ -111,5 +114,29 @@ public class RoomType implements Serializable {
 
     public void setDepositPercent(double depositPercent) {
         this.depositPercent = depositPercent;
+    }
+
+    public String getTienNghi() {
+        return tienNghi;
+    }
+
+    public void setTienNghi(String tienNghi) {
+        this.tienNghi = tienNghi;
+    }
+
+    public String getBedTypeIdsWithQty() {
+        return bedTypeIdsWithQty;
+    }
+
+    public void setBedTypeIdsWithQty(String bedTypeIdsWithQty) {
+        this.bedTypeIdsWithQty = bedTypeIdsWithQty;
+    }
+
+    public String getAmenityIds() {
+        return amenityIds;
+    }
+
+    public void setAmenityIds(String amenityIds) {
+        this.amenityIds = amenityIds;
     }
 }

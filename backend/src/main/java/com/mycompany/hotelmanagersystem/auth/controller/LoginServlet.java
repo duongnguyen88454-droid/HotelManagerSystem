@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
+@WebServlet(name = "LoginServlet", urlPatterns = { "/login" })
 public class LoginServlet extends HttpServlet {
     private AuthService authService;
 
@@ -42,7 +42,8 @@ public class LoginServlet extends HttpServlet {
         String redirectTarget = request.getParameter("redirect");
 
         try {
-            // Xác thực đăng nhập qua AuthService (Service băm SHA-256 mật khẩu vừa nhập và so khớp với CSDL)
+            // Xác thực đăng nhập qua AuthService (Service băm SHA-256 mật khẩu vừa nhập và
+            // so khớp với CSDL)
             UserSessionDTO user = authService.login(loginIdentifier, password);
 
             // Lưu người dùng vào session

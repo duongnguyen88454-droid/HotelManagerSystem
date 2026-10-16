@@ -1,46 +1,40 @@
 package com.mycompany.hotelmanagersystem.manager.service;
 
-import com.mycompany.hotelmanagersystem.manager.dao.ManagerReportDAO;
-import com.mycompany.hotelmanagersystem.manager.dao.ServiceAnalyticsDAO;
-import com.mycompany.hotelmanagersystem.manager.dto.DailyAuditReportDTO;
-import com.mycompany.hotelmanagersystem.manager.dto.MonthlyRevenueDTO;
-import com.mycompany.hotelmanagersystem.manager.dto.ServiceAnalyticsDTO;
+import com.mycompany.hotelmanagersystem.manager.dao.RevenueReportDAO;
+import com.mycompany.hotelmanagersystem.manager.dto.InvoiceRevenueItemDTO;
+import com.mycompany.hotelmanagersystem.manager.dto.PaymentReceiptItemDTO;
+import com.mycompany.hotelmanagersystem.manager.dto.ProductRevenueItemDTO;
+import com.mycompany.hotelmanagersystem.manager.dto.RoomRevenueItemDTO;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 public class ManagerReportService {
 
-    private final ManagerReportDAO reportDAO;
-    private final ServiceAnalyticsDAO serviceAnalyticsDAO;
+    private final RevenueReportDAO revenueReportDAO;
 
     public ManagerReportService() {
-        this.reportDAO = new ManagerReportDAO();
-        this.serviceAnalyticsDAO = new ServiceAnalyticsDAO();
+        this.revenueReportDAO = new RevenueReportDAO();
     }
 
-    public ManagerReportService(ManagerReportDAO reportDAO, ServiceAnalyticsDAO serviceAnalyticsDAO) {
-        this.reportDAO = reportDAO;
-        this.serviceAnalyticsDAO = serviceAnalyticsDAO;
+    public ManagerReportService(RevenueReportDAO revenueReportDAO) {
+        this.revenueReportDAO = revenueReportDAO;
     }
 
-    public DailyAuditReportDTO getDailyAuditReport(LocalDate reportDate) {
-        return reportDAO.getDailyAuditReport(reportDate);
+    public List<InvoiceRevenueItemDTO> getInvoiceRevenueReport(LocalDate from, LocalDate to, String empId) {
+        return revenueReportDAO.getInvoiceRevenueReport(from, to, empId);
     }
 
-    public List<MonthlyRevenueDTO> getMonthlyRevenueList() {
-        return reportDAO.getMonthlyRevenueList();
+    public List<RoomRevenueItemDTO> getRoomRevenueReport(LocalDate from, LocalDate to, String empId) {
+        return revenueReportDAO.getRoomRevenueReport(from, to, empId);
     }
 
-    public BigDecimal getRevenueByRange(LocalDate fromDate, LocalDate toDate) {
-        if (fromDate == null || toDate == null || fromDate.isAfter(toDate)) {
-            return BigDecimal.ZERO;
-        }
-        return reportDAO.getRevenueByRange(fromDate, toDate);
+    public List<ProductRevenueItemDTO> getProductRevenueReport(LocalDate from, LocalDate to) {
+        return revenueReportDAO.getProductRevenueReport(from, to);
     }
 
-    public List<ServiceAnalyticsDTO> getServiceAnalytics() {
-        return serviceAnalyticsDAO.getServiceAnalytics();
+    public List<PaymentReceiptItemDTO> getPaymentReceiptReport(LocalDate from, LocalDate to, String empId) {
+        return revenueReportDAO.getPaymentReceiptReport(from, to, empId);
     }
 }
+

@@ -55,18 +55,12 @@ public class AuthService {
             case "HOUSEKEEPER":
                 return contextPath + "/housekeeper/tasks";
             case "MANAGER":
-                return contextPath + "/manager/dashboard";
+                return contextPath + "/manager/hotel-config";
             default:
                 return contextPath + "/index.jsp";
         }
     }
 
-    /**
-     * Đăng ký tài khoản Web Khách hàng mới online (Chỉ ghi vào bảng TAIKHOAN với
-     * đúng 6 thuộc tính chuẩn;
-     * Hoàn toàn không ghi vào bảng KHACHHANG, không bắt buộc SĐT lúc tạo tài
-     * khoản).
-     */
     public boolean register(String hoTen, String email, String password, String confirmPassword)
             throws Exception {
         if (hoTen == null || hoTen.trim().isEmpty() ||
