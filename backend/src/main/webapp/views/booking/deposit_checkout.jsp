@@ -39,16 +39,22 @@
                                 Xác Nhận Đặt Cọc Giữ Chỗ Phòng
                             </h2>
                             <div style="font-size: 13px; color: #e2e8f0;">
-                                Mã đơn đặt phòng: <strong>${bookingDetail.maBooking}</strong> &nbsp;|&nbsp;
+                                <c:choose>
+                                    <c:when test="${not empty bookingDetail.maBooking && bookingDetail.maBooking != 'CHO_THANH_TOAN'}">
+                                        Mã đơn đặt phòng: <strong>${bookingDetail.maBooking}</strong> &nbsp;|&nbsp;
+                                    </c:when>
+                                    <c:otherwise>
+                                        Trạng thái: <strong style="color: #feebc8;">Chờ Thanh Toán Để Tạo Đơn</strong> &nbsp;|&nbsp;
+                                    </c:otherwise>
+                                </c:choose>
                                 Khách hàng: <strong>${bookingDetail.hoTenKhachHang}</strong> (${bookingDetail.soDT})
                             </div>
                         </div>
                         <div
                             style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); padding: 8px 16px; border-radius: 6px; font-size: 13px; text-align: right;">
                             <span
-                                style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85;">Thời
-                                hạn hoàn tất cọc</span>
-                            <strong style="font-size: 15px; color: #feebc8;">10 Phút Giữ Chỗ</strong>
+                                style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85;">Quy trình</span>
+                            <strong style="font-size: 15px; color: #feebc8;">Thanh Toán Để Chốt Phòng</strong>
                         </div>
                     </div>
                 </div>
@@ -193,22 +199,30 @@
                             <div
                                 style="display: flex; justify-content: space-between; border-top: 1px dashed #cbd5e0; padding-top: 6px; margin-top: 6px;">
                                 <span style="color: #718096;">Nội dung CK:</span>
-                                <strong style="color: #2b6cb0; font-size: 14px; font-family: monospace;">COC
-                                    ${bookingDetail.maBooking}</strong>
+                                <strong style="color: #2b6cb0; font-size: 14px; font-family: monospace;">
+                                    <c:choose>
+                                        <c:when test="${not empty bookingDetail.maBooking && bookingDetail.maBooking != 'CHO_THANH_TOAN'}">
+                                            COC ${bookingDetail.maBooking}
+                                        </c:when>
+                                        <c:otherwise>
+                                            COC ${bookingDetail.soDT}
+                                        </c:otherwise>
+                                    </c:choose>
+                                </strong>
                             </div>
                         </div>
 
                         <!-- Nút bấm xác nhận thanh toán -->
                         <form action="${pageContext.request.contextPath}/customer/deposit" method="POST"
                             style="margin: 0;">
-                            <input type="hidden" name="bookingId" value="${bookingDetail.maBooking}">
+                            <input type="hidden" name="bookingId" value="${bookingDetail.maBooking != 'CHO_THANH_TOAN' ? bookingDetail.maBooking : ''}">
                             <input type="hidden" name="paymentMethod" value="BankTransfer">
 
                             <button type="submit"
                                 style="width: 100%; background: #2f855a; color: white; border: none; padding: 14px 20px; border-radius: 6px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 6px rgba(47, 133, 90, 0.25); transition: background 0.2s;"
                                 onmouseover="this.style.background='#276749'"
                                 onmouseout="this.style.background='#2f855a'">
-                                Tôi Đã Hoàn Tất Chuyển Khoản
+                                Tôi Đã Hoàn Tất Chuyển Khoản & Xác Nhận Đặt Phòng
                             </button>
                         </form>
 

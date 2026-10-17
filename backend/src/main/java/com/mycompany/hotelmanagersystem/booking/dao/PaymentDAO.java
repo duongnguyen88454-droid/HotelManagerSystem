@@ -61,17 +61,4 @@ public class PaymentDAO extends BaseRepository<Object, String> {
             return cs.getString(4);
         }
     }
-
-    /**
-     * Dọn dẹp các đơn đặt phòng quá hạn giữ chỗ chưa nộp cọc.
-     */
-    public void cleanExpiredBookings() {
-        String sql = "{call dbo.sp_DonDepDonHetHanGiuCho}";
-        try (Connection conn = DBContext.getConnection(getRole());
-             CallableStatement cs = conn.prepareCall(sql)) {
-            cs.execute();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 }

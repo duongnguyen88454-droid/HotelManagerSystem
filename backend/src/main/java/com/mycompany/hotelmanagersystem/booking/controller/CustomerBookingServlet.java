@@ -95,10 +95,12 @@ public class CustomerBookingServlet extends HttpServlet {
 
     private String resolveCheckOutParam(HttpServletRequest request) {
         String checkOut = request.getParameter("checkOut");
-        return (checkOut != null && !checkOut.trim().isEmpty()) ? checkOut.trim() : LocalDate.now().plusDays(1).toString();
+        return (checkOut != null && !checkOut.trim().isEmpty()) ? checkOut.trim()
+                : LocalDate.now().plusDays(1).toString();
     }
 
-    private AvailableRoomDTO resolveCurrentRoom(HttpServletRequest request, String roomId, String checkIn, String checkOut) {
+    private AvailableRoomDTO resolveCurrentRoom(HttpServletRequest request, String roomId, String checkIn,
+            String checkOut) {
         if (roomId == null || roomId.trim().isEmpty()) {
             return null;
         }
@@ -217,8 +219,7 @@ public class CustomerBookingServlet extends HttpServlet {
                     roomDetail.getTenLoaiPhong(),
                     roomDetail.getGiaPhong(),
                     checkIn.trim(),
-                    checkOut.trim()
-            ));
+                    checkOut.trim()));
             if (session != null) {
                 session.setAttribute("BOOKING_CART", cart);
             }
@@ -230,30 +231,14 @@ public class CustomerBookingServlet extends HttpServlet {
     }
 
     private void executeBooking(HttpServletRequest request, HttpServletResponse response,
-                                HttpSession session, UserSessionDTO currentUser,
-                                Customer guest, BookingCartDTO cart)
+            HttpSession session, UserSessionDTO currentUser,
+            Customer guest, BookingCartDTO cart)
             throws ServletException, IOException {
-        try {
-            String note = request.getParameter("note");
-            String maTaiKhoan = currentUser.getMaTaiKhoan();
-            String maKH = customerService.findOrUpsertGuestByCCCD(
-                    guest.getHoTen(), guest.getEmail(), guest.getSoDT(), guest.getCccd());
-
-            String createdBookingId = bookingService.createMultiRoomBooking(maKH, maTaiKhoan, cart, note);
-
-            currentUser.setSoDT(guest.getSoDT());
-            currentUser.setMaDinhDanh(maKH);
-            session.setAttribute("CURRENT_USER", currentUser);
-            session.setAttribute("SAVED_CCCD", guest.getCccd());
-            session.removeAttribute("BOOKING_CART");
-
-            response.sendRedirect(request.getContextPath() + "/customer/deposit?bookingId=" + createdBookingId);
-        } catch (IllegalArgumentException ex) {
-            request.setAttribute("errorMessage", ex.getMessage());
-            doGet(request, response);
-        } catch (Exception ex) {
-            request.setAttribute("errorMessage", "Đã xảy ra lỗi trong quá trình đặt phòng: " + ex.getMessage());
-            doGet(request, response);
+        String note = request.getParameter("note");
+        if (session != null) {
+            session.setAttribute("PENDING_BOOKING_GUEST", guest);
+            session.setAttribute("PENDING_BOOKING_NOTE", note);
         }
+        response.sendRedirect(request.getContextPath() + "/customer/deposit");
     }
 }

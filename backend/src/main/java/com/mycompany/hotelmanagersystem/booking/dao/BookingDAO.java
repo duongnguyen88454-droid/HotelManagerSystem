@@ -8,7 +8,6 @@ import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
 import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -91,8 +90,6 @@ public class BookingDAO extends BaseRepository<Object, String> {
         try {
             conn = DBContext.getConnection(getRole());
             conn.setAutoCommit(false);
-
-            cleanupExpiredPendingBookings(conn);
 
             for (CartRoomItemDTO roomItem : cart.getItems().values()) {
                 Date dIn = Date.valueOf(roomItem.getNgayNhan());
@@ -212,12 +209,6 @@ public class BookingDAO extends BaseRepository<Object, String> {
             }
         }
         return "BK001";
-    }
-
-    private void cleanupExpiredPendingBookings(Connection conn) throws SQLException {
-        try (CallableStatement cs = conn.prepareCall("{call dbo.sp_DonDepDonHetHanGiuCho}")) {
-            cs.execute();
-        }
     }
 
     private void rollbackTransaction(Connection conn) {

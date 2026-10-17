@@ -25,11 +25,4 @@ public class PaymentService {
         }
         return paymentDAO.confirmDepositPaymentSP(bookingId.trim(), paymentMethod, note);
     }
-
-    /**
-     * Dọn dẹp các đơn đặt phòng quá hạn giữ chỗ chưa nộp cọc.
-     */
-    public void cleanExpiredBookings() {
-        paymentDAO.cleanExpiredBookings();
-    }
 }

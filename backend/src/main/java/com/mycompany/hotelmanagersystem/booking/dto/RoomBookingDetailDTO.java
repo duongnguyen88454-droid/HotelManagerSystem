@@ -1,13 +1,14 @@
 package com.mycompany.hotelmanagersystem.booking.dto;
 
 import java.io.Serializable;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
- * DTO chi tiết của 1 phòng trong đơn đặt phòng kèm danh sách các dịch vụ gọi cho phòng đó
+ * DTO chi tiết của 1 phòng trong đơn đặt phòng kèm danh sách các dịch vụ gọi
+ * cho phòng đó
  */
 public class RoomBookingDetailDTO implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -30,8 +31,8 @@ public class RoomBookingDetailDTO implements Serializable {
     public RoomBookingDetailDTO() {
     }
 
-    public RoomBookingDetailDTO(String maPhong, String soPhong, String maLoaiPhong, String tenLoaiPhong, 
-                                double donGiaPhong, Date ngayNhanDuKien, Date ngayTraDuKien, int soDem) {
+    public RoomBookingDetailDTO(String maPhong, String soPhong, String maLoaiPhong, String tenLoaiPhong,
+            double donGiaPhong, Date ngayNhanDuKien, Date ngayTraDuKien, int soDem) {
         this.maPhong = maPhong;
         this.soPhong = soPhong;
         this.maLoaiPhong = maLoaiPhong;
