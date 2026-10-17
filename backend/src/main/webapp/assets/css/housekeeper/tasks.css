@@ -213,3 +213,77 @@
 .empty-state-desc {
     font-size: var(--fs-xs);
 }
+
+/* ========================================================================= */
+/* ĐỊNH DẠNG MODAL VÀ CHECKBOX CHO BÀN LÀM VIỆC BUỒNG PHÒNG                  */
+/* ========================================================================= */
+.modal-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: var(--space-4, 16px) var(--space-5, 20px) !important;
+    border-bottom: 1px solid var(--color-border, #e2e8f0) !important;
+}
+
+.modal-header .modal-title,
+.modal-title {
+    font-size: var(--fs-lg, 1.125rem) !important;
+    font-weight: var(--fw-semibold, 600) !important;
+    margin: 0 !important;
+    color: var(--color-text-main, #0f172a) !important;
+}
+
+.modal-close {
+    background: transparent !important;
+    border: none !important;
+    font-size: 1.5rem !important;
+    line-height: 1 !important;
+    color: var(--color-text-muted, #64748b) !important;
+    cursor: pointer !important;
+    padding: 4px 8px !important;
+    border-radius: var(--radius-sm, 4px) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+}
+
+.modal-close:hover {
+    color: var(--color-text-main, #0f172a) !important;
+    background: var(--color-surface-alt, #f1f5f9) !important;
+}
+
+.modal-footer {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: var(--space-3, 12px) !important;
+    padding: var(--space-4, 16px) var(--space-5, 20px) !important;
+    border-top: 1px solid var(--color-border, #e2e8f0) !important;
+    background-color: var(--color-surface-alt, #f8fafc) !important;
+}
+
+.checkbox-card {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: var(--space-3, 12px) !important;
+    padding: var(--space-3, 12px) !important;
+    border: 1px solid var(--color-border, #e2e8f0) !important;
+    border-radius: var(--radius-md, 8px) !important;
+    background-color: var(--color-surface, #ffffff) !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.checkbox-card:hover {
+    border-color: var(--color-primary, #2563eb) !important;
+    background-color: var(--color-surface-subtle, #f8fafc) !important;
+}
+
+.checkbox-card input[type="checkbox"] {
+    margin-top: 3px !important;
+    width: 18px !important;
+    height: 18px !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+}
+

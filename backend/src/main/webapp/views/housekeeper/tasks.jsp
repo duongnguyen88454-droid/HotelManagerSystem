@@ -4,6 +4,7 @@
             <jsp:include page="/views/common/header.jsp">
                 <jsp:param name="title" value="Bàn Làm Việc Buồng Phòng - Danh Sách Nhiệm Vụ" />
                 <jsp:param name="zone" value="portal" />
+                <jsp:param name="pageCss" value="housekeeper/tasks.css" />
             </jsp:include>
 
             <div class="portal-wrapper portal-layout">
