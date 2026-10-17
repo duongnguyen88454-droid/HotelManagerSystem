@@ -42,6 +42,11 @@ public class HousekeeperTaskDAO extends BaseRepository<HousekeeperTaskDTO, Strin
         return this::mapTaskRow;
     }
 
+    @Override
+    protected String getRole() {
+        return "Housekeeper";
+    }
+
     public List<HousekeeperTaskDTO> getTasks(String statusFilter) {
         return getTasks(statusFilter, null, null);
     }
