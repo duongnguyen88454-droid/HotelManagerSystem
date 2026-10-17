@@ -35,6 +35,11 @@ public class DamageReportDAO extends BaseRepository<DamageCategoryDTO, String> {
                 rs.getString("DamageName"));
     }
 
+    @Override
+    protected String getRole() {
+        return "Housekeeper";
+    }
+
     public List<DamageCategoryDTO> getAllDamageCategories() {
         return query(SELECT_CATEGORIES_SQL);
     }
@@ -44,7 +49,7 @@ public class DamageReportDAO extends BaseRepository<DamageCategoryDTO, String> {
             throws SQLException, ClassNotFoundException {
         Connection conn = null;
         try {
-            conn = DBContext.getConnection();
+            conn = DBContext.getConnection(getRole());
             conn.setAutoCommit(false);
 
             String maPhong = findRoomIdByTask(conn, maNhiemVu);

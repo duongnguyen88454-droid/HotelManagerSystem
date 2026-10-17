@@ -29,6 +29,11 @@ public class ManagerDashboardDAO extends BaseRepository<RoomOccupancyDTO, Intege
         return this::mapResultSetToDTO;
     }
 
+    @Override
+    protected String getRole() {
+        return "Manager";
+    }
+
     public RoomOccupancyDTO getOccupancySummary() {
         return queryOne(SELECT_OCCUPANCY_SQL).orElseGet(() -> new RoomOccupancyDTO(0, 0, 0, 0, 0, BigDecimal.ZERO));
     }

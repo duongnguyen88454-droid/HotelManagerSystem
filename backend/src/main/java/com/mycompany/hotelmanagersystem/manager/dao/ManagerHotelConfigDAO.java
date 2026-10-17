@@ -48,6 +48,11 @@ public class ManagerHotelConfigDAO extends BaseRepository<RoomType, String> {
         };
     }
 
+    @Override
+    protected String getRole() {
+        return "Manager";
+    }
+
     public List<RoomType> getAllRoomTypes() {
         String sql = "SELECT rt.RoomTypeId, rt.RoomTypeName, rt.BasePrice, rt.Capacity, rt.EarlyCheckInFee, "
                 + "rt.LateCheckOutFee, rt.DepositPercent, rt.IsActive, "
@@ -92,7 +97,7 @@ public class ManagerHotelConfigDAO extends BaseRepository<RoomType, String> {
                 + "BasePrice = ?, EarlyCheckInFee = ?, LateCheckOutFee = ?, "
                 + "DepositPercent = ?, IsActive = ? WHERE RoomTypeId = ?";
 
-        try (Connection conn = DBContext.getConnection()) {
+        try (Connection conn = DBContext.getConnection(getRole())) {
             conn.setAutoCommit(false);
             try {
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -148,7 +153,7 @@ public class ManagerHotelConfigDAO extends BaseRepository<RoomType, String> {
         String sqlRoomType = "INSERT INTO RoomType (RoomTypeId, RoomTypeName, Capacity, BasePrice, EarlyCheckInFee, "
                 + "LateCheckOutFee, DepositPercent, IsActive) VALUES (?, ?, ?, ?, ?, ?, ?, 1)";
 
-        try (Connection conn = DBContext.getConnection()) {
+        try (Connection conn = DBContext.getConnection(getRole())) {
             conn.setAutoCommit(false);
             try {
                 try (PreparedStatement ps = conn.prepareStatement(sqlRoomType)) {

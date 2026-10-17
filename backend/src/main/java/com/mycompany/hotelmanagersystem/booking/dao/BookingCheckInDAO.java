@@ -16,7 +16,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
- * DAO chuyên trách các truy vấn và thủ tục Check-in cho Phân hệ Lễ tân (Phase 3).
+ * DAO chuyên trách các truy vấn và thủ tục Check-in cho Phân hệ Lễ tân (Phase
+ * 3).
  * Tách biệt hoàn toàn khỏi BookingDAO để tuân thủ QT 2.1 và QT 5.2.
  */
 public class BookingCheckInDAO extends BaseRepository<BookingBarDTO, String> {
@@ -36,8 +37,14 @@ public class BookingCheckInDAO extends BaseRepository<BookingBarDTO, String> {
         return rs -> mapRowToBookingBar(rs, LocalDate.now());
     }
 
+    @Override
+    protected String getRole() {
+        return "Receptionist";
+    }
+
     /**
-     * Truy vấn toàn bộ dải đặt phòng trong tuần có trạng thái Confirmed hoặc CheckedIn.
+     * Truy vấn toàn bộ dải đặt phòng trong tuần có trạng thái Confirmed hoặc
+     * CheckedIn.
      */
     public List<BookingBarDTO> getBookingBarsInWeek(LocalDate startDate, LocalDate endDate) {
         String sql = "SELECT br.BookingId AS MaBooking, br.RoomId AS MaPhong, c.FullName AS TenKhachHang, "
@@ -108,7 +115,7 @@ public class BookingCheckInDAO extends BaseRepository<BookingBarDTO, String> {
     public boolean executeCheckIn(String maBooking, String maPhong) {
         String callSql = "{CALL sp_CheckInNhanPhong(?, ?)}";
 
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
                 CallableStatement cs = conn.prepareCall(callSql)) {
 
             cs.setString(1, maBooking);
@@ -138,7 +145,7 @@ public class BookingCheckInDAO extends BaseRepository<BookingBarDTO, String> {
 
         Connection conn = null;
         try {
-            conn = DBContext.getConnection();
+            conn = DBContext.getConnection(getRole());
             conn.setAutoCommit(false);
 
             try (PreparedStatement psBp = conn.prepareStatement(updateBp);

@@ -61,12 +61,17 @@ public class ManagerEmployeeDAO extends BaseRepository<EmployeeItemDTO, String> 
         return this::mapRowToDTO;
     }
 
+    @Override
+    protected String getRole() {
+        return "Manager";
+    }
+
     public List<EmployeeItemDTO> getAllEmployees() {
         return query(SELECT_EMPLOYEES_SQL);
     }
 
     public boolean updateEmployeeResignation(String employeeId, boolean isResigned) {
-        try (Connection conn = DBContext.getConnection()) {
+        try (Connection conn = DBContext.getConnection(getRole())) {
             conn.setAutoCommit(false);
             if (isResigned) {
                 try (PreparedStatement ps = conn.prepareStatement(RESIGN_EMPLOYEE_SQL)) {
@@ -97,7 +102,7 @@ public class ManagerEmployeeDAO extends BaseRepository<EmployeeItemDTO, String> 
     public boolean createEmployeeWithAccount(CreateEmployeeDTO dto) {
         String callAccountSql = "{call dbo.sp_ThemTaiKhoan(?, ?, ?, ?, ?)}";
         String callEmployeeSql = "{call dbo.sp_ThemNhanVien(?, ?, ?, ?, NULL, ?)}";
-        try (Connection conn = DBContext.getConnection()) {
+        try (Connection conn = DBContext.getConnection(getRole())) {
             conn.setAutoCommit(false);
             String newAccountId;
             try (CallableStatement csAcc = conn.prepareCall(callAccountSql)) {
@@ -131,7 +136,7 @@ public class ManagerEmployeeDAO extends BaseRepository<EmployeeItemDTO, String> 
         String updateWithPassSql = "UPDATE Account SET UserName = ?, Password = ?, Role = ?, AccountStatus = ? WHERE AccountId = ?";
         String updateNoPassSql = "UPDATE Account SET UserName = ?, Role = ?, AccountStatus = ? WHERE AccountId = ?";
 
-        try (Connection conn = DBContext.getConnection()) {
+        try (Connection conn = DBContext.getConnection(getRole())) {
             String accountId = findAccountIdByEmpId(conn, findAccSql, dto.getEmployeeId());
             if (accountId == null) {
                 return false;

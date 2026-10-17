@@ -78,6 +78,11 @@ public class RevenueReportDAO extends BaseRepository<InvoiceRevenueItemDTO, Stri
         return this::mapInvoiceRow;
     }
 
+    @Override
+    protected String getRole() {
+        return "Manager";
+    }
+
     public List<InvoiceRevenueItemDTO> getInvoiceRevenueReport(LocalDate from, LocalDate to, String empId) {
         Date sqlFrom = Date.valueOf(from);
         Date sqlTo = Date.valueOf(to);

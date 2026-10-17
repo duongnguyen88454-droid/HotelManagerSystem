@@ -41,6 +41,11 @@ public class MaintenanceDAO extends BaseRepository<DamagedRoomItemDTO, String> {
         return this::mapResultSetToDTO;
     }
 
+    @Override
+    protected String getRole() {
+        return "Manager";
+    }
+
     public List<DamagedRoomItemDTO> getPendingDamagedRooms() {
         return query(SELECT_PENDING_DAMAGES_SQL);
     }
@@ -48,7 +53,7 @@ public class MaintenanceDAO extends BaseRepository<DamagedRoomItemDTO, String> {
     public boolean resolveDamagedRoom(String maBaoCao, String maPhong) {
         Connection conn = null;
         try {
-            conn = DBContext.getConnection();
+            conn = DBContext.getConnection(getRole());
             conn.setAutoCommit(false);
 
             try (PreparedStatement psReport = conn.prepareStatement(UPDATE_REPORT_STATUS_SQL);

@@ -31,6 +31,11 @@ public class InvoiceDAO extends BaseRepository<InvoiceDetailDTO, String> {
         return this::mapRowToInvoiceDetail;
     }
 
+    @Override
+    protected String getRole() {
+        return "Receptionist";
+    }
+
     /**
      * Lấy mã hóa đơn tương ứng với đơn đặt phòng.
      */

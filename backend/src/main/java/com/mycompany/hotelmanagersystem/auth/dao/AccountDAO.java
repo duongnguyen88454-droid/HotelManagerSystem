@@ -36,6 +36,11 @@ public class AccountDAO extends BaseRepository<Account, String> {
         );
     }
 
+    @Override
+    protected String getRole() {
+        return "Manager";
+    }
+
     public UserSessionDTO checkLogin(String identifier, String password) {
         if (identifier == null || identifier.trim().isEmpty() || password == null) {
             return null;

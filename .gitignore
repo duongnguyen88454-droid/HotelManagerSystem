@@ -69,3 +69,8 @@ tools/**/__pycache__/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Environment & Secrets (Bảo mật thông tin đăng nhập)
+.env
+*.env
+!.env.example

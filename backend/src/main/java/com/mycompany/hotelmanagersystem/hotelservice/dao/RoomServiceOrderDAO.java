@@ -34,13 +34,18 @@ public class RoomServiceOrderDAO extends BaseRepository<RoomServiceUsageDTO, Str
         return this::mapRowToUsage;
     }
 
+    @Override
+    protected String getRole() {
+        return "Receptionist";
+    }
+
     /**
      * Gọi Stored Procedure sp_GoiThemDichVu để thêm dịch vụ vào đơn đặt phòng.
      */
     public ServiceOrderResultDTO executeOrderService(ServiceOrderRequestDTO req) {
         String callSql = "{CALL dbo.sp_GoiThemDichVu(?, ?, ?, ?)}";
 
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              CallableStatement cs = conn.prepareCall(callSql)) {
 
             cs.setString(1, req.getMaBooking());

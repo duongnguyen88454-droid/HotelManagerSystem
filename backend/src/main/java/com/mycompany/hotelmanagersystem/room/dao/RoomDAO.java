@@ -33,6 +33,11 @@ public class RoomDAO extends BaseRepository<AvailableRoomDTO, String> {
         return this::mapAvailableRoom;
     }
 
+    @Override
+    protected String getRole() {
+        return "Customer";
+    }
+
     /**
      * Lấy toàn bộ danh sách hạng phòng đang kinh doanh
      */

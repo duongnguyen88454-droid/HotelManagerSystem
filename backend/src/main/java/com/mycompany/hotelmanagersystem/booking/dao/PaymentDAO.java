@@ -29,6 +29,11 @@ public class PaymentDAO extends BaseRepository<Object, String> {
         return rs -> null;
     }
 
+    @Override
+    protected String getRole() {
+        return "Customer";
+    }
+
     /**
      * Xác nhận thanh toán tiền đặt cọc giữ chỗ qua Stored Procedure sp_XacNhanThanhToanCoc.
      *
@@ -42,7 +47,7 @@ public class PaymentDAO extends BaseRepository<Object, String> {
     public String confirmDepositPaymentSP(String bookingId, String paymentMethod, String note)
             throws SQLException, ClassNotFoundException {
         String sql = "{call dbo.sp_XacNhanThanhToanCoc(?, ?, ?, ?)}";
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              CallableStatement cs = conn.prepareCall(sql)) {
 
             cs.setString(1, bookingId);
@@ -62,7 +67,7 @@ public class PaymentDAO extends BaseRepository<Object, String> {
      */
     public void cleanExpiredBookings() {
         String sql = "{call dbo.sp_DonDepDonHetHanGiuCho}";
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              CallableStatement cs = conn.prepareCall(sql)) {
             cs.execute();
         } catch (SQLException | ClassNotFoundException e) {

@@ -18,8 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Data Access Object quản lý điều phối tạo đơn đặt phòng (Booking) và giao dịch toàn vẹn.
- * Đã refactor tinh gọn theo QT 2.1, QT 2.2 và QT 2.3 trong ARCHITECTURE_RULES.md.
+ * Data Access Object quản lý điều phối tạo đơn đặt phòng (Booking) và giao dịch
+ * toàn vẹn.
+ * Đã refactor tinh gọn theo QT 2.1, QT 2.2 và QT 2.3 trong
+ * ARCHITECTURE_RULES.md.
  */
 public class BookingDAO extends BaseRepository<Object, String> {
 
@@ -41,6 +43,11 @@ public class BookingDAO extends BaseRepository<Object, String> {
         return rs -> null;
     }
 
+    @Override
+    protected String getRole() {
+        return "Receptionist";
+    }
+
     /**
      * Điều phối tạo đơn đặt phòng trực tuyến 1 phòng kèm dịch vụ trong 1
      * Transaction
@@ -48,7 +55,7 @@ public class BookingDAO extends BaseRepository<Object, String> {
     public String createOnlineBookingWithServices(SingleBookingRequestDTO req) throws Exception {
         Connection conn = null;
         try {
-            conn = DBContext.getConnection();
+            conn = DBContext.getConnection(getRole());
             conn.setAutoCommit(false);
 
             Date checkInSql = req.getCheckIn() != null ? Date.valueOf(req.getCheckIn()) : null;
@@ -82,7 +89,7 @@ public class BookingDAO extends BaseRepository<Object, String> {
 
         Connection conn = null;
         try {
-            conn = DBContext.getConnection();
+            conn = DBContext.getConnection(getRole());
             conn.setAutoCommit(false);
 
             cleanupExpiredPendingBookings(conn);
@@ -128,8 +135,6 @@ public class BookingDAO extends BaseRepository<Object, String> {
     public String createMultiRoomBookingWithServices(String maKH, BookingCartDTO cart, String ghiChu) throws Exception {
         return createMultiRoomBookingWithServices(maKH, null, cart, ghiChu);
     }
-
-
 
     // --- CÁC HÀM HELPER NỘI BỘ TRONG TRANSACTION ---
 

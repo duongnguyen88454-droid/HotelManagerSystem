@@ -31,6 +31,11 @@ public class BookingCancellationDAO extends BaseRepository<String, String> {
         return rs -> rs.getString("RoomId");
     }
 
+    @Override
+    protected String getRole() {
+        return "Receptionist";
+    }
+
     /**
      * Hủy một phòng cụ thể trong đơn qua Stored Procedure dbo.sp_HuyPhong.
      * CSDL sẽ kích hoạt Trigger 8 để giải phóng phòng Vacant và Trigger 5 để cập nhật lại hóa đơn.
@@ -38,7 +43,7 @@ public class BookingCancellationDAO extends BaseRepository<String, String> {
     public boolean cancelSingleRoom(String bookingId, String roomId, String cancelledBy, String reason)
             throws SQLException, ClassNotFoundException {
         String sql = "{call dbo.sp_HuyPhong(?, ?, ?, 0, ?, ?)}";
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              CallableStatement cs = conn.prepareCall(sql)) {
 
             cs.setString(1, bookingId);

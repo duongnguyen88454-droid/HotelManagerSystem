@@ -28,6 +28,11 @@ public class ActiveBookingDAO extends BaseRepository<ActiveBookingItemDTO, Strin
         return this::mapRowToActiveBooking;
     }
 
+    @Override
+    protected String getRole() {
+        return "Receptionist";
+    }
+
     /**
      * Tìm kiếm các đơn đặt phòng chưa thanh toán hoặc thanh toán một phần theo từ khóa.
      */

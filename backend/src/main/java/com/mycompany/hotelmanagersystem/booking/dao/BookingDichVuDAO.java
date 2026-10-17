@@ -12,7 +12,8 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * DAO chuyên trách quản lý các dịch vụ đi kèm trong đơn đặt phòng (Booking Services).
+ * DAO chuyên trách quản lý các dịch vụ đi kèm trong đơn đặt phòng (Booking
+ * Services).
  * Tách biệt từ BookingDAO theo QT 2.1 và QT 2.3 trong ARCHITECTURE_RULES.md.
  */
 public class BookingDichVuDAO extends BaseRepository<Object, String> {
@@ -34,6 +35,11 @@ public class BookingDichVuDAO extends BaseRepository<Object, String> {
         return rs -> null;
     }
 
+    @Override
+    protected String getRole() {
+        return "Receptionist";
+    }
+
     /**
      * Điều phối thêm dịch vụ vào phòng cụ thể trong đơn booking
      */
@@ -41,7 +47,7 @@ public class BookingDichVuDAO extends BaseRepository<Object, String> {
             String nguoiThem) throws Exception {
         Connection conn = null;
         try {
-            conn = DBContext.getConnection();
+            conn = DBContext.getConnection(getRole());
             conn.setAutoCommit(false);
 
             validateRoomBelongsToBooking(conn, maBooking, maPhong);
@@ -67,7 +73,7 @@ public class BookingDichVuDAO extends BaseRepository<Object, String> {
     public boolean removeServiceFromBookingRoom(String maBookingDichVu, String maBooking) throws Exception {
         Connection conn = null;
         try {
-            conn = DBContext.getConnection();
+            conn = DBContext.getConnection(getRole());
             conn.setAutoCommit(false);
 
             double thanhTien = getBookingServiceCost(conn, maBookingDichVu, maBooking);

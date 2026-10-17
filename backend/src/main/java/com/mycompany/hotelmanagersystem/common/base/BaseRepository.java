@@ -45,9 +45,19 @@ public abstract class BaseRepository<T, ID> {
         return queryCustom(sql, getRowMapper(), params);
     }
 
+    /**
+     * Vai trò CSDL mặc định khi thực thi qua BaseRepository.
+     * Các DAO con có thể ghi đè để chỉ định vai trò phù hợp (Manager, Receptionist...).
+     *
+     * @return Tên vai trò CSDL (mặc định là Customer)
+     */
+    protected String getRole() {
+        return "Customer";
+    }
+
     protected <R> List<R> queryCustom(String sql, RowMapper<R> mapper, Object... params) {
         List<R> list = new ArrayList<>();
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setParameters(ps, params);
             try (ResultSet rs = ps.executeQuery()) {
@@ -72,7 +82,7 @@ public abstract class BaseRepository<T, ID> {
     }
 
     protected int executeUpdate(String sql, Object... params) {
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setParameters(ps, params);
             return ps.executeUpdate();
@@ -83,7 +93,7 @@ public abstract class BaseRepository<T, ID> {
 
     protected boolean exists(String conditionSql, Object... params) {
         String sql = "SELECT 1 FROM " + getTableName() + " WHERE " + conditionSql;
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setParameters(ps, params);
             try (ResultSet rs = ps.executeQuery()) {
@@ -95,7 +105,7 @@ public abstract class BaseRepository<T, ID> {
     }
 
     protected String queryScalarString(String sql, Object... params) {
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setParameters(ps, params);
             try (ResultSet rs = ps.executeQuery()) {
@@ -110,7 +120,7 @@ public abstract class BaseRepository<T, ID> {
     }
 
     protected Long queryScalarLong(String sql, Object... params) {
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setParameters(ps, params);
             try (ResultSet rs = ps.executeQuery()) {
@@ -125,7 +135,7 @@ public abstract class BaseRepository<T, ID> {
     }
 
     protected Double queryScalarDouble(String sql, Object... params) {
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setParameters(ps, params);
             try (ResultSet rs = ps.executeQuery()) {

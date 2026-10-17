@@ -27,6 +27,11 @@ public class CheckOutDAO extends BaseRepository<Object, String> {
         return rs -> null;
     }
 
+    @Override
+    protected String getRole() {
+        return "Receptionist";
+    }
+
     /**
      * Check-out toàn bộ các phòng còn lại trong đơn đặt phòng.
      *
@@ -38,7 +43,7 @@ public class CheckOutDAO extends BaseRepository<Object, String> {
      */
     public boolean executeCheckOutAll(String maBooking, String maNV) throws SQLException, ClassNotFoundException {
         String sql = "{call dbo.sp_CheckOutTraPhong(?, NULL)}";
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              CallableStatement cs = conn.prepareCall(sql)) {
             cs.setString(1, maBooking);
             cs.execute();
@@ -59,7 +64,7 @@ public class CheckOutDAO extends BaseRepository<Object, String> {
     public boolean executeCheckOutRoom(String maBooking, String maPhong, String maNV)
             throws SQLException, ClassNotFoundException {
         String sql = "{call dbo.sp_CheckOutTraPhong(?, ?)}";
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              CallableStatement cs = conn.prepareCall(sql)) {
             cs.setString(1, maBooking);
             cs.setString(2, maPhong);

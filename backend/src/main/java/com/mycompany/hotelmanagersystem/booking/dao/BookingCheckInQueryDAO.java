@@ -38,6 +38,11 @@ public class BookingCheckInQueryDAO extends BaseRepository<CheckInArrivalItemDTO
         return this::mapRowToArrivalDTO;
     }
 
+    @Override
+    protected String getRole() {
+        return "Receptionist";
+    }
+
     /**
      * Lấy danh sách các đơn đặt phòng chờ tiếp nhận tại quầy.
      */

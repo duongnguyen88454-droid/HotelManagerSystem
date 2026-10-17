@@ -33,10 +33,15 @@ public class PaymentDAO extends BaseRepository<PaymentRecordDTO, String> {
         return this::mapRowToPaymentRecord;
     }
 
+    @Override
+    protected String getRole() {
+        return "Receptionist";
+    }
+
     public String recordPayment(String maHoaDon, String maTaiKhoan, double soTien, String phuongThuc)
             throws SQLException, ClassNotFoundException {
         String sql = "{call dbo.sp_GhiNhanThanhToan(?, ?, ?, ?, ?, ?)}";
-        try (Connection conn = DBContext.getConnection();
+        try (Connection conn = DBContext.getConnection(getRole());
              CallableStatement cs = conn.prepareCall(sql)) {
             cs.setString(1, maHoaDon);
             String validAccountId = resolveValidAccountId(conn, maTaiKhoan);

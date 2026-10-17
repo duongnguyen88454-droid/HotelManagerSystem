@@ -33,6 +33,11 @@ public class CustomerDAO extends BaseRepository<Customer, String> {
         );
     }
 
+    @Override
+    protected String getRole() {
+        return "Customer";
+    }
+
     public Customer findCustomerByCCCD(String cccd) {
         if (cccd == null || cccd.trim().isEmpty()) {
             return null;

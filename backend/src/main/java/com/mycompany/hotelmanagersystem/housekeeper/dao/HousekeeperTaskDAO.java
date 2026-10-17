@@ -83,7 +83,7 @@ public class HousekeeperTaskDAO extends BaseRepository<HousekeeperTaskDTO, Strin
             throws SQLException, ClassNotFoundException {
         String callSql = "{call dbo.sp_CapNhatTienDoDonPhong(?, ?, ?, ?)}";
         String normalizedAction = normalizeAction(hanhDong);
-        try (Connection conn = DBContext.getConnection()) {
+        try (Connection conn = DBContext.getConnection(getRole())) {
             String validAccountId = resolveAccountId(conn, maNV);
             try (CallableStatement cs = conn.prepareCall(callSql)) {
                 cs.setString(1, maNhiemVu);

@@ -38,6 +38,11 @@ public class ManagerRefundDAO extends BaseRepository<CancellationRecordDTO, Stri
         return this::mapRowToDTO;
     }
 
+    @Override
+    protected String getRole() {
+        return "Manager";
+    }
+
     public List<CancellationRecordDTO> getAllCancellationRequests() {
         return query(SELECT_CANCELLATIONS_SQL);
     }
