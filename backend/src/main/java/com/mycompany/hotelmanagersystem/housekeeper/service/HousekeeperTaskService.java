@@ -4,6 +4,7 @@ import com.mycompany.hotelmanagersystem.housekeeper.dao.DamageReportDAO;
 import com.mycompany.hotelmanagersystem.housekeeper.dao.HousekeeperTaskDAO;
 import com.mycompany.hotelmanagersystem.housekeeper.dto.DamageCategoryDTO;
 import com.mycompany.hotelmanagersystem.housekeeper.dto.DamageDetailItemDTO;
+import com.mycompany.hotelmanagersystem.housekeeper.dto.HousekeeperDamageReportDTO;
 import com.mycompany.hotelmanagersystem.housekeeper.dto.HousekeeperTaskDTO;
 
 import java.util.Collections;
@@ -39,6 +40,19 @@ public class HousekeeperTaskService {
     public List<HousekeeperTaskDTO> getTaskList(String statusFilter, String maTK, String maNV) {
         try {
             return taskDAO.getTasks(statusFilter, maTK, maNV);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Lấy danh sách lịch sử biên bản sự cố hư hại cơ sở vật chất.
+     *
+     * @return danh sách biên bản hư hại
+     */
+    public List<HousekeeperDamageReportDTO> getDamageReports() {
+        try {
+            return damageReportDAO.getDamageReports();
         } catch (Exception e) {
             return Collections.emptyList();
         }

@@ -3,6 +3,7 @@ package com.mycompany.hotelmanagersystem.manager.controller;
 import com.mycompany.hotelmanagersystem.manager.dto.CreateRoomTypeDTO;
 import com.mycompany.hotelmanagersystem.manager.dto.RoomTypePriceDTO;
 import com.mycompany.hotelmanagersystem.manager.service.ManagerHotelConfigService;
+import com.mycompany.hotelmanagersystem.manager.service.ManagerRoomService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class ManagerHotelConfigServlet extends HttpServlet {
 
     private final ManagerHotelConfigService configService = new ManagerHotelConfigService();
+    private final ManagerRoomService roomService = new ManagerRoomService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -31,6 +33,7 @@ public class ManagerHotelConfigServlet extends HttpServlet {
         request.setAttribute("bedTypes", configService.getAllBedTypes());
         request.setAttribute("amenities", configService.getAllRoomAmenities());
         request.setAttribute("services", configService.getAllServices());
+        request.setAttribute("physicalRooms", roomService.getAllPhysicalRooms());
         request.getRequestDispatcher("/views/manager/hotel_config.jsp").forward(request, response);
     }
 
@@ -51,6 +54,10 @@ public class ManagerHotelConfigServlet extends HttpServlet {
             handleAmenity(request, session, action);
         } else if ("add_service".equalsIgnoreCase(action) || "update_service".equalsIgnoreCase(action)) {
             handleService(request, session, action);
+        } else if ("add_room".equalsIgnoreCase(action)) {
+            handleAddRoom(request, session);
+        } else if ("update_room_status".equalsIgnoreCase(action)) {
+            handleUpdateRoomStatus(request, session);
         }
 
         response.sendRedirect(request.getContextPath() + "/manager/hotel-config");
@@ -171,6 +178,23 @@ public class ManagerHotelConfigServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             session.setAttribute("flashError", "Đơn giá dịch vụ không hợp lệ!");
         }
+    }
+
+    private void handleAddRoom(HttpServletRequest request, HttpSession session) {
+        String roomId = request.getParameter("roomId");
+        String roomTypeId = request.getParameter("roomTypeId");
+        String roomName = request.getParameter("roomName");
+        boolean success = roomService.addPhysicalRoom(roomId, roomTypeId, roomName);
+        setFlash(session, success, "Đã thêm phòng vật lý mới thành công!",
+                "Không thể thêm phòng (có thể trùng mã phòng hoặc dữ liệu không hợp lệ)!");
+    }
+
+    private void handleUpdateRoomStatus(HttpServletRequest request, HttpSession session) {
+        String roomId = request.getParameter("roomId");
+        String roomStatus = request.getParameter("roomStatus");
+        boolean success = roomService.updateRoomOperationalStatus(roomId, roomStatus);
+        setFlash(session, success, "Đã cập nhật trạng thái phòng thành công!",
+                "Không thể cập nhật trạng thái phòng!");
     }
 
     private void setFlash(HttpSession session, boolean success, String successMsg, String errorMsg) {

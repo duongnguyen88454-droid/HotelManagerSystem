@@ -5,9 +5,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Tiện ích băm và xác thực mật khẩu sử dụng thuật toán SHA-256.
- * Đảm bảo an toàn một chiều, không lưu mật khẩu thô và hỗ trợ tương thích
- * ngược.
+ * Tiện ích băm và xác thực mật khẩu sử dụng thuật toán chuẩn SHA-256.
+ * Đảm bảo an toàn một chiều, không lưu mật khẩu thô.
  */
 public class PasswordUtil {
 

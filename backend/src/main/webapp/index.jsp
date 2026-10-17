@@ -95,88 +95,121 @@
                         </div>
                     </section>
 
-                    <!-- 3. DANH SÁCH CÁC HẠNG PHÒNG ĐỂ KHÁCH HÀNG LƯỚT VÀ XEM THÔNG TIN -->
+                    <!-- 3. KHÁM PHÁ KHÔNG GIAN NGHỈ DƯỠNG & KIẾN TRÚC KHÁCH SẠN (HÌNH ẢNH & MIÊU TẢ THỰC TẾ) -->
                     <section id="danh-sach-phong" class="featured-rooms-section">
                         <div class="section-header">
-                            <span class="section-tag">BỘ SƯU TẬP PHÒNG NGHỈ</span>
-                            <h2>Không Gian Nghỉ Dưỡng Hoàn Mỹ</h2>
+                            <span class="section-tag">TRẢI NGHIỆM ĐẲNG CẤP</span>
+                            <h2>Không Gian &amp; Dịch Vụ Nghỉ Dưỡng Hoàn Mỹ</h2>
                             <div class="section-divider"></div>
-                            <p>Quý khách có thể xem thông số chi tiết của từng hạng phòng. Khi tiến hành đặt phòng, hệ
-                                thống sẽ yêu cầu đăng nhập tài khoản.</p>
+                            <p>Khám phá kiến trúc tinh tế, hệ thống phòng nghỉ hướng biển và chuỗi tiện ích đẳng cấp chuẩn 5 sao quốc tế tại Grand Horizon.</p>
                         </div>
 
                         <div class="rooms-grid">
-                            <c:choose>
-                                <c:when test="${not empty activeRoomTypes}">
-                                    <c:forEach var="rt" items="${activeRoomTypes}">
-                                        <article class="room-card">
-                                            <div class="room-visual-banner">
-                                                <span class="room-visual-tag">TIÊU CHUẨN 5 SAO</span>
-                                                <h3 class="room-visual-title">${rt.tenLoaiPhong}</h3>
-                                            </div>
-                                            <div class="room-card-body">
-                                                <div class="room-specs-table">
-                                                    <div class="spec-item">
-                                                        <span class="spec-title">Diện Tích</span>
-                                                        <span class="spec-data">${rt.dienTich} m²</span>
-                                                    </div>
-                                                    <div class="spec-item">
-                                                        <span class="spec-title">Loại Giường</span>
-                                                        <span class="spec-data">${rt.loaiGiuong}</span>
-                                                    </div>
-                                                    <div class="spec-item">
-                                                        <span class="spec-title">Sức Chứa Tối Đa</span>
-                                                        <span class="spec-data">${rt.soNguoiToiDa} Khách</span>
-                                                    </div>
-                                                    <div class="spec-item">
-                                                        <span class="spec-title">Dịch Vụ Kèm Theo</span>
-                                                        <span class="spec-data">Wifi, Dọn phòng</span>
-                                                    </div>
-                                                </div>
+                            <!-- Thẻ 1: Sảnh đón tiếp -->
+                            <article class="room-card">
+                                <div style="height: 220px; position: relative; overflow: hidden;">
+                                    <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" 
+                                         alt="Grand Lobby" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    <span class="room-visual-tag" style="position: absolute; top: 14px; left: 14px; z-index: 2;">KHÔNG GIAN TIẾP ĐÓN</span>
+                                </div>
+                                <div class="room-card-body">
+                                    <h3 style="color: #1a365d; font-size: 19px; font-weight: 700; margin: 0 0 10px 0;">Sảnh Đón Tiếp Hoàng Gia</h3>
+                                    <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
+                                        Kiến trúc tráng lệ với đèn chùm pha lê và sàn cẩm thạch sang trọng, mang đến cảm giác chào đón ấm áp và trang trọng nhất.
+                                    </p>
+                                    <div style="font-size: 12px; color: #718096; font-weight: 600;">Phục vụ tiếp đón 24/7 &bull; Welcome Drink miễn phí</div>
+                                </div>
+                            </article>
 
-                                                <div class="room-card-footer">
-                                                    <div class="room-price-display">
-                                                        <span class="room-price-label">Giá niêm yết</span>
-                                                        <div>
-                                                            <span class="room-price-amount">
-                                                                <fmt:formatNumber value="${rt.giaPhong}"
-                                                                    type="number" /> VNĐ
-                                                            </span>
-                                                            <span class="room-price-unit">/ đêm</span>
-                                                        </div>
-                                                    </div>
+                            <!-- Thẻ 2: Phòng Ocean Suite -->
+                            <article class="room-card">
+                                <div style="height: 220px; position: relative; overflow: hidden;">
+                                    <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80" 
+                                         alt="Ocean Suite" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    <span class="room-visual-tag" style="position: absolute; top: 14px; left: 14px; z-index: 2;">PHÒNG NGHỈ THƯỢNG HẠNG</span>
+                                </div>
+                                <div class="room-card-body">
+                                    <h3 style="color: #1a365d; font-size: 19px; font-weight: 700; margin: 0 0 10px 0;">Ocean View Luxury Suite</h3>
+                                    <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
+                                        Tầm nhìn panorama ôm trọn bình minh trên biển, ban công thoáng đãng, giường King đệm lông vũ cùng bồn tắm nằm cao cấp.
+                                    </p>
+                                    <div style="font-size: 12px; color: #718096; font-weight: 600;">View toàn cảnh biển &bull; Ban công riêng &bull; Smart TV 65"</div>
+                                </div>
+                            </article>
 
-                                                    <!-- NÚT ĐẶT PHÒNG: NẾU CHƯA ĐĂNG NHẬP THÌ YÊU CẦU ĐĂNG NHẬP -->
-                                                    <c:choose>
-                                                        <c:when
-                                                            test="${not empty sessionScope.CURRENT_USER and sessionScope.CURRENT_USER.customer}">
-                                                            <a href="${pageContext.request.contextPath}/customer/search-rooms?roomType=${rt.maLoaiPhong}"
-                                                                class="btn-book-action">
-                                                                Đặt Phòng Này
-                                                            </a>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <a href="${pageContext.request.contextPath}/login?redirect=${pageContext.request.contextPath}/customer/search-rooms"
-                                                                class="btn-book-action auth-required">
-                                                                Đăng Nhập Để Đặt
-                                                            </a>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </div>
-                                            </div>
-                                        </article>
-                                    </c:forEach>
-                                </c:when>
-                                <c:otherwise>
-                                    <!-- Fallback nếu đang bảo trì dữ liệu -->
-                                    <div
-                                        style="grid-column: 1 / -1; text-align: center; padding: 40px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0;">
-                                        <p style="color: #718096; margin: 0; font-size: 15px;">Hệ thống đang cập nhật
-                                            danh mục phòng nghỉ. Quý khách vui lòng liên hệ quầy tiếp đón để được hỗ
-                                            trợ.</p>
-                                    </div>
-                                </c:otherwise>
-                            </c:choose>
+                            <!-- Thẻ 3: Hồ bơi vô cực -->
+                            <article class="room-card">
+                                <div style="height: 220px; position: relative; overflow: hidden;">
+                                    <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80" 
+                                         alt="Infinity Pool" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    <span class="room-visual-tag" style="position: absolute; top: 14px; left: 14px; z-index: 2;">TIỆN ÍCH NGOÀI TRỜI</span>
+                                </div>
+                                <div class="room-card-body">
+                                    <h3 style="color: #1a365d; font-size: 19px; font-weight: 700; margin: 0 0 10px 0;">Hồ Bơi Vô Cực Chân Mây</h3>
+                                    <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
+                                        Thư giãn trong làn nước trong vắt trên tầng cao, vừa thưởng thức cocktail nhiệt đới vừa ngắm hoàng hôn rực rỡ chân trời.
+                                    </p>
+                                    <div style="font-size: 12px; color: #718096; font-weight: 600;">Hệ thống nước ấm 4 mùa &bull; Pool Bar phục vụ tại chỗ</div>
+                                </div>
+                            </article>
+
+                            <!-- Thẻ 4: Ẩm thực cao cấp -->
+                            <article class="room-card">
+                                <div style="height: 220px; position: relative; overflow: hidden;">
+                                    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80" 
+                                         alt="Fine Dining" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    <span class="room-visual-tag" style="position: absolute; top: 14px; left: 14px; z-index: 2;">ẨM THỰC THƯỢNG HẠNG</span>
+                                </div>
+                                <div class="room-card-body">
+                                    <h3 style="color: #1a365d; font-size: 19px; font-weight: 700; margin: 0 0 10px 0;">Nhà Hàng Á - Âu The Horizon</h3>
+                                    <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
+                                        Hương vị ẩm thực đa dạng từ hải sản tươi sống địa phương đến bít tết bò Wagyu hảo hạng do bếp trưởng chuẩn sao chế biến.
+                                    </p>
+                                    <div style="font-size: 12px; color: #718096; font-weight: 600;">Buffet sáng quốc tế &bull; Set menu tiệc tối lãng mạn</div>
+                                </div>
+                            </article>
+
+                            <!-- Thẻ 5: Spa thư giãn -->
+                            <article class="room-card">
+                                <div style="height: 220px; position: relative; overflow: hidden;">
+                                    <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80" 
+                                         alt="Wellness Spa" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    <span class="room-visual-tag" style="position: absolute; top: 14px; left: 14px; z-index: 2;">CHĂM SÓC SỨC KHỎE</span>
+                                </div>
+                                <div class="room-card-body">
+                                    <h3 style="color: #1a365d; font-size: 19px; font-weight: 700; margin: 0 0 10px 0;">Zenith Wellness &amp; Spa</h3>
+                                    <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
+                                        Đắm mình trong không gian thảo mộc thiên nhiên, liệu trình massage đá nóng và xông hơi muối Himalaya giúp phục hồi sinh lực.
+                                    </p>
+                                    <div style="font-size: 12px; color: #718096; font-weight: 600;">Liệu pháp thảo mộc &bull; Xông hơi đá muối &bull; Yoga buổi sáng</div>
+                                </div>
+                            </article>
+
+                            <!-- Thẻ 6: Phòng gia đình -->
+                            <article class="room-card">
+                                <div style="height: 220px; position: relative; overflow: hidden;">
+                                    <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80" 
+                                         alt="Family Suite" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    <span class="room-visual-tag" style="position: absolute; top: 14px; left: 14px; z-index: 2;">KỲ NGHỈ GIA ĐÌNH</span>
+                                </div>
+                                <div class="room-card-body">
+                                    <h3 style="color: #1a365d; font-size: 19px; font-weight: 700; margin: 0 0 10px 0;">Royal Family Retreat</h3>
+                                    <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
+                                        Thiết kế 2 phòng ngủ liên thông, phòng khách rộng rãi và khu bếp tiện lợi, nơi gắn kết trọn vẹn yêu thương cho cả gia đình.
+                                    </p>
+                                    <div style="font-size: 12px; color: #718096; font-weight: 600;">2 Giường Queen &bull; Khu vực sinh hoạt riêng &bull; Sức chứa 4-5 người</div>
+                                </div>
+                            </article>
+                        </div>
+
+                        <!-- Nút kêu gọi hành động đặt phòng -->
+                        <div style="text-align: center; margin-top: 40px;">
+                            <a href="${pageContext.request.contextPath}/customer/search-rooms" 
+                               style="background: #1a365d; color: white; padding: 14px 36px; border-radius: 6px; font-size: 15px; font-weight: 700; text-decoration: none; display: inline-block; box-shadow: 0 4px 14px rgba(26,54,93,0.3); transition: all 0.2s;"
+                               onmouseover="this.style.background='#2b4c7e'; this.style.transform='translateY(-2px)'"
+                               onmouseout="this.style.background='#1a365d'; this.style.transform='none'">
+                                Khám Phá Danh Sách Phòng Trống &amp; Đặt Ngay &rarr;
+                            </a>
                         </div>
                     </section>
 

@@ -1,10 +1,10 @@
 package com.mycompany.hotelmanagersystem.booking.service;
 
+import com.mycompany.hotelmanagersystem.booking.dao.BookingCancellationDAO;
 import com.mycompany.hotelmanagersystem.booking.dao.BookingCheckInDAO;
 import com.mycompany.hotelmanagersystem.booking.dao.BookingCheckInQueryDAO;
 import com.mycompany.hotelmanagersystem.booking.dto.CheckInArrivalItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CheckInDetailDTO;
-import com.mycompany.hotelmanagersystem.booking.dto.CheckInRequestDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CheckInResultDTO;
 import com.mycompany.hotelmanagersystem.room.dto.BookingBarDTO;
 
@@ -19,15 +19,19 @@ public class CheckInService {
 
     private final BookingCheckInDAO checkInDAO;
     private final BookingCheckInQueryDAO checkInQueryDAO;
+    private final BookingCancellationDAO cancellationDAO;
 
     public CheckInService() {
         this.checkInDAO = new BookingCheckInDAO();
         this.checkInQueryDAO = new BookingCheckInQueryDAO();
+        this.cancellationDAO = new BookingCancellationDAO();
     }
 
-    public CheckInService(BookingCheckInDAO checkInDAO, BookingCheckInQueryDAO checkInQueryDAO) {
+    public CheckInService(BookingCheckInDAO checkInDAO, BookingCheckInQueryDAO checkInQueryDAO,
+                          BookingCancellationDAO cancellationDAO) {
         this.checkInDAO = checkInDAO;
         this.checkInQueryDAO = checkInQueryDAO;
+        this.cancellationDAO = cancellationDAO;
     }
 
     /**
@@ -84,39 +88,52 @@ public class CheckInService {
     }
 
     /**
-     * Thực hiện thủ tục Check-in nhận 1 phòng (tương thích ngược).
+     * Thực hiện hủy các phòng được chọn hoặc toàn bộ đơn đặt phòng.
+     * Tái sử dụng sp_HuyPhong qua BookingCancellationDAO.
      */
-    public CheckInResultDTO executeCheckIn(CheckInRequestDTO request) {
-        if (request == null) {
-            return new CheckInResultDTO(false, "Yêu cầu Check-in không hợp lệ!", null, null, null);
-        }
-
-        String maBooking = request.getMaBooking();
-        String maPhong = request.getMaPhong();
-
+    public CheckInResultDTO executeCancelRooms(String maBooking, List<String> roomIds,
+                                              String cancelledBy, String reason) {
         if (maBooking == null || maBooking.trim().isEmpty()) {
-            return new CheckInResultDTO(false, "Mã Booking không được để trống!", maBooking, maPhong, null);
+            return new CheckInResultDTO(false, "Mã Booking không được để trống!", null, null, null);
         }
-        if (maPhong == null || maPhong.trim().isEmpty()) {
-            return new CheckInResultDTO(false, "Mã phòng không được để trống!", maBooking, maPhong, null);
-        }
+        String cleanBk = maBooking.trim();
+        String validReason = (reason != null && !reason.trim().isEmpty())
+                ? reason.trim() : "Khách yêu cầu hủy phòng tại quầy tiếp đón";
 
-        boolean eligible = checkInDAO.isBookingEligibleForCheckIn(maBooking.trim(), maPhong.trim());
-        if (!eligible) {
-            return new CheckInResultDTO(false,
-                    "Đơn đặt phòng không hợp lệ hoặc phòng này đã hoàn tất Check-in trước đó!",
-                    maBooking, maPhong, null);
-        }
+        try {
+            if (roomIds == null || roomIds.isEmpty()) {
+                boolean ok = cancellationDAO.cancelAllRoomsInBooking(cleanBk, cancelledBy, validReason);
+                if (ok) {
+                    return new CheckInResultDTO(true,
+                            "Đã hủy toàn bộ đơn đặt phòng " + cleanBk + " thành công!",
+                            cleanBk, "ALL", "Cancelled");
+                }
+                return new CheckInResultDTO(false,
+                        "Hủy đơn đặt phòng thất bại hoặc trạng thái không hợp lệ!",
+                        cleanBk, null, null);
+            }
 
-        boolean success = checkInDAO.executeCheckIn(maBooking.trim(), maPhong.trim());
-        if (success) {
-            return new CheckInResultDTO(true,
-                    "Xác nhận Check-in nhận phòng " + maPhong + " thành công!",
-                    maBooking, maPhong, "Occupied");
-        } else {
+            int successCount = 0;
+            for (String roomId : roomIds) {
+                if (roomId != null && !roomId.trim().isEmpty()) {
+                    if (cancellationDAO.cancelSingleRoom(cleanBk, roomId.trim(), cancelledBy, validReason)) {
+                        successCount++;
+                    }
+                }
+            }
+            if (successCount > 0) {
+                String roomListStr = String.join(", ", roomIds);
+                return new CheckInResultDTO(true,
+                        "Đã hủy thành công " + successCount + " phòng (" + roomListStr + ") trong đơn " + cleanBk + "!",
+                        cleanBk, roomListStr, "Cancelled");
+            }
             return new CheckInResultDTO(false,
-                    "Không thể thực hiện Check-in do lỗi hệ thống CSDL!",
-                    maBooking, maPhong, null);
+                    "Không thể hủy các phòng đã chọn. Vui lòng kiểm tra lại trạng thái phòng!",
+                    cleanBk, null, null);
+        } catch (Exception e) {
+            return new CheckInResultDTO(false,
+                    "Lỗi cơ sở dữ liệu khi hủy phòng: " + e.getMessage(),
+                    cleanBk, null, null);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.mycompany.hotelmanagersystem.receptionist.controller;
 
+import com.mycompany.hotelmanagersystem.auth.dto.UserSessionDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CheckInArrivalItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CheckInDetailDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CheckInResultDTO;
@@ -87,6 +88,7 @@ public class ReceptionistCheckInServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
 
+        String action = request.getParameter("action");
         String maBooking = request.getParameter("maBooking");
         String[] maPhongArr = request.getParameterValues("maPhong[]");
         if (maPhongArr == null || maPhongArr.length == 0) {
@@ -97,8 +99,35 @@ public class ReceptionistCheckInServlet extends HttpServlet {
         }
 
         List<String> roomIds = (maPhongArr != null) ? Arrays.asList(maPhongArr) : new ArrayList<>();
+
+        if ("cancel".equalsIgnoreCase(action)) {
+            handleCancelPost(request, response, maBooking, roomIds);
+            return;
+        }
+
         CheckInResultDTO result = checkInService.executeCheckInMultipleRooms(maBooking, roomIds);
         response.getWriter().write(buildJsonResponse(result));
+    }
+
+    private void handleCancelPost(HttpServletRequest request, HttpServletResponse response,
+                                  String maBooking, List<String> roomIds) throws IOException {
+        String reason = request.getParameter("reason");
+        String cancelledBy = resolveAccountId(request.getSession(false));
+        CheckInResultDTO result = checkInService.executeCancelRooms(maBooking, roomIds, cancelledBy, reason);
+        response.getWriter().write(buildJsonResponse(result));
+    }
+
+    private String resolveAccountId(HttpSession session) {
+        if (session != null) {
+            UserSessionDTO user = (UserSessionDTO) session.getAttribute("CURRENT_USER");
+            if (user == null) {
+                user = (UserSessionDTO) session.getAttribute("user");
+            }
+            if (user != null && user.getMaTaiKhoan() != null && !user.getMaTaiKhoan().trim().isEmpty()) {
+                return user.getMaTaiKhoan().trim();
+            }
+        }
+        return "ACC002";
     }
 
     private String buildJsonResponse(CheckInResultDTO result) {

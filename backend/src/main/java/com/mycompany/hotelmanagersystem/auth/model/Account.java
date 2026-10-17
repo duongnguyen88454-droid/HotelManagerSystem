@@ -72,11 +72,6 @@ public class Account implements Serializable {
         this.email = email;
     }
 
-    // Alias tương thích ngược cho TenDangNhap (Email đóng vai trò tên đăng nhập)
-    public String getTenDangNhap() {
-        return email;
-    }
-
     public String getHoTen() {
         return hoTenTaiKhoan;
     }

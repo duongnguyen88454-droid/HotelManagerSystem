@@ -88,15 +88,6 @@ function handleBookingBarClick(roomId, roomNo, bookingId, guestName, phone, cccd
     openModal('bookingModal');
 }
 
-// Hỗ trợ tương thích
-function openRoomDetailModal(roomId, bookingId, guestName, phone, cccd, inDate, outDate, actualIn, actualOut) {
-    handleBookingBarClick(roomId, roomId, bookingId, guestName, phone, cccd, 'CheckedIn', inDate, outDate, actualIn, actualOut);
-}
-
-function openCheckInModal(roomId, roomNo, bookingId, guestName, phone, cccd, inDate, outDate) {
-    handleBookingBarClick(roomId, roomNo, bookingId, guestName, phone, cccd, 'Confirmed', inDate, outDate, '___', '___');
-}
-
 // Tải danh sách dịch vụ phòng đã dùng từ API (FN-3.5)
 function loadServicesUsed(bookingId, roomId) {
     const contextPath = window.CONTEXT_PATH || '';

@@ -5,17 +5,22 @@ import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 import com.mycompany.hotelmanagersystem.housekeeper.dto.DamageCategoryDTO;
 import com.mycompany.hotelmanagersystem.housekeeper.dto.DamageDetailItemDTO;
+import com.mycompany.hotelmanagersystem.housekeeper.dto.HousekeeperDamageReportDTO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class DamageReportDAO extends BaseRepository<DamageCategoryDTO, String> {
 
     private static final String SELECT_CATEGORIES_SQL = "SELECT DamageTypeId, DamageName FROM DamageType ORDER BY DamageTypeId ASC";
+
+    private static final String SELECT_DAMAGE_REPORTS_SQL =
+            "SELECT * FROM v_DamageReports ORDER BY DetectedAt DESC";
 
     @Override
     protected String getTableName() {
@@ -42,6 +47,35 @@ public class DamageReportDAO extends BaseRepository<DamageCategoryDTO, String> {
 
     public List<DamageCategoryDTO> getAllDamageCategories() {
         return query(SELECT_CATEGORIES_SQL);
+    }
+
+    /**
+     * Lấy danh sách toàn bộ các biên bản hư hại cơ sở vật chất phục vụ buồng phòng.
+     *
+     * @return danh sách các biên bản hư hại
+     */
+    public List<HousekeeperDamageReportDTO> getDamageReports() {
+        List<HousekeeperDamageReportDTO> list = new ArrayList<>();
+        try (Connection conn = DBContext.getConnection(getRole());
+             PreparedStatement ps = conn.prepareStatement(SELECT_DAMAGE_REPORTS_SQL);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(new HousekeeperDamageReportDTO(
+                        rs.getString("DamageReportId"),
+                        rs.getString("RoomId"),
+                        rs.getString("RoomName"),
+                        rs.getString("RoomTypeName"),
+                        rs.getTimestamp("DetectedAt"),
+                        rs.getString("DamageTypeName"),
+                        rs.getNString("DamageDescription"),
+                        rs.getString("ReportStatus"),
+                        rs.getString("CreateBy")
+                ));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     public void createDamageReportAndLockRoom(String maNhiemVu, String maNV, String moTaChung,

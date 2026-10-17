@@ -63,7 +63,7 @@ public class CustomerDAO extends BaseRepository<Customer, String> {
             return existing.getMaKH();
         }
 
-        return insertNewGuestWithFallback(hoTen.trim(), email.trim(), soDT.trim(), cleanCCCD);
+        return insertNewGuest(hoTen.trim(), email.trim(), soDT.trim(), cleanCCCD);
     }
 
     private void validateGuestInput(String hoTen, String email, String soDT, String cccd) {
@@ -94,34 +94,15 @@ public class CustomerDAO extends BaseRepository<Customer, String> {
         executeUpdate(updateSql, name, email, phone, cleanCCCD);
     }
 
-    private String insertNewGuestWithFallback(String hoTen, String email, String soDT, String cleanCCCD) throws Exception {
+    private String insertNewGuest(String hoTen, String email, String soDT, String cleanCCCD) throws Exception {
         String insertSql = "INSERT INTO Customer (CustomerId, FullName, Email, PhoneNumber, CCCD) VALUES (?, ?, ?, ?, ?)";
         String newMaKH = getNextCustomerIdFromDB(null);
         try {
             executeUpdate(insertSql, newMaKH, hoTen, email, soDT, cleanCCCD);
             return newMaKH;
         } catch (Exception e) {
-            String fallbackMaKH = fallbackLinkByContact(hoTen, email, soDT, cleanCCCD);
-            if (fallbackMaKH != null) {
-                return fallbackMaKH;
-            }
             throw new Exception("Lỗi ghi nhận hồ sơ khách lưu trú: " + e.getMessage(), e);
         }
-    }
-
-    private String fallbackLinkByContact(String hoTen, String email, String soDT, String cleanCCCD) {
-        String fallbackSql = "SELECT CustomerId FROM Customer WHERE PhoneNumber = ? OR Email = ?";
-        String matchedMaKH = queryScalarString(fallbackSql, soDT, email);
-        if (matchedMaKH != null) {
-            updateGuestProfileByMaKH(matchedMaKH, cleanCCCD, hoTen, email, soDT);
-            return matchedMaKH;
-        }
-        return null;
-    }
-
-    private void updateGuestProfileByMaKH(String maKH, String cccd, String hoTen, String email, String soDT) {
-        String sql = "UPDATE Customer SET CCCD = ?, FullName = ?, Email = ?, PhoneNumber = ? WHERE CustomerId = ?";
-        executeUpdate(sql, cccd, hoTen, email, soDT, maKH);
     }
 
     public String getNextCustomerIdFromDB(Connection conn) {

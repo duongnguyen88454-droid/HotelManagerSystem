@@ -51,11 +51,10 @@ public class InvoiceDAO extends BaseRepository<InvoiceDetailDTO, String> {
                 + "       inv.TotalRoomCharge, inv.TotalServiceCharge, inv.EarlyCheckInFee, inv.LateCheckOutFee, "
                 + "       inv.FinalTotalAmount AS TongTienCuoiCung, inv.InvoiceStatus AS TrangThaiHoaDon, "
                 + "       b.CustomerId AS MaKH, c.FullName AS TenKhachHang, "
-                + "       c.PhoneNumber AS SoDT, c.CCCD, ISNULL(acc.Username, N'Hệ Thống') AS TenNVLap "
+                + "       c.PhoneNumber AS SoDT, c.CCCD, ISNULL(b.CreateBy, N'Hệ Thống') AS TenNVLap "
                 + "FROM Invoice inv "
                 + "INNER JOIN Booking b ON inv.BookingId = b.BookingId "
                 + "INNER JOIN Customer c ON b.CustomerId = c.CustomerId "
-                + "LEFT JOIN Account acc ON b.CreateBy = acc.AccountId "
                 + "WHERE inv.InvoiceId = ?";
         return queryOneCustom(sql, this::mapRowToInvoiceDetail, maHoaDon).orElse(null);
     }

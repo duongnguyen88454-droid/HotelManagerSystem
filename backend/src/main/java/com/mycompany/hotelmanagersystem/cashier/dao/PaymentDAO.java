@@ -64,36 +64,17 @@ public class PaymentDAO extends BaseRepository<PaymentRecordDTO, String> {
             return null;
         }
         String cleanId = accountOrEmpId.trim();
-        String checkAccSql = "SELECT AccountId FROM Account WHERE AccountId = ?";
-        try (PreparedStatement ps = conn.prepareStatement(checkAccSql)) {
-            ps.setString(1, cleanId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return cleanId;
-                }
-            }
-        } catch (SQLException ignored) {
-        }
-
-        String findByEmpSql = "SELECT AccountId FROM Employee WHERE EmployeeId = ?";
-        try (PreparedStatement ps = conn.prepareStatement(findByEmpSql)) {
-            ps.setString(1, cleanId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("AccountId");
-                }
-            }
-        } catch (SQLException ignored) {
+        if (cleanId.toUpperCase().startsWith("ACC")) {
+            return cleanId;
         }
         return null;
     }
 
     public List<PaymentRecordDTO> getPaymentHistory(String maHoaDon) {
         String sql = "SELECT p.PaymentId AS MaThanhToan, p.InvoiceId AS MaHoaDon, p.ProcessBy AS MaNV, " +
-                     "       ISNULL(acc.Username, N'Khách Hàng') AS TenNV, p.TotalAmount AS SoTien, " +
+                     "       ISNULL(p.ProcessBy, N'Khách Hàng') AS TenNV, p.TotalAmount AS SoTien, " +
                      "       p.PaymentMethod AS PhuongThucThanhToan, p.PaymentDate AS ThoiDiemThanhToan " +
                      "FROM Payment p " +
-                     "LEFT JOIN Account acc ON p.ProcessBy = acc.AccountId " +
                      "WHERE p.InvoiceId = ? " +
                      "ORDER BY p.PaymentDate ASC";
         return query(sql, maHoaDon);

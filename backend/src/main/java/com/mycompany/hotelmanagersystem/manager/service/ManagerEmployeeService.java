@@ -1,5 +1,6 @@
 package com.mycompany.hotelmanagersystem.manager.service;
 
+import com.mycompany.hotelmanagersystem.auth.util.PasswordUtil;
 import com.mycompany.hotelmanagersystem.manager.dao.ManagerEmployeeDAO;
 import com.mycompany.hotelmanagersystem.manager.dto.CreateEmployeeDTO;
 import com.mycompany.hotelmanagersystem.manager.dto.EmployeeItemDTO;
@@ -49,6 +50,7 @@ public class ManagerEmployeeService {
         if (!"Receptionist".equalsIgnoreCase(role) && !"Housekeeper".equalsIgnoreCase(role)) {
             return false;
         }
+        dto.setPassword(PasswordUtil.hashPassword(dto.getPassword().trim()));
         return employeeDAO.createEmployeeWithAccount(dto);
     }
 
@@ -63,6 +65,9 @@ public class ManagerEmployeeService {
         String status = dto.getAccountStatus();
         if (!"Active".equalsIgnoreCase(status) && !"Locked".equalsIgnoreCase(status)) {
             return false;
+        }
+        if (!isBlank(dto.getNewPassword())) {
+            dto.setNewPassword(PasswordUtil.hashPassword(dto.getNewPassword().trim()));
         }
         return employeeDAO.updateEmployeeAccount(dto);
     }

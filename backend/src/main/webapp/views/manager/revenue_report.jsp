@@ -209,6 +209,12 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="report-pagination-container" style="display: none; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; border-top: 1px solid #e2e8f0; font-size: 13px; color: #475569;">
+                    <div class="report-pagination-info">
+                        Hiển thị <strong class="page-start">1</strong> - <strong class="page-end">10</strong> trên tổng số <strong class="page-total">0</strong> dòng
+                    </div>
+                    <div class="report-pagination-buttons" style="display: flex; gap: 4px; align-items: center;"></div>
+                </div>
             </div>
         </c:if>
 
@@ -287,6 +293,12 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="report-pagination-container" style="display: none; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; border-top: 1px solid #e2e8f0; font-size: 13px; color: #475569;">
+                    <div class="report-pagination-info">
+                        Hiển thị <strong class="page-start">1</strong> - <strong class="page-end">10</strong> trên tổng số <strong class="page-total">0</strong> dòng
+                    </div>
+                    <div class="report-pagination-buttons" style="display: flex; gap: 4px; align-items: center;"></div>
+                </div>
             </div>
         </c:if>
 
@@ -354,53 +366,21 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="report-pagination-container" style="display: none; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; border-top: 1px solid #e2e8f0; font-size: 13px; color: #475569;">
+                    <div class="report-pagination-info">
+                        Hiển thị <strong class="page-start">1</strong> - <strong class="page-end">10</strong> trên tổng số <strong class="page-total">0</strong> dòng
+                    </div>
+                    <div class="report-pagination-buttons" style="display: flex; gap: 4px; align-items: center;"></div>
+                </div>
             </div>
         </c:if>
 
         <!-- PHÂN HỆ 4: TỔNG DOANH THU & PHIẾU THU DÒNG TIỀN -->
         <c:if test="${reportType eq 'overall'}">
-            <c:set var="sumCash" value="0" />
-            <c:set var="sumBank" value="0" />
-            <c:set var="sumCard" value="0" />
             <c:set var="sumOverall" value="0" />
             <c:forEach var="item" items="${overallReport}">
-                <c:if test="${item.paymentMethod eq 'Cash'}"><c:set var="sumCash" value="${sumCash + item.totalAmount}" /></c:if>
-                <c:if test="${item.paymentMethod eq 'BankTransfer' or item.paymentMethod eq 'Momo' or item.paymentMethod eq 'VNPay'}"><c:set var="sumBank" value="${sumBank + item.totalAmount}" /></c:if>
-                <c:if test="${item.paymentMethod eq 'CreditCard'}"><c:set var="sumCard" value="${sumCard + item.totalAmount}" /></c:if>
                 <c:set var="sumOverall" value="${sumOverall + item.totalAmount}" />
             </c:forEach>
-
-            <!-- CÁC THẺ KPI DÒNG TIỀN THEO PHƯƠNG THỨC THANH TOÁN -->
-            <div class="portal-kpi-grid" style="margin-bottom: 20px;">
-                <div class="portal-kpi-card" style="border-top: 4px solid #1e3a8a;">
-                    <div class="portal-kpi-label">Tổng Dòng Tiền Thu</div>
-                    <div class="portal-kpi-value" style="color: #1e3a8a;">
-                        <fmt:formatNumber value="${sumOverall}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
-                    </div>
-                    <div class="portal-kpi-desc">Toàn bộ phiếu thu đã xác nhận</div>
-                </div>
-                <div class="portal-kpi-card" style="border-top: 4px solid #16a34a;">
-                    <div class="portal-kpi-label">Thu Tiền Mặt (Cash)</div>
-                    <div class="portal-kpi-value" style="color: #16a34a;">
-                        <fmt:formatNumber value="${sumCash}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
-                    </div>
-                    <div class="portal-kpi-desc">Thực thu tại quầy thu ngân</div>
-                </div>
-                <div class="portal-kpi-card" style="border-top: 4px solid #3b82f6;">
-                    <div class="portal-kpi-label">Chuyển Khoản / Ví Điện Tử</div>
-                    <div class="portal-kpi-value" style="color: #2563eb;">
-                        <fmt:formatNumber value="${sumBank}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
-                    </div>
-                    <div class="portal-kpi-desc">Chuyển khoản qua ngân hàng, Momo, VNPay</div>
-                </div>
-                <div class="portal-kpi-card" style="border-top: 4px solid #eab308;">
-                    <div class="portal-kpi-label">Thẻ Tín Dụng (POS)</div>
-                    <div class="portal-kpi-value" style="color: #ca8a04;">
-                        <fmt:formatNumber value="${sumCard}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
-                    </div>
-                    <div class="portal-kpi-desc">Quẹt thẻ Visa, MasterCard</div>
-                </div>
-            </div>
 
             <div class="portal-card" style="padding: 0; overflow: hidden;">
                 <div class="portal-table-wrapper" style="border: none; border-radius: 0;">
@@ -461,13 +441,138 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="report-pagination-container" style="display: none; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; border-top: 1px solid #e2e8f0; font-size: 13px; color: #475569;">
+                    <div class="report-pagination-info">
+                        Hiển thị <strong class="page-start">1</strong> - <strong class="page-end">10</strong> trên tổng số <strong class="page-total">0</strong> dòng
+                    </div>
+                    <div class="report-pagination-buttons" style="display: flex; gap: 4px; align-items: center;"></div>
+                </div>
             </div>
         </c:if>
     </main>
 </div>
 
-<!-- JAVASCRIPT XUẤT EXCEL THUẦN (HỖ TRỢ UNICODE TIẾNG VIỆT HOÀN HẢO CHO EXCEL) -->
+<!-- JAVASCRIPT PHÂN TRANG 10 DÒNG/TRANG & XUẤT EXCEL THUẦN -->
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    initTablePagination();
+});
+
+function initTablePagination() {
+    var table = document.getElementById('reportDataTable');
+    if (!table) return;
+
+    var tbody = table.querySelector('tbody');
+    if (!tbody) return;
+
+    var allRows = Array.from(tbody.querySelectorAll('tr'));
+    var dataRows = allRows.filter(function (row) {
+        return !row.classList.contains('summary-highlight-row') && row.querySelectorAll('td').length > 1;
+    });
+
+    var totalItems = dataRows.length;
+    var pageSize = 10;
+    var totalPages = Math.ceil(totalItems / pageSize);
+
+    var pagContainer = document.querySelector('.report-pagination-container');
+    if (!pagContainer) return;
+
+    if (totalItems <= pageSize) {
+        pagContainer.style.display = 'none';
+        return;
+    }
+
+    pagContainer.style.display = 'flex';
+    var currentPage = 1;
+
+    function showPage(page) {
+        currentPage = page;
+        var startIdx = (page - 1) * pageSize;
+        var endIdx = Math.min(startIdx + pageSize, totalItems);
+
+        dataRows.forEach(function (row, idx) {
+            if (idx >= startIdx && idx < endIdx) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        var startEl = pagContainer.querySelector('.page-start');
+        var endEl = pagContainer.querySelector('.page-end');
+        var totalEl = pagContainer.querySelector('.page-total');
+        if (startEl) startEl.textContent = (startIdx + 1);
+        if (endEl) endEl.textContent = endIdx;
+        if (totalEl) totalEl.textContent = totalItems;
+
+        renderButtons();
+    }
+
+    function renderButtons() {
+        var btnContainer = pagContainer.querySelector('.report-pagination-buttons');
+        if (!btnContainer) return;
+        btnContainer.innerHTML = '';
+
+        // Nút Trước
+        var prevBtn = createPageBtn('« Trước', currentPage > 1, function () {
+            if (currentPage > 1) showPage(currentPage - 1);
+        });
+        btnContainer.appendChild(prevBtn);
+
+        // Các nút số trang
+        for (var i = 1; i <= totalPages; i++) {
+            (function (p) {
+                var pageBtn = createPageBtn(p, true, function () {
+                    showPage(p);
+                });
+                if (p === currentPage) {
+                    pageBtn.style.backgroundColor = '#2563eb';
+                    pageBtn.style.color = '#ffffff';
+                    pageBtn.style.borderColor = '#2563eb';
+                    pageBtn.style.fontWeight = '700';
+                }
+                btnContainer.appendChild(pageBtn);
+            })(i);
+        }
+
+        // Nút Kế tiếp
+        var nextBtn = createPageBtn('Kế tiếp »', currentPage < totalPages, function () {
+            if (currentPage < totalPages) showPage(currentPage + 1);
+        });
+        btnContainer.appendChild(nextBtn);
+    }
+
+    function createPageBtn(text, enabled, onClick) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = text;
+        btn.style.padding = '5px 12px';
+        btn.style.fontSize = '13px';
+        btn.style.border = '1px solid #cbd5e1';
+        btn.style.borderRadius = '6px';
+        btn.style.background = '#ffffff';
+        btn.style.color = enabled ? '#1e293b' : '#94a3b8';
+        btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
+        btn.disabled = !enabled;
+        btn.style.transition = 'all 0.15s ease';
+        if (enabled) {
+            btn.addEventListener('mouseenter', function() {
+                if (btn.style.backgroundColor !== 'rgb(37, 99, 235)') {
+                    btn.style.background = '#f1f5f9';
+                }
+            });
+            btn.addEventListener('mouseleave', function() {
+                if (btn.style.backgroundColor !== 'rgb(37, 99, 235)') {
+                    btn.style.background = '#ffffff';
+                }
+            });
+            btn.addEventListener('click', onClick);
+        }
+        return btn;
+    }
+
+    showPage(1);
+}
 function exportTableToExcel(tableId, filename) {
     var table = document.getElementById(tableId);
     if (!table) {

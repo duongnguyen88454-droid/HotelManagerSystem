@@ -48,8 +48,8 @@
         <!-- CỘT TRÁI: THÔNG SỐ, TIỆN ÍCH VÀ DỊCH VỤ MIỄN PHÍ -->
         <div style="flex: 1; min-width: 650px;">
             
-            <!-- Banner minh họa phòng sang trọng -->
-            <div style="background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%); height: 220px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; margin-bottom: 25px; box-shadow: inset 0 0 40px rgba(0,0,0,0.2);">
+            <!-- Banner minh họa phòng sang trọng với ảnh view phòng thực tế -->
+            <div style="background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.78)), url('${not empty room.hinhAnhMinhHoa ? room.hinhAnhMinhHoa : 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80'}') center/cover no-repeat; height: 260px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; margin-bottom: 25px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); border: 1px solid rgba(255,255,255,0.1);">
                 <div style="text-align: center; padding: 20px;">
                     <div style="font-size: 13px; font-weight: 700; color: #fbd38d; text-transform: uppercase; letter-spacing: 1px;">
                         Không Gian Nghỉ Dưỡng Sang Trọng

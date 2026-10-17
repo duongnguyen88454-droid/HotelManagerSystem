@@ -14,7 +14,7 @@
    ========================================================================== */
 .hero-section {
     position: relative;
-    background: linear-gradient(135deg, #0a192f 0%, #1a365d 50%, #2b4c7e 100%);
+    background: linear-gradient(rgba(10, 25, 47, 0.72), rgba(10, 25, 47, 0.85)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
     color: #ffffff;
     padding: 90px 24px 130px 24px;
     text-align: center;

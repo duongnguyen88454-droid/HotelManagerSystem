@@ -40,11 +40,13 @@
                             </h2>
                             <div style="font-size: 13px; color: #e2e8f0;">
                                 <c:choose>
-                                    <c:when test="${not empty bookingDetail.maBooking && bookingDetail.maBooking != 'CHO_THANH_TOAN'}">
+                                    <c:when
+                                        test="${not empty bookingDetail.maBooking && bookingDetail.maBooking != 'CHO_THANH_TOAN'}">
                                         Mã đơn đặt phòng: <strong>${bookingDetail.maBooking}</strong> &nbsp;|&nbsp;
                                     </c:when>
                                     <c:otherwise>
-                                        Trạng thái: <strong style="color: #feebc8;">Chờ Thanh Toán Để Tạo Đơn</strong> &nbsp;|&nbsp;
+                                        Trạng thái: <strong style="color: #feebc8;">Chờ Thanh Toán Để Tạo Đơn</strong>
+                                        &nbsp;|&nbsp;
                                     </c:otherwise>
                                 </c:choose>
                                 Khách hàng: <strong>${bookingDetail.hoTenKhachHang}</strong> (${bookingDetail.soDT})
@@ -53,7 +55,8 @@
                         <div
                             style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); padding: 8px 16px; border-radius: 6px; font-size: 13px; text-align: right;">
                             <span
-                                style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85;">Quy trình</span>
+                                style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85;">Quy
+                                trình</span>
                             <strong style="font-size: 15px; color: #feebc8;">Thanh Toán Để Chốt Phòng</strong>
                         </div>
                     </div>
@@ -201,7 +204,8 @@
                                 <span style="color: #718096;">Nội dung CK:</span>
                                 <strong style="color: #2b6cb0; font-size: 14px; font-family: monospace;">
                                     <c:choose>
-                                        <c:when test="${not empty bookingDetail.maBooking && bookingDetail.maBooking != 'CHO_THANH_TOAN'}">
+                                        <c:when
+                                            test="${not empty bookingDetail.maBooking && bookingDetail.maBooking != 'CHO_THANH_TOAN'}">
                                             COC ${bookingDetail.maBooking}
                                         </c:when>
                                         <c:otherwise>
@@ -215,7 +219,8 @@
                         <!-- Nút bấm xác nhận thanh toán -->
                         <form action="${pageContext.request.contextPath}/customer/deposit" method="POST"
                             style="margin: 0;">
-                            <input type="hidden" name="bookingId" value="${bookingDetail.maBooking != 'CHO_THANH_TOAN' ? bookingDetail.maBooking : ''}">
+                            <input type="hidden" name="bookingId"
+                                value="${bookingDetail.maBooking != 'CHO_THANH_TOAN' ? bookingDetail.maBooking : ''}">
                             <input type="hidden" name="paymentMethod" value="BankTransfer">
 
                             <button type="submit"

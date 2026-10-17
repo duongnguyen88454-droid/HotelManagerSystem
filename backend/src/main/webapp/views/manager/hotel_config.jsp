@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+            <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
             <jsp:include page="/views/common/header.jsp">
                 <jsp:param name="title" value="Cấu Hình Khách Sạn &amp; Biểu Phí" />
             </jsp:include>
@@ -58,6 +59,10 @@
                         <button type="button" onclick="switchTab('tab-service')" id="btn-tab-service"
                             style="padding: 12px 20px; font-weight: 600; border: none; background: transparent; cursor: pointer; border-bottom: 3px solid transparent; color: #64748b; font-size: 15px;">
                             4. Dịch Vụ Bổ Sung (Service)
+                        </button>
+                        <button type="button" onclick="switchTab('tab-room')" id="btn-tab-room"
+                            style="padding: 12px 20px; font-weight: 600; border: none; background: transparent; cursor: pointer; border-bottom: 3px solid transparent; color: #64748b; font-size: 15px;">
+                            5. Quản Lý Phòng Vật Lý (Rooms)
                         </button>
                     </div>
 
@@ -467,6 +472,138 @@
                                         </c:forEach>
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 5: PHÒNG VẬT LÝ (ROOM) -->
+                    <div id="tab-room" class="config-tab-content" style="display: none;">
+                        <!-- Form ẩn cập nhật trạng thái vận hành của từng phòng -->
+                        <c:forEach var="rm" items="${physicalRooms}">
+                            <form id="form-room-${rm.roomId}" action="${pageContext.request.contextPath}/manager/hotel-config" method="POST">
+                                <input type="hidden" name="action" value="update_room_status" />
+                                <input type="hidden" name="roomId" value="${rm.roomId}" />
+                            </form>
+                        </c:forEach>
+
+                        <div style="display: grid; grid-template-columns: 1fr 2.5fr; gap: 24px;">
+                            <!-- Form Thêm Phòng Mới -->
+                            <div style="background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: fit-content;">
+                                <h4 style="margin: 0 0 14px; color: #0f172a; font-size: 16px; font-weight: 700;">Thêm Phòng Vật Lý Mới</h4>
+                                <form action="${pageContext.request.contextPath}/manager/hotel-config" method="POST">
+                                    <input type="hidden" name="action" value="add_room" />
+                                    <div style="margin-bottom: 12px;">
+                                        <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">
+                                            Mã Phòng (Số phòng) <span style="color: red;">*</span>
+                                        </label>
+                                        <input type="text" name="roomId" placeholder="Ví dụ: P104, P205" required maxlength="20"
+                                            style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; text-transform: uppercase;" />
+                                    </div>
+                                    <div style="margin-bottom: 12px;">
+                                        <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">
+                                            Tên Hiển Thị Phòng <span style="color: red;">*</span>
+                                        </label>
+                                        <input type="text" name="roomName" placeholder="Ví dụ: Phòng 104, Phòng 205" required maxlength="100"
+                                            style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;" />
+                                    </div>
+                                    <div style="margin-bottom: 16px;">
+                                        <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">
+                                            Hạng Phòng Thuộc Về <span style="color: red;">*</span>
+                                        </label>
+                                        <select name="roomTypeId" required style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                                            <option value="">-- Chọn Hạng Phòng --</option>
+                                            <c:forEach var="rt" items="${roomTypes}">
+                                                <option value="${rt.maLoaiPhong}">${rt.tenLoaiPhong} (${rt.maLoaiPhong})</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn-add">
+                                        Thêm Phòng Vào Hệ Thống
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Bảng Danh Sách Phòng Vật Lý -->
+                            <div style="background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;">
+                                <div style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b;">
+                                            Danh Sách Phòng Vật Lý Trong Khách Sạn (Bảng Room)
+                                        </h3>
+                                        <p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">
+                                            Quản lý số phòng thực tế, trạng thái vận hành, tình trạng buồng phòng và khách cư trú.
+                                        </p>
+                                    </div>
+                                    <span style="font-size: 13px; font-weight: 600; color: #3b82f6; background: #eff6ff; padding: 4px 10px; border-radius: 9999px;">
+                                        Tổng: ${fn:length(physicalRooms)} phòng
+                                    </span>
+                                </div>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                                        <thead>
+                                            <tr style="background: #ffffff; border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 600;">
+                                                <th style="padding: 12px 14px;">Mã Phòng</th>
+                                                <th style="padding: 12px 14px;">Tên Phòng</th>
+                                                <th style="padding: 12px 14px;">Hạng Phòng</th>
+                                                <th style="padding: 12px 14px; text-align: center;">Tình Trạng Buồng</th>
+                                                <th style="padding: 12px 14px; text-align: center;">Khách Ở</th>
+                                                <th style="padding: 12px 14px; text-align: center;">Vận Hành</th>
+                                                <th style="padding: 12px 14px; text-align: center;">Lưu</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <c:forEach var="rm" items="${physicalRooms}">
+                                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                                    <td style="padding: 12px 14px; font-weight: 700; color: #1e293b;">
+                                                        <c:out value="${rm.roomId}" />
+                                                    </td>
+                                                    <td style="padding: 12px 14px; font-weight: 600; color: #0f172a;">
+                                                        <c:out value="${rm.roomName}" />
+                                                    </td>
+                                                    <td style="padding: 12px 14px; color: #475569;">
+                                                        <span style="font-weight: 600; color: #3b82f6;"><c:out value="${rm.roomTypeName}" /></span>
+                                                    </td>
+                                                    <td style="padding: 12px 14px; text-align: center;">
+                                                        <c:choose>
+                                                            <c:when test="${rm.housekeepingStatus == 'Clean'}">
+                                                                <span style="background: #f0fdf4; color: #166534; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Sạch Sẽ</span>
+                                                            </c:when>
+                                                            <c:when test="${rm.housekeepingStatus == 'Cleaning'}">
+                                                                <span style="background: #eff6ff; color: #1d4ed8; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Đang Dọn</span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span style="background: #fef2f2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Cần Dọn</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                    <td style="padding: 12px 14px; text-align: center;">
+                                                        <c:choose>
+                                                            <c:when test="${rm.occupancyStatus == 'Occupied'}">
+                                                                <span style="background: #fef3c7; color: #92400e; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Đang Có Khách</span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span style="background: #f8fafc; color: #64748b; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Trống</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                    <td style="padding: 12px 14px; text-align: center;">
+                                                        <select form="form-room-${rm.roomId}" name="roomStatus"
+                                                            style="padding: 4px 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                            <option value="Available" ${rm.roomStatus == 'Available' ? 'selected="selected"' : ''}>Hoạt Động (Available)</option>
+                                                            <option value="Maintenance" ${rm.roomStatus == 'Maintenance' ? 'selected="selected"' : ''}>Bảo Trì (Maintenance)</option>
+                                                            <option value="OutOfService" ${rm.roomStatus == 'OutOfService' ? 'selected="selected"' : ''}>Ngưng Dùng (OutOfService)</option>
+                                                        </select>
+                                                    </td>
+                                                    <td style="padding: 12px 14px; text-align: center;">
+                                                        <button type="submit" form="form-room-${rm.roomId}" class="btn-save-sm">
+                                                            Lưu
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>

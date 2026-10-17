@@ -319,3 +319,33 @@ INNER JOIN Customer c ON b.CustomerId = c.CustomerId
 LEFT JOIN Account acc ON p.ProcessBy = acc.AccountId
 LEFT JOIN Employee emp ON acc.AccountId = emp.AccountId;
 GO
+
+-- ============================================================================
+-- VIEW 11: DAMAGE REPORTS (ALL INCIDENTS FOR HOUSEKEEPING & MAINTENANCE)
+-- Phục vụ: DamageReportDAO.java (Lịch sử sự cố hư hại Buồng Phòng & Nghiệm thu)
+-- ============================================================================
+CREATE OR ALTER VIEW v_DamageReports
+AS
+SELECT dr.DamageReportId,
+       dr.RoomId,
+       r.RoomName,
+       rt.RoomTypeName,
+       dr.DetectedAt,
+       dt.DamageName AS DamageTypeName,
+       drdt.Note AS DamageDescription,
+       dr.DamageReportStatus AS ReportStatus,
+       dr.CreateBy
+FROM   DamageReport AS dr
+       INNER JOIN
+       Room AS r
+       ON dr.RoomId = r.RoomId
+       INNER JOIN
+       RoomType AS rt
+       ON r.RoomTypeId = rt.RoomTypeId
+       LEFT JOIN
+       DamageReport_DamageType AS drdt
+       ON dr.DamageReportId = drdt.DamageReportId
+       LEFT JOIN
+       DamageType AS dt
+       ON drdt.DamageTypeId = dt.DamageTypeId;
+GO

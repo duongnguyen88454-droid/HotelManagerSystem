@@ -1,6 +1,7 @@
 package com.mycompany.hotelmanagersystem.housekeeper.controller;
 
 import com.mycompany.hotelmanagersystem.auth.dto.UserSessionDTO;
+import com.mycompany.hotelmanagersystem.housekeeper.dto.HousekeeperDamageReportDTO;
 import com.mycompany.hotelmanagersystem.housekeeper.dto.HousekeeperTaskDTO;
 import com.mycompany.hotelmanagersystem.housekeeper.service.HousekeeperTaskService;
 
@@ -38,13 +39,18 @@ public class HousekeeperPortalServlet extends HttpServlet {
             maNV = user.getMaDinhDanh();
         }
 
-        List<HousekeeperTaskDTO> taskList = taskService.getTaskList(status, maTK, maNV);
-        HousekeeperTaskDTO currentActiveTask = findActiveTaskOfCurrentUser(request, taskList);
+        String resolvedStatus = resolveCurrentStatus(status);
+        if ("DamageHistory".equalsIgnoreCase(resolvedStatus)) {
+            List<HousekeeperDamageReportDTO> damageList = taskService.getDamageReports();
+            request.setAttribute("damageList", damageList);
+        } else {
+            List<HousekeeperTaskDTO> taskList = taskService.getTaskList(status, maTK, maNV);
+            HousekeeperTaskDTO currentActiveTask = findActiveTaskOfCurrentUser(request, taskList);
+            request.setAttribute("taskList", taskList);
+            request.setAttribute("currentActiveTask", currentActiveTask);
+        }
 
-        request.setAttribute("taskList", taskList);
-        request.setAttribute("currentStatus", resolveCurrentStatus(status));
-        request.setAttribute("currentActiveTask", currentActiveTask);
-
+        request.setAttribute("currentStatus", resolvedStatus);
         request.getRequestDispatcher("/views/housekeeper/tasks.jsp").forward(request, response);
     }
 

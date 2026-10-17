@@ -3,7 +3,6 @@ package com.mycompany.hotelmanagersystem.booking.dao;
 import com.mycompany.hotelmanagersystem.booking.dto.BookingCartDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartRoomItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
-import com.mycompany.hotelmanagersystem.booking.dto.SingleBookingRequestDTO;
 import com.mycompany.hotelmanagersystem.common.base.BaseRepository;
 import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
@@ -45,35 +44,6 @@ public class BookingDAO extends BaseRepository<Object, String> {
     @Override
     protected String getRole() {
         return "Receptionist";
-    }
-
-    /**
-     * Điều phối tạo đơn đặt phòng trực tuyến 1 phòng kèm dịch vụ trong 1
-     * Transaction
-     */
-    public String createOnlineBookingWithServices(SingleBookingRequestDTO req) throws Exception {
-        Connection conn = null;
-        try {
-            conn = DBContext.getConnection(getRole());
-            conn.setAutoCommit(false);
-
-            Date checkInSql = req.getCheckIn() != null ? Date.valueOf(req.getCheckIn()) : null;
-            Date checkOutSql = req.getCheckOut() != null ? Date.valueOf(req.getCheckOut()) : null;
-            validateRoomAvailability(conn, req.getMaPhong(), checkInSql, checkOutSql);
-            String maBooking = getNextBookingIdFromDB(conn);
-            insertBookingHeader(conn, maBooking, req.getMaKH(), req.getMaTaiKhoan(), req.getTongChiPhi());
-            insertBookingRoom(conn, maBooking, req.getMaPhong(), req.getDonGiaPhong(), checkInSql, checkOutSql);
-            bookingDichVuDAO.insertBookingServices(conn, maBooking, req.getMaPhong(), req.getSelectedServices());
-            invoiceWriter.ensureInvoiceExists(conn, maBooking);
-
-            conn.commit();
-            return maBooking;
-        } catch (Exception e) {
-            rollbackTransaction(conn);
-            throw e;
-        } finally {
-            closeTransactionConnection(conn);
-        }
     }
 
     /**

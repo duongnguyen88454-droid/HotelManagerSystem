@@ -113,10 +113,6 @@ public class AccountDAO extends BaseRepository<Account, String> {
         if (tk.getHoTen() != null && !tk.getHoTen().trim().isEmpty()) {
             return tk.getHoTen().trim();
         }
-        if (tk.getTenDangNhap() != null && !tk.getTenDangNhap().trim().isEmpty()
-                && !tk.getTenDangNhap().contains("@")) {
-            return tk.getTenDangNhap().trim();
-        }
         if (tk.getEmail() != null && tk.getEmail().contains("@")) {
             return tk.getEmail().substring(0, tk.getEmail().indexOf('@')).trim();
         }

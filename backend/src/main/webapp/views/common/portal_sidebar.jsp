@@ -32,6 +32,10 @@
                             </a>
 
                             <div class="nav-group-title">Giao Dịch</div>
+                            <a href="${pageContext.request.contextPath}/cashier/dashboard"
+                                class="portal-nav-item ${param.activeMenu eq 'cashier' ? 'active' : ''}">
+                                <span>Quầy Thu Ngân & Check-out</span>
+                            </a>
                             <a href="${pageContext.request.contextPath}/receptionist/refunds"
                                 class="portal-nav-item ${param.activeMenu eq 'refunds' ? 'active' : ''}">
                                 <span>Xét Duyệt Hoàn Cọc</span>

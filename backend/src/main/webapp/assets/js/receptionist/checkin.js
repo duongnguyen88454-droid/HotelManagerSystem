@@ -13,6 +13,10 @@ function openCheckInDetailModal(maBooking) {
     document.getElementById('mdlBookingId').value = maBooking;
     document.getElementById('mdlRoomListBody').innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b;">Đang tải danh sách phòng...</td></tr>';
     document.getElementById('cleaningNotice').style.display = 'none';
+    const btnGoToCashier = document.getElementById('btnGoToCashier');
+    if (btnGoToCashier) {
+        btnGoToCashier.style.display = 'none';
+    }
 
     const contextPath = window.CONTEXT_PATH || '';
     const url = contextPath + '/receptionist/checkin?action=detail&maBooking=' + encodeURIComponent(maBooking);
@@ -103,6 +107,19 @@ function renderDetailModal(data) {
 
     const btnConfirm = document.getElementById('btnConfirmCheckIn');
     btnConfirm.disabled = true;
+
+    // Nút chuyển sang quầy Check-out & Thanh toán nếu đơn có phòng đã nhận
+    const btnGoToCashier = document.getElementById('btnGoToCashier');
+    const hasAnyCheckedIn = data.rooms && data.rooms.some(r => r.daNhanPhong);
+    if (btnGoToCashier) {
+        if (hasAnyCheckedIn) {
+            const bookingId = data.maBooking || document.getElementById('mdlBookingId').value;
+            btnGoToCashier.href = (window.CONTEXT_PATH || '') + '/cashier/booking-detail?maBooking=' + encodeURIComponent(bookingId);
+            btnGoToCashier.style.display = 'inline-flex';
+        } else {
+            btnGoToCashier.style.display = 'none';
+        }
+    }
 }
 
 function toggleSelectAllRooms(masterChk) {
@@ -166,6 +183,64 @@ function submitCheckInSelection() {
         })
         .catch(err => {
             alert('[Lỗi kết nối] Không thể kết nối đến máy chủ: ' + err.message);
+        });
+}
+
+function submitCancelSelection() {
+    const maBooking = document.getElementById('mdlBookingId').value.trim();
+    if (!maBooking) {
+        alert('[Lỗi] Không tìm thấy mã đơn đặt phòng!');
+        return;
+    }
+
+    const checkedBoxes = document.querySelectorAll('input[name="selectedRoom"]:checked');
+    let confirmMsg = '';
+    const isSingleRooms = checkedBoxes.length > 0;
+
+    if (isSingleRooms) {
+        confirmMsg = 'Bạn có chắc chắn muốn HỦY ' + checkedBoxes.length + ' phòng đã chọn trong đơn ' + maBooking + ' không?';
+    } else {
+        confirmMsg = 'Bạn chưa chọn phòng cụ thể nào.\nBạn có chắc chắn muốn HỦY TOÀN BỘ đơn đặt phòng ' + maBooking + ' không?';
+    }
+
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+
+    const reason = prompt('Nhập lý do hủy phòng / đơn đặt phòng:', 'Khách liên hệ yêu cầu hủy phòng');
+    if (reason === null) {
+        return; // Người dùng ấn Cancel trong prompt
+    }
+
+    const params = new URLSearchParams();
+    params.append('action', 'cancel');
+    params.append('maBooking', maBooking);
+    params.append('reason', reason.trim());
+
+    if (isSingleRooms) {
+        checkedBoxes.forEach(cb => {
+            params.append('maPhong[]', cb.value);
+        });
+    }
+
+    const contextPath = window.CONTEXT_PATH || '';
+    fetch(contextPath + '/receptionist/checkin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: params.toString()
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('[Thành công] ' + data.message);
+                closeModal('checkInDetailModal');
+                window.location.reload();
+            } else {
+                alert('[Lỗi Hủy Phòng] ' + (data.message || 'Không thể thực hiện hủy phòng'));
+            }
+        })
+        .catch(err => {
+            alert('[Lỗi kết nối] Không thể gửi yêu cầu đến máy chủ: ' + err.message);
         });
 }
 

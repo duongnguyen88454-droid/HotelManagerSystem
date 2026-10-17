@@ -189,14 +189,11 @@ public class CustomerBookingServlet extends HttpServlet {
         if (cart != null && cart.getTotalRoomCount() > 0) {
             return cart;
         }
-        return resolveSingleRoomCartFallback(request, session);
+        return createSingleRoomCart(request, session);
     }
 
-    private BookingCartDTO resolveSingleRoomCartFallback(HttpServletRequest request, HttpSession session) {
+    private BookingCartDTO createSingleRoomCart(HttpServletRequest request, HttpSession session) {
         String roomId = request.getParameter("roomId");
-        if (roomId == null) {
-            roomId = request.getParameter("maPhong");
-        }
         String checkIn = request.getParameter("checkIn");
         String checkOut = request.getParameter("checkOut");
 

@@ -115,7 +115,23 @@ public class RoomDAO extends BaseRepository<AvailableRoomDTO, String> {
                 rs.getDouble("BasePrice"),
                 rs.getNString("AmenitiesDescription"));
         dto.setDepositPercent(rs.getDouble("DepositPercent"));
+        dto.setHinhAnhMinhHoa(resolveRoomImage(rs.getNString("RoomTypeName")));
         return dto;
+    }
+
+    private String resolveRoomImage(String roomTypeName) {
+        if (roomTypeName == null) {
+            return "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80";
+        }
+        String lower = roomTypeName.toLowerCase();
+        if (lower.contains("suite") || lower.contains("vip") || lower.contains("executive")) {
+            return "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80";
+        } else if (lower.contains("family") || lower.contains("gia đình")) {
+            return "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80";
+        } else if (lower.contains("deluxe") || lower.contains("ocean")) {
+            return "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80";
+        }
+        return "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80";
     }
 
     private RoomType mapRoomType(ResultSet rs) throws SQLException {

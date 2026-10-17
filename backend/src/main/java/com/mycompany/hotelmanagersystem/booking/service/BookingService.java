@@ -9,14 +9,10 @@ import com.mycompany.hotelmanagersystem.booking.dto.BookingDetailDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartRoomItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CartServiceItemDTO;
 import com.mycompany.hotelmanagersystem.booking.dto.CustomerBookingHistoryDTO;
-import com.mycompany.hotelmanagersystem.booking.dto.SingleBookingRequestDTO;
 import com.mycompany.hotelmanagersystem.hotelservice.model.ServiceItem;
 import com.mycompany.hotelmanagersystem.hotelservice.service.HotelServiceService;
-import com.mycompany.hotelmanagersystem.room.dto.AvailableRoomDTO;
-import com.mycompany.hotelmanagersystem.room.service.RoomService;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,22 +27,20 @@ public class BookingService {
     private final BookingQueryDAO bookingQueryDAO;
     private final BookingDichVuDAO bookingDichVuDAO;
     private final BookingCancellationDAO bookingCancellationDAO;
-    private final RoomService roomService;
     private final HotelServiceService hotelServiceService;
 
     public BookingService() {
         this(new BookingDAO(), new BookingQueryDAO(), new BookingDichVuDAO(),
-                new BookingCancellationDAO(), new RoomService(), new HotelServiceService());
+                new BookingCancellationDAO(), new HotelServiceService());
     }
 
     public BookingService(BookingDAO bookingDAO, BookingQueryDAO bookingQueryDAO, BookingDichVuDAO bookingDichVuDAO,
-            BookingCancellationDAO bookingCancellationDAO, RoomService roomService,
+            BookingCancellationDAO bookingCancellationDAO,
             HotelServiceService hotelServiceService) {
         this.bookingDAO = bookingDAO;
         this.bookingQueryDAO = bookingQueryDAO;
         this.bookingDichVuDAO = bookingDichVuDAO;
         this.bookingCancellationDAO = bookingCancellationDAO;
-        this.roomService = roomService;
         this.hotelServiceService = hotelServiceService;
     }
 
@@ -55,50 +49,6 @@ public class BookingService {
      */
     public List<ServiceItem> getActiveServices() {
         return hotelServiceService.getAllActiveServices();
-    }
-
-    /**
-     * Tạo đơn đặt phòng trực tuyến kèm dịch vụ đã chọn cho 1 phòng.
-     */
-    public String createBookingWithServices(SingleBookingRequestDTO req) throws Exception {
-        if (req == null) {
-            throw new IllegalArgumentException("Yêu cầu đặt phòng không hợp lệ!");
-        }
-        if (req.getMaKH() == null || req.getMaKH().trim().isEmpty()) {
-            throw new IllegalArgumentException("Khách hàng chưa đăng nhập hoặc thông tin không hợp lệ!");
-        }
-        if (req.getMaPhong() == null || req.getMaPhong().trim().isEmpty()) {
-            throw new IllegalArgumentException("Vui lòng chọn phòng cần đặt!");
-        }
-
-        LocalDate today = LocalDate.now();
-        LocalDate checkInLocal = req.getCheckIn();
-        LocalDate checkOutLocal = req.getCheckOut();
-
-        if (checkInLocal == null || checkInLocal.isBefore(today)) {
-            throw new IllegalArgumentException("Ngày nhận phòng không thể trước ngày hôm nay!");
-        }
-        if (checkOutLocal == null || !checkOutLocal.isAfter(checkInLocal)) {
-            throw new IllegalArgumentException("Ngày trả phòng phải sau ngày nhận phòng!");
-        }
-
-        AvailableRoomDTO room = roomService.getRoomDetailById(req.getMaPhong().trim());
-        if (room == null) {
-            throw new IllegalArgumentException("Phòng " + req.getMaPhong() + " không tồn tại!");
-        }
-
-        long daysBetween = ChronoUnit.DAYS.between(checkInLocal, checkOutLocal);
-        int soDem = (int) Math.max(1, daysBetween);
-        double donGiaPhong = room.getGiaPhong();
-        double tienPhong = donGiaPhong * soDem;
-
-        double tongTienDichVu = calculateServicesTotal(req.getSelectedServices());
-        double tongChiPhi = tienPhong + tongTienDichVu;
-
-        req.setDonGiaPhong(donGiaPhong);
-        req.setTongChiPhi(tongChiPhi);
-
-        return bookingDAO.createOnlineBookingWithServices(req);
     }
 
     /**
@@ -274,22 +224,5 @@ public class BookingService {
                 }
             }
         }
-    }
-
-    private double calculateServicesTotal(Map<String, Integer> selectedServices) {
-        if (selectedServices == null || selectedServices.isEmpty()) {
-            return 0.0;
-        }
-        double total = 0.0;
-        for (Map.Entry<String, Integer> entry : selectedServices.entrySet()) {
-            int soLuong = entry.getValue() != null ? entry.getValue() : 0;
-            if (soLuong > 0) {
-                ServiceItem item = hotelServiceService.getServiceById(entry.getKey());
-                if (item != null) {
-                    total += item.getDonGia() * soLuong;
-                }
-            }
-        }
-        return total;
     }
 }

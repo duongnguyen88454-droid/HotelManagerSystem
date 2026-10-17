@@ -127,7 +127,13 @@
                 Lưu ý: Có phòng đang được dọn dẹp hoặc chưa sẵn sàng, vui lòng kiểm tra với bộ phận buồng phòng trước khi bàn giao chìa khóa!
             </div>
         </div>
-        <div class="modal-foot" style="padding: 16px 24px; border-top: 1px solid var(--portal-border); background: #f8fafc; display: flex; justify-content: flex-end; gap: 10px;">
+        <div class="modal-foot" style="padding: 16px 24px; border-top: 1px solid var(--portal-border); background: #f8fafc; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
+            <button type="button" id="btnCancelBooking" class="portal-btn portal-btn-danger" style="margin-right: auto; display: inline-flex; align-items: center; gap: 6px;" onclick="submitCancelSelection()">
+                <i class="fas fa-ban"></i> Hủy Phòng / Đơn Đặt
+            </button>
+            <a id="btnGoToCashier" href="#" class="portal-btn portal-btn-primary" style="display: none; text-decoration: none; align-items: center; justify-content: center;">
+                Quầy Check-out &amp; Thanh Toán
+            </a>
             <button type="button" id="btnConfirmCheckIn" class="portal-btn portal-btn-success" onclick="submitCheckInSelection()">Xác Nhận Bàn Giao</button>
             <button type="button" class="portal-btn portal-btn-secondary" onclick="closeModal('checkInDetailModal')">Đóng</button>
         </div>

@@ -13,12 +13,6 @@ public class AuthService {
         this.accountDAO = new AccountDAO();
     }
 
-    /**
-     * Xác thực đăng nhập bằng đúng Email và Mật khẩu trong bảng TAIKHOAN:
-     * - Băm mật khẩu thô người dùng vừa nhập bằng thuật toán SHA-256.
-     * - So sánh chuỗi băm này với chuỗi băm đã lưu trong CSDL (qua PasswordUtil).
-     * - Hỗ trợ tương thích ngược (fallback) cho tài khoản seed mẫu.
-     */
     public UserSessionDTO login(String email, String password) throws Exception {
         if (email == null || email.trim().isEmpty()) {
             throw new Exception("Vui lòng nhập Email.");
@@ -40,9 +34,6 @@ public class AuthService {
         return user;
     }
 
-    /**
-     * Xác định URL đích theo vai trò sau khi đăng nhập thành công
-     */
     public String getRedirectUrlByRole(String contextPath, String role) {
         if (role == null) {
             return contextPath + "/index.jsp";

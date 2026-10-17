@@ -9,9 +9,9 @@
 
             <div class="container" style="max-width: 1200px; margin-top: 25px; margin-bottom: 90px;">
 
-                <!-- Banner chào mừng thương hiệu sang trọng -->
+                <!-- Banner chào mừng thương hiệu sang trọng với ảnh background Resort 5 sao -->
                 <div
-                    style="background: linear-gradient(135deg, #1a365d 0%, #2a4365 100%); color: white; padding: 36px 40px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); margin-bottom: 30px;">
+                    style="background: linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.82)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat; color: white; padding: 48px 40px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); margin-bottom: 35px; border: 1px solid rgba(255,255,255,0.15);">
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                         <div style="max-width: 750px;">
@@ -28,18 +28,6 @@
                                 tiện nghi hiện đại bậc nhất. Vui lòng nhập tiêu chí lưu trú bên dưới để tìm kiếm và đặt
                                 phòng ưng ý.
                             </p>
-                        </div>
-                        <div
-                            style="background: rgba(255,255,255,0.08); padding: 16px 24px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.18); text-align: right; min-width: 220px;">
-                            <div style="font-size: 12px; color: #cbd5e0; margin-bottom: 2px;">Tài khoản hội viên:</div>
-                            <div style="font-size: 18px; font-weight: 700; color: #fbd38d;">
-                                ${sessionScope.CURRENT_USER.maDinhDanh}</div>
-                            <div style="margin-top: 8px;">
-                                <a href="${pageContext.request.contextPath}/customer/history"
-                                    style="color: #ffffff; text-decoration: underline; font-size: 13px; font-weight: 500;">
-                                    Lịch sử đơn đặt phòng
-                                </a>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -115,9 +103,9 @@
                             <!-- Nút tìm kiếm phòng nổi bật -->
                             <div>
                                 <button type="submit"
-                                    style="width: 100%; background: #dd6b20; color: white; border: none; padding: 11px 18px; font-size: 14px; font-weight: 700; border-radius: 6px; cursor: pointer; transition: background 0.2s;"
-                                    onmouseover="this.style.background='#c05621'"
-                                    onmouseout="this.style.background='#dd6b20'">
+                                    style="width: 100%; background: #1a365d; color: white; border: none; padding: 11px 18px; font-size: 14px; font-weight: 700; border-radius: 6px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 6px rgba(26, 54, 93, 0.2);"
+                                    onmouseover="this.style.background='#2b6cb0'; this.style.boxShadow='0 4px 12px rgba(26, 54, 93, 0.3)';"
+                                    onmouseout="this.style.background='#1a365d'; this.style.boxShadow='0 2px 6px rgba(26, 54, 93, 0.2)';">
                                     Tìm Kiếm Phòng
                                 </button>
                             </div>

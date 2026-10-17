@@ -131,6 +131,7 @@ GRANT SELECT ON v_ArrivalCheckInBookings TO role_Receptionist;
 GRANT SELECT ON v_ReceivableBookings TO role_Receptionist;
 GRANT SELECT ON v_HousekeeperTasks TO role_Receptionist;
 GRANT SELECT ON v_MaintenancePendingRooms TO role_Receptionist;
+GRANT SELECT ON v_DamageReports TO role_Receptionist;
 GRANT SELECT ON v_CustomerBookingHistory TO role_Receptionist;
 
 -- Quyền thực thi các thủ tục Check-in/Check-out/Thu tiền/Dịch vụ/Hủy phòng
@@ -169,6 +170,7 @@ GRANT SELECT ON RoomService TO role_Housekeeper;
 GRANT SELECT, INSERT, UPDATE ON DamageReport TO role_Housekeeper;
 GRANT SELECT, INSERT, UPDATE ON DamageReport_DamageType TO role_Housekeeper;
 GRANT SELECT ON v_HousekeeperTasks TO role_Housekeeper;
+GRANT SELECT ON v_DamageReports TO role_Housekeeper;
 
 -- Quyền thực thi thủ tục cập nhật tiến độ dọn dẹp & báo hỏng thiết bị
 GRANT EXECUTE ON dbo.sp_CapNhatTienDoDonPhong TO role_Housekeeper;
@@ -226,6 +228,7 @@ DENY SELECT, INSERT, UPDATE, DELETE ON RoomCleaningTask TO role_Customer;
 DENY SELECT, INSERT, UPDATE, DELETE ON DamageReport TO role_Customer;
 DENY SELECT, INSERT, UPDATE, DELETE ON DamageReport_DamageType TO role_Customer;
 DENY SELECT ON v_HousekeeperTasks TO role_Customer;
+DENY SELECT ON v_DamageReports TO role_Customer;
 DENY SELECT ON v_ArrivalCheckInBookings TO role_Customer;
 DENY SELECT ON v_ReceivableBookings TO role_Customer;
 DENY SELECT ON v_InvoiceRevenueReport TO role_Customer;

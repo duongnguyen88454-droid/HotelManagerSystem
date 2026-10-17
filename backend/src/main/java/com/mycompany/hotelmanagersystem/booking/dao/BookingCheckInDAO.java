@@ -123,62 +123,9 @@ public class BookingCheckInDAO extends BaseRepository<BookingBarDTO, String> {
 
             cs.execute();
             return true;
-        } catch (SQLException e) {
-            // Lỗi 2812: Stored procedure không tồn tại -> dùng fallback transaction
-            if (e.getErrorCode() == 2812) {
-                return executeCheckInFallback(maBooking, maPhong);
-            }
-            return false;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * Fallback transaction nếu SP có vấn đề kết nối: đảm bảo cập nhật đồng bộ CSDL.
-     */
-    private boolean executeCheckInFallback(String maBooking, String maPhong) {
-        String updateBp = "UPDATE Booking_Room SET ActualCheckInDate = GETDATE(), BookingStatus = 'CheckedIn' "
-                + "WHERE BookingId = ? AND RoomId = ? AND ActualCheckInDate IS NULL";
-        String updateP = "UPDATE Room SET OccupancyStatus = 'Occupied' WHERE RoomId = ?";
-
-        Connection conn = null;
-        try {
-            conn = DBContext.getConnection(getRole());
-            conn.setAutoCommit(false);
-
-            try (PreparedStatement psBp = conn.prepareStatement(updateBp);
-                    PreparedStatement psP = conn.prepareStatement(updateP)) {
-
-                psBp.setString(1, maBooking);
-                psBp.setString(2, maPhong);
-                int rows = psBp.executeUpdate();
-                if (rows <= 0) {
-                    conn.rollback();
-                    return false;
-                }
-
-                psP.setString(1, maPhong);
-                psP.executeUpdate();
-
-                conn.commit();
-                return true;
-            } catch (SQLException ex) {
-                conn.rollback();
-                ex.printStackTrace();
-                return false;
-            }
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                }
-            }
         }
     }
 

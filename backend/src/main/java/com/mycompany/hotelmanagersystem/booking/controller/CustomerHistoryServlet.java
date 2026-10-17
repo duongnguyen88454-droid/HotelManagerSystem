@@ -31,10 +31,6 @@ public class CustomerHistoryServlet extends HttpServlet {
 
         String maTaiKhoan = currentUser.getMaTaiKhoan();
         List<CustomerBookingHistoryDTO> bookingList = bookingService.getCustomerHistoryByAccountId(maTaiKhoan);
-        // Fallback kiểm tra thêm theo maDinhDanh nếu là tài khoản seed cũ có liên kết KHACHHANG
-        if (bookingList.isEmpty() && currentUser.getMaDinhDanh() != null && !currentUser.getMaDinhDanh().trim().isEmpty()) {
-            bookingList = bookingService.getCustomerHistory(currentUser.getMaDinhDanh().trim());
-        }
         request.setAttribute("bookingList", bookingList);
 
         request.getRequestDispatcher("/views/booking/booking_history.jsp").forward(request, response);

@@ -61,8 +61,9 @@
 
             <div style="min-width: 130px;">
                 <button type="submit"
-                        style="width: 100%; background: #dd6b20; color: white; border: none; padding: 10px 18px; border-radius: 5px; font-weight: 700; font-size: 13px; cursor: pointer; transition: background 0.2s;"
-                        onmouseover="this.style.background='#c05621'" onmouseout="this.style.background='#dd6b20'">
+                        style="width: 100%; background: #1a365d; color: white; border: none; padding: 10px 18px; border-radius: 5px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 6px rgba(26, 54, 93, 0.2);"
+                        onmouseover="this.style.background='#2b6cb0'; this.style.boxShadow='0 4px 12px rgba(26, 54, 93, 0.3)';"
+                        onmouseout="this.style.background='#1a365d'; this.style.boxShadow='0 2px 6px rgba(26, 54, 93, 0.2)';">
                     Tìm Kiếm
                 </button>
             </div>
@@ -219,15 +220,21 @@
                                  onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'"
                                  onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.05)'">
                                 
-                                <!-- Khối 1: Ảnh minh họa bên trái (~250px) -->
-                                <div style="flex: 0 0 250px; width: 250px; background: #1a365d; position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 18px; box-sizing: border-box; color: white;">
-                                    <div>
-                                        <span style="background: #2b6cb0; color: white; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 3px; text-transform: uppercase;">
+                                <!-- Khối 1: Ảnh minh họa phòng (~250px) thay thế cho block xanh trơn -->
+                                <div style="flex: 0 0 250px; width: 250px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 16px; box-sizing: border-box; color: white; background: #0f172a;">
+                                    <img src="${not empty room.hinhAnhMinhHoa ? room.hinhAnhMinhHoa : 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80'}"
+                                         alt="${room.tenLoaiPhong}"
+                                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;"
+                                         onerror="this.src='https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80';" />
+                                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(15,23,42,0.35) 0%, rgba(15,23,42,0.85) 100%); z-index: 2;"></div>
+                                    
+                                    <div style="position: relative; z-index: 3;">
+                                        <span style="background: rgba(43, 108, 176, 0.9); backdrop-filter: blur(4px); color: white; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 4px; text-transform: uppercase;">
                                             ${room.tenLoaiPhong}
                                         </span>
                                     </div>
-                                    <div>
-                                        <div style="font-size: 11px; color: #feebc8; font-weight: 600; text-transform: uppercase;">
+                                    <div style="position: relative; z-index: 3;">
+                                        <div style="font-size: 11px; color: #feebc8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
                                             MÃ PHÒNG: ${room.maPhong}
                                         </div>
                                         <div style="font-size: 22px; font-weight: 700; color: #ffffff; margin-top: 2px;">

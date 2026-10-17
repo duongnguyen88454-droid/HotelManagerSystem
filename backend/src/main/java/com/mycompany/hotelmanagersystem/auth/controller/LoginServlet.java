@@ -42,8 +42,6 @@ public class LoginServlet extends HttpServlet {
         String redirectTarget = request.getParameter("redirect");
 
         try {
-            // Xác thực đăng nhập qua AuthService (Service băm SHA-256 mật khẩu vừa nhập và
-            // so khớp với CSDL)
             UserSessionDTO user = authService.login(loginIdentifier, password);
 
             // Lưu người dùng vào session

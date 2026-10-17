@@ -10,8 +10,6 @@
             <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/booking/booking_detail.css">
 
             <div class="container" style="max-width: 1200px; margin-top: 25px; margin-bottom: 60px;">
-
-                <!-- Thanh dẫn hướng & Nút thao tác -->
                 <div class="no-print"
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                     <div style="font-size: 13px; color: #718096;">

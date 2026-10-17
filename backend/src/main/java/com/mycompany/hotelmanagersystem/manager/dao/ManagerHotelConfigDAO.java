@@ -148,7 +148,7 @@ public class ManagerHotelConfigDAO extends BaseRepository<RoomType, String> {
             return false;
         }
         String generatedId = (dto.getRoomTypeId() != null && !dto.getRoomTypeId().trim().isEmpty())
-                ? dto.getRoomTypeId().trim() : generateNextId("fn_SinhMaRoomType", "RT");
+                ? dto.getRoomTypeId().trim() : generateNextId("fn_SinhMaRoomType");
 
         String sqlRoomType = "INSERT INTO RoomType (RoomTypeId, RoomTypeName, Capacity, BasePrice, EarlyCheckInFee, "
                 + "LateCheckOutFee, DepositPercent, IsActive) VALUES (?, ?, ?, ?, ?, ?, ?, 1)";
@@ -219,7 +219,7 @@ public class ManagerHotelConfigDAO extends BaseRepository<RoomType, String> {
 
     public boolean addBedType(String bedTypeId, String bedTypeName) {
         String finalId = (bedTypeId != null && !bedTypeId.trim().isEmpty())
-                ? bedTypeId.trim() : generateNextId("fn_SinhMaBedType", "BT");
+                ? bedTypeId.trim() : generateNextId("fn_SinhMaBedType");
         String sql = "INSERT INTO BedType (BedTypeId, BedTypeName, IsActive) VALUES (?, ?, 1)";
         return executeUpdate(sql, finalId, bedTypeName) > 0;
     }
@@ -237,7 +237,7 @@ public class ManagerHotelConfigDAO extends BaseRepository<RoomType, String> {
 
     public boolean addRoomAmenity(String amenityId, String amenityName) {
         String finalId = (amenityId != null && !amenityId.trim().isEmpty())
-                ? amenityId.trim() : generateNextId("fn_SinhMaRoomService", "RS");
+                ? amenityId.trim() : generateNextId("fn_SinhMaRoomService");
         String sql = "INSERT INTO RoomService (RoomServiceId, RoomServiceName, IsActive) VALUES (?, ?, 1)";
         return executeUpdate(sql, finalId, amenityName) > 0;
     }
@@ -262,7 +262,7 @@ public class ManagerHotelConfigDAO extends BaseRepository<RoomType, String> {
 
     public boolean addService(String serviceId, String serviceName, double basePrice) {
         String finalId = (serviceId != null && !serviceId.trim().isEmpty())
-                ? serviceId.trim() : generateNextId("fn_SinhMaService", "SRV");
+                ? serviceId.trim() : generateNextId("fn_SinhMaService");
         String sql = "INSERT INTO Service (ServiceId, ServiceName, BasePrice, IsActive) VALUES (?, ?, ?, 1)";
         return executeUpdate(sql, finalId, serviceName, BigDecimal.valueOf(basePrice)) > 0;
     }
@@ -272,16 +272,12 @@ public class ManagerHotelConfigDAO extends BaseRepository<RoomType, String> {
         return executeUpdate(sql, BigDecimal.valueOf(basePrice), isActive, serviceId) > 0;
     }
 
-    private String generateNextId(String functionName, String defaultPrefix) {
-        try {
-            String nextId = queryScalarString("SELECT dbo." + functionName + "()");
-            if (nextId != null && !nextId.trim().isEmpty()) {
-                return nextId.trim();
-            }
-        } catch (Exception ignored) {
-            // Fallback an toan
+    private String generateNextId(String functionName) {
+        String nextId = queryScalarString("SELECT dbo." + functionName + "()");
+        if (nextId != null && !nextId.trim().isEmpty()) {
+            return nextId.trim();
         }
-        return defaultPrefix + (System.currentTimeMillis() % 1000);
+        throw new IllegalStateException("Không thể sinh mã định danh tự động từ hàm " + functionName);
     }
 }
 

@@ -120,7 +120,7 @@
                                                                             data-guest="${cell.bookingBar.tenKhachHang}"
                                                                             data-bookingid="${cell.bookingBar.maBooking}">
                                                                             <div class="booking-bar ${cell.bookingBar.cssClass}"
-                                                                                onclick="openBookingDetail('${cell.bookingBar.maBooking}')"
+                                                                                onclick="openBookingDetail('${cell.bookingBar.maBooking}', '${cell.bookingBar.cssClass}')"
                                                                                 title="Đơn: ${cell.bookingBar.maBooking} | Khách: ${cell.bookingBar.tenKhachHang} (${cell.bookingBar.soDienThoai}) | Nhận: ${cell.bookingBar.ngayNhanDuKien} - Trả: ${cell.bookingBar.ngayTraDuKien}">
                                                                                 <div class="bar-guest-name">
                                                                                     ${cell.bookingBar.tenKhachHang}
@@ -174,10 +174,15 @@
                 }
 
                 /**
-                 * Nhấp vào thanh đặt phòng để tra cứu chi tiết tại quầy check-in
+                 * Nhấp vào thanh đặt phòng: nếu phòng đang ở (CheckedIn) chuyển sang quầy Check-out & Thanh Toán,
+                 * nếu chưa nhận phòng chuyển sang quầy Tiếp Đón.
                  */
-                function openBookingDetail(maBooking) {
-                    window.location.href = window.CONTEXT_PATH + '/receptionist/checkin?keyword=' + encodeURIComponent(maBooking);
+                function openBookingDetail(maBooking, cssClass) {
+                    if (cssClass && (cssClass.indexOf('checkedin') !== -1 || cssClass.indexOf('CheckedIn') !== -1)) {
+                        window.location.href = window.CONTEXT_PATH + '/cashier/booking-detail?maBooking=' + encodeURIComponent(maBooking);
+                    } else {
+                        window.location.href = window.CONTEXT_PATH + '/receptionist/checkin?keyword=' + encodeURIComponent(maBooking);
+                    }
                 }
 
                 /**
