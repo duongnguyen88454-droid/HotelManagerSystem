@@ -67,7 +67,7 @@
                                             <strong class="text-primary">${item.maBaoCao}</strong>
                                         </td>
                                         <td>
-                                            <div class="font-bold text-main">Phòng ${item.soPhong}</div>
+                                            <div class="font-bold text-main">${item.soPhong}</div>
                                             <div class="text-muted text-xs">ID: ${item.maPhong}</div>
                                         </td>
                                         <td class="text-secondary">
@@ -116,7 +116,7 @@
                                                 <form
                                                     action="${pageContext.request.contextPath}/manager/damages"
                                                     method="POST" class="inline"
-                                                    onsubmit="return confirm('Xác nhận nghiệm thu thiết bị đã sửa xong và mở khóa Phòng ${item.soPhong} sang trạng thái Khả dụng (Available)?');">
+                                                    onsubmit="return confirm('Xác nhận nghiệm thu thiết bị đã sửa xong và mở khóa ${item.soPhong} sang trạng thái Khả dụng (Available)?');">
                                                     <input type="hidden" name="action" value="resolve" />
                                                     <input type="hidden" name="maBaoCao" value="${item.maBaoCao}" />
                                                     <input type="hidden" name="maPhong" value="${item.maPhong}" />

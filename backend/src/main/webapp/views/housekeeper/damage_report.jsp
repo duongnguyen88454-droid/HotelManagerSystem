@@ -7,7 +7,7 @@
     <jsp:param name="pageCss" value="housekeeper/damage_report.css" />
 </jsp:include>
 
-<div class="portal-wrapper">
+<div class="portal-wrapper portal-layout">
     <!-- Thanh chức năng bên trái -->
     <jsp:include page="/views/common/portal_sidebar.jsp">
         <jsp:param name="activeMenu" value="tasks" />
@@ -33,7 +33,7 @@
                 <div class="detail-grid">
                     <div class="detail-item">
                         <span class="detail-label">Phòng Xảy Ra Sự Cố</span>
-                        <span class="detail-value text-danger fw-bold text-lg">Phòng ${task.soPhong} (${task.tenLoaiPhong})</span>
+                        <span class="detail-value text-danger fw-bold text-lg">${task.soPhong} (${task.tenLoaiPhong})</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Mã Nhiệm Vụ</span>
@@ -102,7 +102,7 @@
                     <textarea name="moTaChung" class="form-control" rows="3"
                         placeholder="Nhập tóm tắt bối cảnh phát hiện hư hại sau khi khách rời đi..."></textarea>
                     <div class="text-xs text-muted mt-2">
-                        Lưu ý: Sau khi xác nhận, phòng <strong>${task.soPhong}</strong> sẽ tự động chuyển sang trạng thái <strong>Hư Hại (Damaged)</strong> và biên bản sự cố được gửi đến Quản Lý.
+                        Lưu ý: Sau khi xác nhận, <strong>${task.soPhong}</strong> sẽ tự động chuyển sang trạng thái <strong>Hư Hại (Damaged)</strong> và biên bản sự cố được gửi đến Quản Lý.
                     </div>
                 </div>
             </div>

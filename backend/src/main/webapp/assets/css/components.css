@@ -448,7 +448,7 @@ textarea.form-control {
 .modal-md { max-width: 640px; }
 .modal-lg { max-width: 880px; }
 
-.modal-head {
+.modal-head, .modal-header {
   padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--color-border);
   display: flex;
@@ -456,10 +456,30 @@ textarea.form-control {
   align-items: center;
 }
 
-.modal-head h3 {
+.modal-head h3, .modal-header h3, .modal-title {
   font-size: var(--fs-lg);
   font-weight: var(--fw-semibold);
   margin: 0;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--color-text-muted, #64748b);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm, 4px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  color: var(--color-text-main, #0f172a);
+  background: var(--color-surface-alt, #f1f5f9);
 }
 
 .modal-body {
@@ -467,13 +487,38 @@ textarea.form-control {
   overflow-y: auto;
 }
 
-.modal-foot {
+.modal-foot, .modal-footer {
   padding: var(--space-4) var(--space-5);
   border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
   gap: var(--space-3);
   background-color: var(--color-surface-alt);
+}
+
+.checkbox-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.checkbox-card:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-surface-subtle);
+}
+
+.checkbox-card input[type="checkbox"] {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 /* ========================================================================= */

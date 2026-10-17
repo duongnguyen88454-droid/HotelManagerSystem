@@ -1,7 +1,8 @@
 function openInspectionModal(taskId, roomNumber, roomType) {
     document.getElementById('modalTaskId').value = taskId;
     document.getElementById('modalTaskIdText').innerText = 'Mã nhiệm vụ: #' + taskId;
-    document.getElementById('modalRoomInfo').innerText = 'Phòng ' + roomNumber + ' (' + roomType + ')';
+    var displayRoom = roomNumber ? (roomNumber.startsWith('Phòng') ? roomNumber : ('Phòng ' + roomNumber)) : 'Phòng ---';
+    document.getElementById('modalRoomInfo').innerText = displayRoom + ' (' + roomType + ')';
     document.getElementById('modalHasDamage').checked = false;
     toggleDamageNotice(false);
     var modal = document.getElementById('inspectionModal');
@@ -54,7 +55,8 @@ function openTaskDetailModalFromBtn(btn) {
 
 function openTaskDetailModal(taskId, roomNo, roomType, roomStatus, staffName, staffId, assignedTime, startTime, endTime, result) {
     document.getElementById('dtlTaskId').innerText = '#' + (taskId || '--');
-    document.getElementById('dtlRoom').innerText = 'Phòng ' + (roomNo || '--');
+    var displayRoom = roomNo ? (roomNo.startsWith('Phòng') ? roomNo : ('Phòng ' + roomNo)) : '--';
+    document.getElementById('dtlRoom').innerText = displayRoom;
     document.getElementById('dtlRoomType').innerText = roomType || '--';
     document.getElementById('dtlStaff').innerText = (staffName || '--') + (staffId ? ' (' + staffId + ')' : '');
 
