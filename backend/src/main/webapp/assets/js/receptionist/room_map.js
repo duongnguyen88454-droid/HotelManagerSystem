@@ -42,7 +42,8 @@ function handleBookingBarClick(roomId, roomNo, bookingId, guestName, phone, cccd
     document.getElementById('bmBookingIdVal').value = bookingId || '';
 
     document.getElementById('bmBookingId').innerText = bookingId || '--';
-    document.getElementById('bmRoomId').innerText = roomId + (roomNo ? (' (Phòng ' + roomNo + ')') : '');
+    const displayRoom = roomNo ? (roomNo.startsWith('Phòng') ? roomNo : ('Phòng ' + roomNo)) : '';
+    document.getElementById('bmRoomId').innerText = roomId + (displayRoom ? (' (' + displayRoom + ')') : '');
     document.getElementById('bmGuestName').innerText = guestName || '--';
     document.getElementById('bmPhone').innerText = phone || '--';
     document.getElementById('bmCccd').innerText = cccd || '--';

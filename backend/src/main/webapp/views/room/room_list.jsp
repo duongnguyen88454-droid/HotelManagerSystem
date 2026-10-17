@@ -4,38 +4,34 @@
 
 <jsp:include page="/views/common/header.jsp">
     <jsp:param name="title" value="Trang Đặt Phòng - Danh Sách Phòng Khả Dụng" />
+    <jsp:param name="zone" value="public" />
 </jsp:include>
 <jsp:include page="/views/common/navbar.jsp" />
 
-<div class="container" style="max-width: 1220px; margin-top: 25px; margin-bottom: 90px;">
+<div class="public-container my-6">
 
     <!-- Thanh tìm kiếm và đổi tiêu chí nhanh ở đầu trang (Top Search Summary Bar) -->
-    <div style="background: white; border-radius: 8px; border: 1px solid #d2d6dc; padding: 18px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 25px;">
-        <form action="${pageContext.request.contextPath}/customer/search-rooms" method="GET"
-              style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;">
-            
-            <div style="flex: 1; min-width: 160px;">
-                <label style="font-size: 12px; font-weight: 700; color: #4a5568; display: block; margin-bottom: 5px; text-transform: uppercase;">
+    <div class="card p-4 mb-5">
+        <form action="${pageContext.request.contextPath}/customer/search-rooms" method="GET" class="flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-40">
+                <label class="form-label uppercase font-bold text-xs text-secondary mb-1">
                     Ngày Nhận Phòng
                 </label>
-                <input type="date" name="checkIn" id="filterCheckIn" value="${paramCheckIn}" required
-                       style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 13px; color: #2d3748; box-sizing: border-box;">
+                <input type="date" name="checkIn" id="filterCheckIn" value="${paramCheckIn}" required class="form-control text-sm">
             </div>
 
-            <div style="flex: 1; min-width: 160px;">
-                <label style="font-size: 12px; font-weight: 700; color: #4a5568; display: block; margin-bottom: 5px; text-transform: uppercase;">
+            <div class="flex-1 min-w-40">
+                <label class="form-label uppercase font-bold text-xs text-secondary mb-1">
                     Ngày Trả Phòng
                 </label>
-                <input type="date" name="checkOut" id="filterCheckOut" value="${paramCheckOut}" required
-                       style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 13px; color: #2d3748; box-sizing: border-box;">
+                <input type="date" name="checkOut" id="filterCheckOut" value="${paramCheckOut}" required class="form-control text-sm">
             </div>
 
-            <div style="flex: 1; min-width: 130px;">
-                <label style="font-size: 12px; font-weight: 700; color: #4a5568; display: block; margin-bottom: 5px; text-transform: uppercase;">
+            <div class="flex-1 min-w-32">
+                <label class="form-label uppercase font-bold text-xs text-secondary mb-1">
                     Số Khách
                 </label>
-                <select name="guests"
-                        style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 13px; background: white; color: #2d3748; box-sizing: border-box;">
+                <select name="guests" class="form-control text-sm">
                     <option value="">Tất cả</option>
                     <option value="1" ${paramGuests=='1' ? 'selected' : ''}>1 người</option>
                     <option value="2" ${paramGuests=='2' ? 'selected' : ''}>2 người</option>
@@ -44,12 +40,11 @@
                 </select>
             </div>
 
-            <div style="flex: 1; min-width: 170px;">
-                <label style="font-size: 12px; font-weight: 700; color: #4a5568; display: block; margin-bottom: 5px; text-transform: uppercase;">
+            <div class="flex-1 min-w-44">
+                <label class="form-label uppercase font-bold text-xs text-secondary mb-1">
                     Hạng Phòng
                 </label>
-                <select name="roomType"
-                        style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 13px; background: white; color: #2d3748; box-sizing: border-box;">
+                <select name="roomType" class="form-control text-sm">
                     <option value="ALL">Tất cả hạng phòng</option>
                     <c:forEach var="rt" items="${roomTypes}">
                         <option value="${rt.maLoaiPhong}" ${paramRoomType==rt.maLoaiPhong ? 'selected' : ''}>
@@ -59,11 +54,8 @@
                 </select>
             </div>
 
-            <div style="min-width: 130px;">
-                <button type="submit"
-                        style="width: 100%; background: #1a365d; color: white; border: none; padding: 10px 18px; border-radius: 5px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 6px rgba(26, 54, 93, 0.2);"
-                        onmouseover="this.style.background='#2b6cb0'; this.style.boxShadow='0 4px 12px rgba(26, 54, 93, 0.3)';"
-                        onmouseout="this.style.background='#1a365d'; this.style.boxShadow='0 2px 6px rgba(26, 54, 93, 0.2)';">
+            <div class="min-w-32">
+                <button type="submit" class="btn btn-primary w-full">
                     Tìm Kiếm
                 </button>
             </div>
@@ -72,129 +64,124 @@
 
     <!-- Thông báo lỗi nếu có -->
     <c:if test="${not empty errorMessage or not empty param.error}">
-        <div style="margin-bottom: 20px; background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 12px 18px; border-radius: 6px; font-size: 14px;">
+        <div class="alert alert-danger mb-4">
             <strong>Thông báo:</strong> ${not empty errorMessage ? errorMessage : param.error}
         </div>
     </c:if>
 
-    <!-- BỐ CỤC CHÍNH 2 CỘT CHUẨN iVIVU (Bộ lọc bên trái + Danh sách thẻ phòng bên phải) -->
-    <div style="display: flex; gap: 25px; align-items: flex-start; flex-wrap: wrap;">
+    <!-- BỐ CỤC CHÍNH 2 CỘT (Bộ lọc bên trái + Danh sách thẻ phòng bên phải) -->
+    <div class="grid-sidebar-content">
 
         <!-- CỘT TRÁI: BỘ LỌC TÌM KIẾM (FILTER SIDEBAR) -->
-        <div style="flex: 0 0 280px; width: 280px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); box-sizing: border-box;">
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2f7; padding-bottom: 12px; margin-bottom: 18px;">
-                <h3 style="color: #1a365d; font-size: 16px; margin: 0; font-weight: 700;">
+        <div class="card p-4">
+            <div class="flex justify-between items-center border-bottom pb-3 mb-4">
+                <h3 class="text-primary font-bold text-base mb-0">
                     Bộ Lọc Tìm Kiếm
                 </h3>
-                <a href="javascript:void(0)" onclick="resetFilters()" style="font-size: 12px; color: #dd6b20; text-decoration: none; font-weight: 600;">
+                <a href="javascript:void(0)" onclick="resetFilters()" class="text-warning text-xs font-semibold">
                     Xóa tất cả
                 </a>
             </div>
 
             <!-- Tìm kiếm theo số phòng / tên phòng -->
-            <div style="margin-bottom: 20px; border-bottom: 1px solid #f0f4f8; padding-bottom: 16px;">
-                <label style="display: block; font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 8px;">
+            <div class="border-bottom pb-3 mb-3">
+                <label class="form-label font-bold text-xs text-secondary mb-2">
                     Tìm Tên / Số Phòng
                 </label>
-                <input type="text" id="keywordFilter" oninput="applyFilters()" placeholder="Nhập số phòng (VD: 101...)"
-                       style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 13px; box-sizing: border-box;">
+                <input type="text" id="keywordFilter" oninput="applyFilters()" placeholder="Nhập số phòng (VD: 101...)" class="form-control text-sm">
             </div>
 
             <!-- Lọc theo Hạng phòng -->
-            <div style="margin-bottom: 20px; border-bottom: 1px solid #f0f4f8; padding-bottom: 16px;">
-                <div style="font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 10px;">
+            <div class="border-bottom pb-3 mb-3">
+                <div class="font-bold text-xs text-secondary uppercase mb-2">
                     Hạng Phòng
                 </div>
                 <c:forEach var="rt" items="${roomTypes}">
-                    <label style="display: flex; align-items: center; font-size: 13px; color: #4a5568; margin-bottom: 8px; cursor: pointer;">
-                        <input type="checkbox" name="typeCheckbox" value="${rt.maLoaiPhong}" onchange="applyFilters()" style="margin-right: 8px;">
-                        ${rt.tenLoaiPhong}
+                    <label class="flex items-center text-sm text-secondary mb-2 cursor-pointer">
+                        <input type="checkbox" name="typeCheckbox" value="${rt.maLoaiPhong}" onchange="applyFilters()" class="mr-2">
+                        <span>${rt.tenLoaiPhong}</span>
                     </label>
                 </c:forEach>
             </div>
 
             <!-- Lọc theo Loại Giường (BedType 3NF) -->
             <c:if test="${not empty bedTypes}">
-                <div style="margin-bottom: 20px; border-bottom: 1px solid #f0f4f8; padding-bottom: 16px;">
-                    <div style="font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 10px;">
+                <div class="border-bottom pb-3 mb-3">
+                    <div class="font-bold text-xs text-secondary uppercase mb-2">
                         Loại Giường
                     </div>
                     <c:forEach var="bt" items="${bedTypes}">
-                        <label style="display: flex; align-items: center; font-size: 13px; color: #4a5568; margin-bottom: 8px; cursor: pointer;">
-                            <input type="checkbox" name="bedCheckbox" value="${bt.bedTypeName}" onchange="applyFilters()" style="margin-right: 8px;">
-                            ${bt.bedTypeName}
+                        <label class="flex items-center text-sm text-secondary mb-2 cursor-pointer">
+                            <input type="checkbox" name="bedCheckbox" value="${bt.bedTypeName}" onchange="applyFilters()" class="mr-2">
+                            <span>${bt.bedTypeName}</span>
                         </label>
                     </c:forEach>
                 </div>
             </c:if>
 
             <!-- Lọc theo Mức giá (Ngân sách) -->
-            <div style="margin-bottom: 20px; border-bottom: 1px solid #f0f4f8; padding-bottom: 16px;">
-                <div style="font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 10px;">
+            <div class="border-bottom pb-3 mb-3">
+                <div class="font-bold text-xs text-secondary uppercase mb-2">
                     Ngân Sách / Phòng / Đêm
                 </div>
-                <label style="display: block; font-size: 13px; color: #4a5568; margin-bottom: 8px; cursor: pointer;">
-                    <input type="checkbox" name="priceCheckbox" value="under_1m" onchange="applyFilters()" style="margin-right: 8px;">
-                    Dưới 1.000.000 đ
+                <label class="flex items-center text-sm text-secondary mb-2 cursor-pointer">
+                    <input type="checkbox" name="priceCheckbox" value="under_1m" onchange="applyFilters()" class="mr-2">
+                    <span>Dưới 1.000.000 đ</span>
                 </label>
-                <label style="display: block; font-size: 13px; color: #4a5568; margin-bottom: 8px; cursor: pointer;">
-                    <input type="checkbox" name="priceCheckbox" value="1m_2m" onchange="applyFilters()" style="margin-right: 8px;">
-                    1.000.000 đ - 2.000.000 đ
+                <label class="flex items-center text-sm text-secondary mb-2 cursor-pointer">
+                    <input type="checkbox" name="priceCheckbox" value="1m_2m" onchange="applyFilters()" class="mr-2">
+                    <span>1.000.000 đ - 2.000.000 đ</span>
                 </label>
-                <label style="display: block; font-size: 13px; color: #4a5568; margin-bottom: 8px; cursor: pointer;">
-                    <input type="checkbox" name="priceCheckbox" value="2m_3m" onchange="applyFilters()" style="margin-right: 8px;">
-                    2.000.000 đ - 3.000.000 đ
+                <label class="flex items-center text-sm text-secondary mb-2 cursor-pointer">
+                    <input type="checkbox" name="priceCheckbox" value="2m_3m" onchange="applyFilters()" class="mr-2">
+                    <span>2.000.000 đ - 3.000.000 đ</span>
                 </label>
-                <label style="display: block; font-size: 13px; color: #4a5568; margin-bottom: 8px; cursor: pointer;">
-                    <input type="checkbox" name="priceCheckbox" value="over_3m" onchange="applyFilters()" style="margin-right: 8px;">
-                    Trên 3.000.000 đ
+                <label class="flex items-center text-sm text-secondary mb-2 cursor-pointer">
+                    <input type="checkbox" name="priceCheckbox" value="over_3m" onchange="applyFilters()" class="mr-2">
+                    <span>Trên 3.000.000 đ</span>
                 </label>
             </div>
 
             <!-- Lọc theo Sức chứa -->
             <div>
-                <div style="font-size: 13px; font-weight: 700; color: #2d3748; margin-bottom: 10px;">
+                <div class="font-bold text-xs text-secondary uppercase mb-2">
                     Sức Chứa Tối Thiểu
                 </div>
-                <label style="display: block; font-size: 13px; color: #4a5568; margin-bottom: 8px; cursor: pointer;">
-                    <input type="radio" name="capacityRadio" value="all" checked onchange="applyFilters()" style="margin-right: 8px;">
-                    Tất cả sức chứa
+                <label class="flex items-center text-sm text-secondary mb-2 cursor-pointer">
+                    <input type="radio" name="capacityRadio" value="all" checked onchange="applyFilters()" class="mr-2">
+                    <span>Tất cả sức chứa</span>
                 </label>
-                <label style="display: block; font-size: 13px; color: #4a5568; margin-bottom: 8px; cursor: pointer;">
-                    <input type="radio" name="capacityRadio" value="1" onchange="applyFilters()" style="margin-right: 8px;">
-                    Phòng 1 người
+                <label class="flex items-center text-sm text-secondary mb-2 cursor-pointer">
+                    <input type="radio" name="capacityRadio" value="1" onchange="applyFilters()" class="mr-2">
+                    <span>Phòng 1 người</span>
                 </label>
-                <label style="display: block; font-size: 13px; color: #4a5568; margin-bottom: 8px; cursor: pointer;">
-                    <input type="radio" name="capacityRadio" value="2" onchange="applyFilters()" style="margin-right: 8px;">
-                    Phòng 2 người
+                <label class="flex items-center text-sm text-secondary mb-2 cursor-pointer">
+                    <input type="radio" name="capacityRadio" value="2" onchange="applyFilters()" class="mr-2">
+                    <span>Phòng 2 người</span>
                 </label>
-                <label style="display: block; font-size: 13px; color: #4a5568; margin-bottom: 8px; cursor: pointer;">
-                    <input type="radio" name="capacityRadio" value="3" onchange="applyFilters()" style="margin-right: 8px;">
-                    Phòng 3 người trở lên
+                <label class="flex items-center text-sm text-secondary mb-2 cursor-pointer">
+                    <input type="radio" name="capacityRadio" value="3" onchange="applyFilters()" class="mr-2">
+                    <span>Phòng 3 người trở lên</span>
                 </label>
             </div>
-
         </div>
 
         <!-- CỘT PHẢI: DANH SÁCH THẺ PHÒNG NẰM NGANG (HORIZONTAL ROOM CARDS) -->
-        <div style="flex: 1; min-width: 600px;">
-            
+        <div>
             <!-- Tiêu đề kết quả & Sắp xếp -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
                 <div>
-                    <h2 style="color: #1a365d; margin: 0; font-size: 20px; font-weight: 700;">
+                    <h2 class="text-primary font-bold text-xl mb-0">
                         Kết Quả Phòng Trống Khả Dụng
                     </h2>
-                    <p style="color: #718096; margin: 4px 0 0 0; font-size: 13px;">
+                    <p class="text-muted text-xs mt-1">
                         Kỳ nghỉ từ <strong>${paramCheckIn}</strong> đến <strong>${paramCheckOut}</strong>
-                        &bull; Hiện có <strong id="roomCountDisplay">${not empty roomList ? roomList.size() : 0}</strong> phòng phù hợp
+                        &bull; Hiện có <strong id="roomCountDisplay" class="text-primary">${not empty roomList ? roomList.size() : 0}</strong> phòng phù hợp
                     </p>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 13px; color: #4a5568; font-weight: 600;">Sắp xếp:</span>
-                    <select id="sortSelect" onchange="sortRooms()" 
-                            style="padding: 6px 10px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 13px; background: white; color: #2d3748;">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-secondary font-semibold">Sắp xếp:</span>
+                    <select id="sortSelect" onchange="sortRooms()" class="form-control text-xs">
                         <option value="default">Mặc định (Đề xuất)</option>
                         <option value="price_asc">Giá phòng tăng dần</option>
                         <option value="price_desc">Giá phòng giảm dần</option>
@@ -206,7 +193,7 @@
             <!-- Danh sách các thẻ phòng dạng ngang -->
             <c:choose>
                 <c:when test="${not empty roomList}">
-                    <div id="roomContainer" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div id="roomContainer" class="flex flex-col gap-4">
                         <c:forEach var="room" items="${roomList}">
                             <div class="room-horizontal-card"
                                  data-room-id="${room.maPhong}"
@@ -215,101 +202,96 @@
                                  data-type="${room.maLoaiPhong}"
                                  data-price="${room.donGia}"
                                  data-capacity="${room.soNguoiToiDa}"
-                                 data-bed="${room.loaiGiuong}"
-                                 style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: row; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); transition: box-shadow 0.2s;"
-                                 onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'"
-                                 onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.05)'">
+                                 data-bed="${room.loaiGiuong}">
                                 
-                                <!-- Khối 1: Ảnh minh họa phòng (~250px) thay thế cho block xanh trơn -->
-                                <div style="flex: 0 0 250px; width: 250px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 16px; box-sizing: border-box; color: white; background: #0f172a;">
+                                <!-- Khối 1: Ảnh minh họa phòng -->
+                                <div class="room-card-media">
                                     <img src="${not empty room.hinhAnhMinhHoa ? room.hinhAnhMinhHoa : 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80'}"
                                          alt="${room.tenLoaiPhong}"
-                                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;"
                                          onerror="this.src='https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80';" />
-                                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(15,23,42,0.35) 0%, rgba(15,23,42,0.85) 100%); z-index: 2;"></div>
+                                    <div class="media-overlay"></div>
                                     
-                                    <div style="position: relative; z-index: 3;">
-                                        <span style="background: rgba(43, 108, 176, 0.9); backdrop-filter: blur(4px); color: white; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 4px; text-transform: uppercase;">
+                                    <div class="media-content">
+                                        <span class="badge badge-primary text-xs uppercase font-bold">
                                             ${room.tenLoaiPhong}
                                         </span>
                                     </div>
-                                    <div style="position: relative; z-index: 3;">
-                                        <div style="font-size: 11px; color: #feebc8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    <div class="media-content">
+                                        <div class="text-xs text-amber font-bold uppercase">
                                             MÃ PHÒNG: ${room.maPhong}
                                         </div>
-                                        <div style="font-size: 22px; font-weight: 700; color: #ffffff; margin-top: 2px;">
+                                        <div class="text-2xl font-bold text-inverse mt-1">
                                             ${room.soPhong}
                                         </div>
-                                        <div style="font-size: 11px; color: #cbd5e0; margin-top: 4px;">
+                                        <div class="text-xs text-muted mt-1">
                                             Sức chứa tối đa: ${room.soNguoiToiDa} người
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Khối 2: Thông tin chi tiết ở giữa (flex: 1) -->
-                                <div style="flex: 1; padding: 18px 22px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <!-- Khối 2: Thông tin chi tiết ở giữa -->
+                                <div class="room-card-body">
                                     <div>
-                                        <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                                            <h3 style="color: #1a365d; margin: 0; font-size: 18px; font-weight: 700;">
+                                        <div class="flex justify-between items-baseline">
+                                            <h3 class="text-primary font-bold text-lg mb-0">
                                                 ${room.soPhong} - ${room.tenLoaiPhong}
                                             </h3>
                                         </div>
                                         
-                                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
-                                            <span style="background: #276749; color: white; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 3px;">
-                                                ✓ Sẵn Sàng
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <span class="badge badge-success text-xs font-bold">
+                                                Sẵn Sàng
                                             </span>
-                                            <span style="font-size: 12px; color: #718096;">
+                                            <span class="text-xs text-muted">
                                                 Tiêu chuẩn nghỉ dưỡng cao cấp
                                             </span>
                                         </div>
 
                                         <!-- Tags tiện ích nổi bật & Cấu hình giường chuẩn 3NF -->
-                                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;">
-                                            <span style="background: #ebf8ff; border: 1px solid #bee3f8; color: #2b6cb0; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">
-                                                🛏️ ${room.loaiGiuong}
+                                        <div class="room-amenities-wrap">
+                                            <span class="badge badge-info text-xs">
+                                                Giường: ${room.loaiGiuong}
                                             </span>
-                                            <span style="background: #f7fafc; border: 1px solid #e2e8f0; color: #4a5568; font-size: 12px; padding: 3px 8px; border-radius: 4px;">
-                                                👥 Sức chứa ${room.soNguoiToiDa} người
+                                            <span class="badge badge-neutral text-xs">
+                                                Sức chứa ${room.soNguoiToiDa} người
                                             </span>
                                             <c:forEach var="tn" items="${room.danhSachTienNghi}">
-                                                <span style="background: #f7fafc; border: 1px solid #e2e8f0; color: #4a5568; font-size: 12px; padding: 3px 8px; border-radius: 4px;">
-                                                    ✓ ${tn}
+                                                <span class="badge badge-neutral text-xs">
+                                                    ${tn}
                                                 </span>
                                             </c:forEach>
                                         </div>
                                     </div>
 
-                                    <div style="margin-top: 14px; font-size: 12px; color: #276749; font-weight: 600;">
+                                    <div class="mt-3 text-xs text-success font-semibold">
                                         Phòng sạch sẽ, đạt chuẩn vệ sinh - Sẵn sàng tiếp đón
                                     </div>
                                 </div>
 
-                                <!-- Khối 3: Bảng giá & Nút hành động bên phải (~230px) -->
-                                <div style="flex: 0 0 230px; width: 230px; border-left: 1px solid #edf2f7; background: #fafafa; padding: 18px 20px; display: flex; flex-direction: column; justify-content: space-between; text-align: right; box-sizing: border-box;">
+                                <!-- Khối 3: Bảng giá & Nút hành động bên phải -->
+                                <div class="room-card-pricing">
                                     <div>
-                                        <div style="font-size: 13px; font-weight: 700; color: #1a365d; margin-bottom: 6px;">
-                                            Chính Sách & Quy Định
+                                        <div class="text-xs font-bold text-primary mb-1">
+                                            Chính Sách &amp; Quy Định
                                         </div>
-                                        <div style="font-size: 12px; color: #4a5568; line-height: 1.6;">
-                                            <div>✓ Đặt phòng trực tuyến nhanh chóng</div>
-                                            <div>✓ Nhận phòng từ 14:00 chiều</div>
-                                            <div>✓ Trả phòng trước 12:00 trưa</div>
+                                        <div class="text-xs text-secondary leading-relaxed">
+                                            <div>Đặt phòng trực tuyến nhanh chóng</div>
+                                            <div>Nhận phòng từ 14:00 chiều</div>
+                                            <div>Trả phòng trước 12:00 trưa</div>
                                         </div>
                                     </div>
 
-                                    <div style="margin-top: 15px;">
-                                        <div style="font-size: 22px; font-weight: 700; color: #dd6b20;">
+                                    <div class="mt-3">
+                                        <div class="text-2xl font-bold text-warning mono">
                                             <fmt:formatNumber value="${room.donGia}" type="number" maxFractionDigits="0"/> đ
                                         </div>
-                                        <div style="font-size: 12px; color: #718096; margin-bottom: 12px;">
+                                        <div class="text-xs text-muted mb-3">
                                             / phòng / đêm
                                         </div>
 
                                         <!-- Nút Xem Phòng dẫn sang Trang Chi Tiết Phòng -->
                                         <a href="${pageContext.request.contextPath}/customer/room-detail?maPhong=${room.maPhong}&checkIn=${paramCheckIn}&checkOut=${paramCheckOut}"
-                                           style="display: block; width: 100%; box-sizing: border-box; background: #dd6b20; color: white; text-align: center; text-decoration: none; padding: 10px 14px; border-radius: 5px; font-size: 13px; font-weight: 700; transition: background 0.2s;"
-                                           onmouseover="this.style.background='#c05621'" onmouseout="this.style.background='#dd6b20'">
+                                           class="btn btn-primary w-full">
                                             Xem Phòng
                                         </a>
                                     </div>
@@ -320,15 +302,14 @@
                     </div>
                 </c:when>
                 <c:otherwise>
-                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 40px; text-align: center;">
-                        <h3 style="color: #718096; margin: 0 0 10px 0; font-size: 18px;">
+                    <div class="card p-6 text-center">
+                        <h3 class="text-secondary font-bold text-lg mb-2">
                             Không tìm thấy phòng trống khả dụng nào
                         </h3>
-                        <p style="color: #a0aec0; margin: 0 0 20px 0; font-size: 14px;">
+                        <p class="text-muted text-sm mb-4">
                             Rất tiếc trong khoảng thời gian từ ${paramCheckIn} đến ${paramCheckOut} hiện các phòng đã kín chỗ. Quý khách vui lòng chọn khoảng ngày khác.
                         </p>
-                        <a href="${pageContext.request.contextPath}/customer/home" 
-                           style="display: inline-block; background: #1a365d; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-size: 13px; font-weight: 600;">
+                        <a href="${pageContext.request.contextPath}/customer/home" class="btn btn-primary">
                             Quay Lại Trang Chủ
                         </a>
                     </div>
@@ -336,15 +317,14 @@
             </c:choose>
 
             <!-- Khung thông báo khi không có phòng nào khớp bộ lọc JS -->
-            <div id="noMatchMessage" style="display: none; background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 35px; text-align: center; margin-top: 15px;">
-                <h3 style="color: #718096; margin: 0 0 8px 0; font-size: 16px;">
+            <div id="noMatchMessage" class="card p-6 text-center mt-4 hidden">
+                <h3 class="text-secondary font-bold text-base mb-2">
                     Không có phòng nào thỏa mãn tiêu chí bộ lọc đã chọn
                 </h3>
-                <p style="color: #a0aec0; margin: 0 0 15px 0; font-size: 13px;">
+                <p class="text-muted text-xs mb-3">
                     Vui lòng điều chỉnh lại mức giá, hạng phòng hoặc nhấn nút xóa bộ lọc.
                 </p>
-                <button type="button" onclick="resetFilters()"
-                        style="background: #dd6b20; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                <button type="button" onclick="resetFilters()" class="btn btn-outline btn-sm">
                     Xóa Bộ Lọc Tìm Kiếm
                 </button>
             </div>
@@ -355,25 +335,23 @@
 
 <!-- Thanh giỏ hàng nổi chân trang nếu có phòng trong giỏ -->
 <c:if test="${not empty sessionScope.BOOKING_CART and sessionScope.BOOKING_CART.totalRoomCount > 0}">
-    <div style="position: fixed; bottom: 0; left: 0; right: 0; background: #1a365d; color: white; padding: 14px 24px; box-shadow: 0 -4px 16px rgba(0,0,0,0.18); z-index: 1000; border-top: 2px solid #c5a880;">
-        <div style="max-width: 1220px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div class="cart-floating-bar">
+        <div class="public-container flex justify-between items-center flex-wrap gap-3">
             <div>
-                <span style="font-size: 15px; font-weight: 700; color: #fbd38d;">
+                <span class="font-bold text-base text-amber">
                     Đơn đặt phòng đang chọn: ${sessionScope.BOOKING_CART.totalRoomCount} phòng
                 </span>
-                <span style="margin: 0 8px; color: #718096;">|</span>
-                <span style="font-size: 14px; color: #e2e8f0;">
+                <span class="mx-2 text-muted">|</span>
+                <span class="text-sm">
                     Tạm tính: 
-                    <strong style="color: #ffffff; font-size: 16px;">
+                    <strong class="text-inverse text-lg mono ml-1">
                         <fmt:formatNumber value="${sessionScope.BOOKING_CART.grandTotal}" type="number" maxFractionDigits="0"/> đ
                     </strong>
                 </span>
             </div>
-            <div style="display: flex; gap: 12px; align-items: center;">
-                <a href="${pageContext.request.contextPath}/customer/cart?action=view" 
-                   style="background: #dd6b20; color: white; padding: 9px 18px; border-radius: 5px; text-decoration: none; font-size: 13px; font-weight: 700; transition: background 0.2s;"
-                   onmouseover="this.style.background='#c05621'" onmouseout="this.style.background='#dd6b20'">
-                    Kiểm Tra Giỏ & Xác Nhận Đặt
+            <div>
+                <a href="${pageContext.request.contextPath}/customer/cart?action=view" class="btn btn-warning">
+                    Kiểm Tra Giỏ &amp; Xác Nhận Đặt
                 </a>
             </div>
         </div>

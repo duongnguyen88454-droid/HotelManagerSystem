@@ -3,22 +3,10 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <jsp:include page="/views/common/header.jsp">
     <jsp:param name="title" value="Báo Cáo Doanh Thu Khách Sạn" />
+    <jsp:param name="zone" value="portal" />
 </jsp:include>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/portal_layout.css">
 
-<style>
-.summary-highlight-row {
-    background-color: #f1f5f9;
-    font-weight: 700;
-    color: var(--portal-text-primary);
-    border-bottom: 2px solid var(--portal-border);
-}
-.summary-highlight-row td {
-    padding: 12px 14px !important;
-}
-</style>
-
-<div class="portal-wrapper">
+<div class="portal-layout">
     <!-- Thanh chức năng bên trái (Sidebar với 4 menu con) -->
     <jsp:include page="/views/common/portal_sidebar.jsp">
         <jsp:param name="activeMenu" value="revenue" />
@@ -27,50 +15,51 @@
 
     <!-- Màn hình bên phải -->
     <main class="portal-main">
-        <header class="portal-header">
-            <div class="portal-header-left">
+        <header class="page-header">
+            <div class="page-header-left">
                 <c:choose>
                     <c:when test="${reportType eq 'room'}">
-                        <h1>Báo Cáo Doanh Thu Tiền Phòng</h1>
-                        <p>Thống kê số lượt đặt, số đêm lưu trú và tổng doanh thu từng phòng trong khoảng thời gian</p>
+                        <h1 class="page-title">Báo Cáo Doanh Thu Tiền Phòng</h1>
+                        <p class="page-subtitle">Thống kê số lượt đặt, số đêm lưu trú và tổng doanh thu từng phòng trong khoảng thời gian</p>
                     </c:when>
                     <c:when test="${reportType eq 'product'}">
-                        <h1>Báo Cáo Doanh Thu Sản Phẩm & Dịch Vụ</h1>
-                        <p>Thống kê số lượng tiêu thụ và tổng doanh thu các sản phẩm, minibar và dịch vụ gia tăng đã bán</p>
+                        <h1 class="page-title">Báo Cáo Doanh Thu Sản Phẩm &amp; Dịch Vụ</h1>
+                        <p class="page-subtitle">Thống kê số lượng tiêu thụ và tổng doanh thu các sản phẩm, minibar và dịch vụ gia tăng đã bán</p>
                     </c:when>
                     <c:when test="${reportType eq 'overall'}">
-                        <h1>Báo Cáo Tổng Doanh Thu & Dòng Tiền Thu Chi</h1>
-                        <p>Xem chi tiết tổng doanh thu của khách sạn từ các mã phiếu theo loại thu chi và phương thức thanh toán</p>
+                        <h1 class="page-title">Báo Cáo Tổng Doanh Thu &amp; Dòng Tiền Thu Chi</h1>
+                        <p class="page-subtitle">Xem chi tiết tổng doanh thu của khách sạn từ các mã phiếu theo loại thu chi và phương thức thanh toán</p>
                     </c:when>
                     <c:otherwise>
-                        <h1>Báo Cáo Doanh Thu Hóa Đơn</h1>
-                        <p>Cung cấp toàn bộ thông tin từ tất cả các hóa đơn phát sinh trong quá trình giao dịch ở khách sạn</p>
+                        <h1 class="page-title">Báo Cáo Doanh Thu Hóa Đơn</h1>
+                        <p class="page-subtitle">Cung cấp toàn bộ thông tin từ tất cả các hóa đơn phát sinh trong quá trình giao dịch ở khách sạn</p>
                     </c:otherwise>
                 </c:choose>
             </div>
-            <div class="portal-header-right">
+            <div class="page-header-right">
+                <span class="pill pill-primary">Ca trực: <%= new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date()) %></span>
             </div>
         </header>
 
         <!-- THANH CÔNG CỤ LỌC & THAO TÁC (FILTER TOOLBAR) -->
-        <div class="portal-card" style="padding: 16px 20px; margin-bottom: 20px;">
-            <form action="${pageContext.request.contextPath}/manager/revenue" method="GET" style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin: 0;">
+        <div class="card p-3 mb-4">
+            <form action="${pageContext.request.contextPath}/manager/revenue" method="GET" class="filter-group">
                 <input type="hidden" name="type" value="${reportType}" />
                 
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label style="font-size: 13px; font-weight: 700; color: var(--portal-text-secondary); white-space: nowrap;">Từ Ngày:</label>
-                    <input type="date" name="fromDate" value="${fromDate}" required class="portal-input" style="padding: 6px 10px;" />
+                <div class="flex items-center gap-2">
+                    <label class="form-label mb-0 nowrap font-bold text-secondary">Từ Ngày:</label>
+                    <input type="date" name="fromDate" value="${fromDate}" required class="form-control" />
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label style="font-size: 13px; font-weight: 700; color: var(--portal-text-secondary); white-space: nowrap;">Đến Ngày:</label>
-                    <input type="date" name="toDate" value="${toDate}" required class="portal-input" style="padding: 6px 10px;" />
+                <div class="flex items-center gap-2">
+                    <label class="form-label mb-0 nowrap font-bold text-secondary">Đến Ngày:</label>
+                    <input type="date" name="toDate" value="${toDate}" required class="form-control" />
                 </div>
 
                 <c:if test="${reportType ne 'product'}">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <label style="font-size: 13px; font-weight: 700; color: var(--portal-text-secondary); white-space: nowrap;">Nhân Viên:</label>
-                        <select name="employeeId" class="portal-select" style="padding: 6px 10px; min-width: 170px;">
+                    <div class="flex items-center gap-2">
+                        <label class="form-label mb-0 nowrap font-bold text-secondary">Nhân Viên:</label>
+                        <select name="employeeId" class="form-control" style="min-width: 170px;">
                             <option value="">Tất cả nhân viên</option>
                             <c:forEach var="emp" items="${employeeList}">
                                 <option value="${emp.employeeId}" ${selectedEmployeeId eq emp.employeeId ? 'selected' : ''}>
@@ -81,11 +70,11 @@
                     </div>
                 </c:if>
 
-                <div style="display: flex; gap: 8px; margin-left: auto;">
-                    <button type="submit" class="portal-btn portal-btn-primary" style="padding: 7px 16px; font-size: 13px;">
+                <div class="flex gap-2" style="margin-left: auto;">
+                    <button type="submit" class="btn btn-primary btn-sm">
                         Tải Lại
                     </button>
-                    <button type="button" class="portal-btn portal-btn-success" style="padding: 7px 16px; font-size: 13px; background-color: #16a34a;" onclick="exportTableToExcel('reportDataTable', 'BaoCao_${reportType}_${fromDate}_${toDate}');">
+                    <button type="button" class="btn btn-success btn-sm" onclick="exportTableToExcel('reportDataTable', 'BaoCao_${reportType}_${fromDate}_${toDate}');">
                         Xuất Excel
                     </button>
                 </div>
@@ -109,89 +98,89 @@
                 <c:set var="sumPaid" value="${sumPaid + item.paidAmount}" />
             </c:forEach>
 
-            <div class="portal-card" style="padding: 0; overflow: hidden;">
-                <div class="portal-table-wrapper" style="border: none; border-radius: 0;">
-                    <table class="portal-table" id="reportDataTable">
+            <div class="card p-0">
+                <div class="table-wrapper">
+                    <table class="table" id="reportDataTable">
                         <thead>
                             <tr>
                                 <th>Mã Hóa Đơn</th>
                                 <th>Khách Hàng</th>
                                 <th>Phòng</th>
                                 <th>Ngày Lập</th>
-                                <th style="text-align: right;">Đặt Trước</th>
-                                <th style="text-align: right;">Tiền Phòng</th>
-                                <th style="text-align: right;">Dịch Vụ</th>
-                                <th style="text-align: right;">Phụ Thu</th>
-                                <th style="text-align: right;">Tổng Tiền</th>
-                                <th style="text-align: right; color: #16a34a;">Thực Thu</th>
-                                <th style="text-align: center;">Trạng Thái</th>
+                                <th class="text-right">Đặt Trước</th>
+                                <th class="text-right">Tiền Phòng</th>
+                                <th class="text-right">Dịch Vụ</th>
+                                <th class="text-right">Phụ Thu</th>
+                                <th class="text-right">Tổng Tiền</th>
+                                <th class="text-right text-success">Thực Thu</th>
+                                <th class="text-center">Trạng Thái</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- DÒNG TỔNG CỘNG ĐẬM NÉT ĐẦU BẢNG (CHUẨN PMS TCSOFT) -->
+                            <!-- DÒNG TỔNG CỘNG ĐẬM NÉT ĐẦU BẢNG -->
                             <tr class="summary-highlight-row">
-                                <td colspan="4" style="color: var(--portal-primary); font-size: 14px;">
+                                <td colspan="4" class="text-primary font-bold text-sm">
                                     TỔNG TIỀN (${not empty invoiceReport ? invoiceReport.size() : 0} hóa đơn)
                                 </td>
-                                <td style="text-align: right;">
+                                <td class="text-right mono">
                                     <fmt:formatNumber value="${sumDeposit}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                 </td>
-                                <td style="text-align: right;">
+                                <td class="text-right mono">
                                     <fmt:formatNumber value="${sumRoom}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                 </td>
-                                <td style="text-align: right;">
+                                <td class="text-right mono">
                                     <fmt:formatNumber value="${sumService}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                 </td>
-                                <td style="text-align: right;">
+                                <td class="text-right mono">
                                     <fmt:formatNumber value="${sumSurcharge}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                 </td>
-                                <td style="text-align: right; color: var(--portal-primary);">
+                                <td class="text-right text-primary mono font-bold">
                                     <fmt:formatNumber value="${sumFinal}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                 </td>
-                                <td style="text-align: right; color: #16a34a; font-size: 14.5px;">
+                                <td class="text-right text-success mono font-bold text-sm">
                                     <fmt:formatNumber value="${sumPaid}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                 </td>
-                                <td style="text-align: center;">-</td>
+                                <td class="text-center">-</td>
                             </tr>
 
                             <c:choose>
                                 <c:when test="${not empty invoiceReport}">
                                     <c:forEach var="inv" items="${invoiceReport}">
                                         <tr>
-                                            <td style="font-weight: 700; color: var(--portal-primary);">
-                                                ${inv.invoiceId}
+                                            <td>
+                                                <strong class="text-primary">${inv.invoiceId}</strong>
                                             </td>
-                                            <td style="font-weight: 600;">${inv.customerName}</td>
-                                            <td style="color: var(--portal-text-secondary); font-size: 13px;">${inv.roomNames}</td>
-                                            <td style="font-size: 13px; color: var(--portal-text-muted);">${inv.createDate}</td>
-                                            <td style="text-align: right;">
+                                            <td class="font-semibold">${inv.customerName}</td>
+                                            <td class="text-secondary text-sm">${inv.roomNames}</td>
+                                            <td class="text-muted text-xs">${inv.createDate}</td>
+                                            <td class="text-right mono">
                                                 <fmt:formatNumber value="${inv.deposit}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
-                                            <td style="text-align: right;">
+                                            <td class="text-right mono">
                                                 <fmt:formatNumber value="${inv.roomCharge}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
-                                            <td style="text-align: right;">
+                                            <td class="text-right mono">
                                                 <fmt:formatNumber value="${inv.serviceCharge}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
-                                            <td style="text-align: right;">
+                                            <td class="text-right mono">
                                                 <fmt:formatNumber value="${inv.surcharge}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
-                                            <td style="text-align: right; font-weight: 600;">
+                                            <td class="text-right font-semibold mono">
                                                 <fmt:formatNumber value="${inv.finalTotalAmount}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
-                                            <td style="text-align: right; font-weight: 700; color: #16a34a;">
+                                            <td class="text-right font-bold text-success mono">
                                                 <fmt:formatNumber value="${inv.paidAmount}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
-                                            <td style="text-align: center;">
+                                            <td class="text-center">
                                                 <c:choose>
                                                     <c:when test="${inv.invoiceStatus eq 'Paid'}">
-                                                        <span class="badge-pill badge-available">Đã Quyết Toán</span>
+                                                        <span class="badge badge-success badge-pill badge-available">Đã Quyết Toán</span>
                                                     </c:when>
                                                     <c:when test="${inv.invoiceStatus eq 'PartiallyPaid'}">
-                                                        <span class="badge-pill badge-cleaning">Một Phần</span>
+                                                        <span class="badge badge-warning badge-pill badge-cleaning">Một Phần</span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="badge-pill badge-occupied">Chưa Thanh Toán</span>
+                                                        <span class="badge badge-danger badge-pill badge-occupied">Chưa Thanh Toán</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
@@ -200,7 +189,7 @@
                                 </c:when>
                                 <c:otherwise>
                                     <tr>
-                                        <td colspan="11" style="padding: 30px; text-align: center; color: var(--portal-text-muted);">
+                                        <td colspan="11" class="text-center py-6 text-muted">
                                             Không tìm thấy hóa đơn nào trong khoảng thời gian đã chọn.
                                         </td>
                                     </tr>
@@ -209,11 +198,11 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="report-pagination-container" style="display: none; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; border-top: 1px solid #e2e8f0; font-size: 13px; color: #475569;">
-                    <div class="report-pagination-info">
+                <div class="report-pagination-container pagination-bar" style="display: none;">
+                    <div class="report-pagination-info pagination-info">
                         Hiển thị <strong class="page-start">1</strong> - <strong class="page-end">10</strong> trên tổng số <strong class="page-total">0</strong> dòng
                     </div>
-                    <div class="report-pagination-buttons" style="display: flex; gap: 4px; align-items: center;"></div>
+                    <div class="report-pagination-buttons pagination-actions"></div>
                 </div>
             </div>
         </c:if>
@@ -229,33 +218,33 @@
                 <c:set var="sumRoomRevenue" value="${sumRoomRevenue + item.totalRevenue}" />
             </c:forEach>
 
-            <div class="portal-card" style="padding: 0; overflow: hidden;">
-                <div class="portal-table-wrapper" style="border: none; border-radius: 0;">
-                    <table class="portal-table" id="reportDataTable">
+            <div class="card p-0">
+                <div class="table-wrapper">
+                    <table class="table" id="reportDataTable">
                         <thead>
                             <tr>
                                 <th>Mã Phòng</th>
                                 <th>Tên Phòng (Số Phòng)</th>
                                 <th>Hạng Phòng</th>
-                                <th style="text-align: right;">Đơn Giá Niêm Yết</th>
-                                <th style="text-align: center;">Số Lượt Đặt</th>
-                                <th style="text-align: center;">Số Đêm Đã Thuê</th>
-                                <th style="text-align: right; color: #16a34a;">Tổng Doanh Thu</th>
+                                <th class="text-right">Đơn Giá Niêm Yết</th>
+                                <th class="text-center">Số Lượt Đặt</th>
+                                <th class="text-center">Số Đêm Đã Thuê</th>
+                                <th class="text-right text-success">Tổng Doanh Thu</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- DÒNG TỔNG CỘNG TIỀN PHÒNG -->
                             <tr class="summary-highlight-row">
-                                <td colspan="4" style="color: var(--portal-primary); font-size: 14px;">
+                                <td colspan="4" class="text-primary font-bold text-sm">
                                     TỔNG DOANH THU TIỀN PHÒNG (${not empty roomReport ? roomReport.size() : 0} phòng)
                                 </td>
-                                <td style="text-align: center; color: var(--portal-primary);">
+                                <td class="text-center text-primary font-bold">
                                     ${sumBookings} lượt
                                 </td>
-                                <td style="text-align: center; color: var(--portal-primary);">
+                                <td class="text-center text-primary font-bold">
                                     ${sumNights} đêm
                                 </td>
-                                <td style="text-align: right; color: #16a34a; font-size: 15px;">
+                                <td class="text-right text-success mono font-bold text-sm">
                                     <fmt:formatNumber value="${sumRoomRevenue}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                 </td>
                             </tr>
@@ -264,19 +253,19 @@
                                 <c:when test="${not empty roomReport}">
                                     <c:forEach var="r" items="${roomReport}">
                                         <tr>
-                                            <td style="font-weight: 700; color: var(--portal-primary);">${r.roomId}</td>
-                                            <td style="font-weight: 600; font-size: 14px;">${r.roomName}</td>
-                                            <td style="color: var(--portal-text-secondary);">${r.roomTypeName}</td>
-                                            <td style="text-align: right;">
+                                            <td><strong class="text-primary">${r.roomId}</strong></td>
+                                            <td class="font-semibold text-main">${r.roomName}</td>
+                                            <td class="text-secondary text-sm">${r.roomTypeName}</td>
+                                            <td class="text-right mono">
                                                 <fmt:formatNumber value="${r.basePrice}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
-                                            <td style="text-align: center; font-weight: 600;">
+                                            <td class="text-center font-semibold">
                                                 ${r.totalBookings}
                                             </td>
-                                            <td style="text-align: center; font-weight: 700;">
+                                            <td class="text-center font-bold">
                                                 ${r.totalNights}
                                             </td>
-                                            <td style="text-align: right; font-weight: 800; color: #16a34a; font-size: 14.5px;">
+                                            <td class="text-right font-bold text-success mono text-sm">
                                                 <fmt:formatNumber value="${r.totalRevenue}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
                                         </tr>
@@ -284,7 +273,7 @@
                                 </c:when>
                                 <c:otherwise>
                                     <tr>
-                                        <td colspan="7" style="padding: 30px; text-align: center; color: var(--portal-text-muted);">
+                                        <td colspan="7" class="text-center py-6 text-muted">
                                             Chưa ghi nhận doanh thu phòng nào trong khoảng thời gian đã chọn.
                                         </td>
                                     </tr>
@@ -293,11 +282,11 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="report-pagination-container" style="display: none; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; border-top: 1px solid #e2e8f0; font-size: 13px; color: #475569;">
-                    <div class="report-pagination-info">
+                <div class="report-pagination-container pagination-bar" style="display: none;">
+                    <div class="report-pagination-info pagination-info">
                         Hiển thị <strong class="page-start">1</strong> - <strong class="page-end">10</strong> trên tổng số <strong class="page-total">0</strong> dòng
                     </div>
-                    <div class="report-pagination-buttons" style="display: flex; gap: 4px; align-items: center;"></div>
+                    <div class="report-pagination-buttons pagination-actions"></div>
                 </div>
             </div>
         </c:if>
@@ -311,28 +300,28 @@
                 <c:set var="sumProductRevenue" value="${sumProductRevenue + item.totalRevenue}" />
             </c:forEach>
 
-            <div class="portal-card" style="padding: 0; overflow: hidden;">
-                <div class="portal-table-wrapper" style="border: none; border-radius: 0;">
-                    <table class="portal-table" id="reportDataTable">
+            <div class="card p-0">
+                <div class="table-wrapper">
+                    <table class="table" id="reportDataTable">
                         <thead>
                             <tr>
                                 <th>Mã Dịch Vụ / Sản Phẩm</th>
                                 <th>Tên Sản Phẩm / Dịch Vụ Tiêu Dùng</th>
-                                <th style="text-align: right;">Đơn Giá Niêm Yết</th>
-                                <th style="text-align: center;">Số Lượng Đã Bán</th>
-                                <th style="text-align: right; color: #16a34a;">Tổng Doanh Thu</th>
+                                <th class="text-right">Đơn Giá Niêm Yết</th>
+                                <th class="text-center">Số Lượng Đã Bán</th>
+                                <th class="text-right text-success">Tổng Doanh Thu</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- DÒNG TỔNG CỘNG SẢN PHẨM -->
                             <tr class="summary-highlight-row">
-                                <td colspan="3" style="color: var(--portal-primary); font-size: 14px;">
+                                <td colspan="3" class="text-primary font-bold text-sm">
                                     TỔNG DOANH THU TIÊU DÙNG (${not empty productReport ? productReport.size() : 0} mặt hàng)
                                 </td>
-                                <td style="text-align: center; color: var(--portal-primary);">
+                                <td class="text-center text-primary font-bold">
                                     ${sumQty} lượt
                                 </td>
-                                <td style="text-align: right; color: #16a34a; font-size: 15px;">
+                                <td class="text-right text-success mono font-bold text-sm">
                                     <fmt:formatNumber value="${sumProductRevenue}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                 </td>
                             </tr>
@@ -341,15 +330,15 @@
                                 <c:when test="${not empty productReport}">
                                     <c:forEach var="p" items="${productReport}">
                                         <tr>
-                                            <td style="font-weight: 700; color: var(--portal-primary);">${p.serviceId}</td>
-                                            <td style="font-weight: 600; font-size: 14px;">${p.serviceName}</td>
-                                            <td style="text-align: right;">
+                                            <td><strong class="text-primary">${p.serviceId}</strong></td>
+                                            <td class="font-semibold text-main">${p.serviceName}</td>
+                                            <td class="text-right mono">
                                                 <fmt:formatNumber value="${p.basePrice}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
-                                            <td style="text-align: center; font-weight: 700;">
+                                            <td class="text-center font-bold">
                                                 ${p.quantitySold}
                                             </td>
-                                            <td style="text-align: right; font-weight: 800; color: #16a34a; font-size: 14.5px;">
+                                            <td class="text-right font-bold text-success mono text-sm">
                                                 <fmt:formatNumber value="${p.totalRevenue}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
                                         </tr>
@@ -357,7 +346,7 @@
                                 </c:when>
                                 <c:otherwise>
                                     <tr>
-                                        <td colspan="5" style="padding: 30px; text-align: center; color: var(--portal-text-muted);">
+                                        <td colspan="5" class="text-center py-6 text-muted">
                                             Chưa ghi nhận doanh thu sản phẩm nào trong khoảng thời gian đã chọn.
                                         </td>
                                     </tr>
@@ -366,11 +355,11 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="report-pagination-container" style="display: none; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; border-top: 1px solid #e2e8f0; font-size: 13px; color: #475569;">
-                    <div class="report-pagination-info">
+                <div class="report-pagination-container pagination-bar" style="display: none;">
+                    <div class="report-pagination-info pagination-info">
                         Hiển thị <strong class="page-start">1</strong> - <strong class="page-end">10</strong> trên tổng số <strong class="page-total">0</strong> dòng
                     </div>
-                    <div class="report-pagination-buttons" style="display: flex; gap: 4px; align-items: center;"></div>
+                    <div class="report-pagination-buttons pagination-actions"></div>
                 </div>
             </div>
         </c:if>
@@ -382,9 +371,9 @@
                 <c:set var="sumOverall" value="${sumOverall + item.totalAmount}" />
             </c:forEach>
 
-            <div class="portal-card" style="padding: 0; overflow: hidden;">
-                <div class="portal-table-wrapper" style="border: none; border-radius: 0;">
-                    <table class="portal-table" id="reportDataTable">
+            <div class="card p-0">
+                <div class="table-wrapper">
+                    <table class="table" id="reportDataTable">
                         <thead>
                             <tr>
                                 <th>Mã Phiếu Thu</th>
@@ -394,17 +383,17 @@
                                 <th>Thời Điểm Thu</th>
                                 <th>Phương Thức</th>
                                 <th>Nhân Viên Thu</th>
-                                <th style="text-align: right; color: #16a34a;">Số Tiền Thực Thu</th>
+                                <th class="text-right text-success">Số Tiền Thực Thu</th>
                                 <th>Ghi Chú</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- DÒNG TỔNG CỘNG PHIẾU THU -->
                             <tr class="summary-highlight-row">
-                                <td colspan="7" style="color: var(--portal-primary); font-size: 14px;">
+                                <td colspan="7" class="text-primary font-bold text-sm">
                                     TỔNG THỰC THU (${not empty overallReport ? overallReport.size() : 0} phiếu thu)
                                 </td>
-                                <td style="text-align: right; color: #16a34a; font-size: 15px;">
+                                <td class="text-right text-success mono font-bold text-sm">
                                     <fmt:formatNumber value="${sumOverall}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                 </td>
                                 <td>-</td>
@@ -414,25 +403,25 @@
                                 <c:when test="${not empty overallReport}">
                                     <c:forEach var="pay" items="${overallReport}">
                                         <tr>
-                                            <td style="font-weight: 700; color: var(--portal-primary);">${pay.paymentId}</td>
-                                            <td style="font-weight: 600;">${pay.invoiceId}</td>
-                                            <td style="color: var(--portal-text-secondary);">${pay.bookingId}</td>
-                                            <td style="font-weight: 600;">${pay.customerName}</td>
-                                            <td style="font-size: 13px; color: var(--portal-text-muted);">${pay.paymentDate}</td>
+                                            <td><strong class="text-primary">${pay.paymentId}</strong></td>
+                                            <td class="font-semibold text-main">${pay.invoiceId}</td>
+                                            <td class="text-secondary text-sm">${pay.bookingId}</td>
+                                            <td class="font-semibold">${pay.customerName}</td>
+                                            <td class="text-muted text-xs">${pay.paymentDate}</td>
                                             <td>
-                                                <span class="badge-pill badge-available">${pay.paymentMethod}</span>
+                                                <span class="badge badge-success badge-pill badge-available">${pay.paymentMethod}</span>
                                             </td>
-                                            <td style="font-size: 13px; color: var(--portal-text-secondary);">${pay.staffName}</td>
-                                            <td style="text-align: right; font-weight: 800; color: #16a34a; font-size: 14.5px;">
+                                            <td class="text-secondary text-xs">${pay.staffName}</td>
+                                            <td class="text-right font-bold text-success mono text-sm">
                                                 <fmt:formatNumber value="${pay.totalAmount}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
-                                            <td style="font-size: 13px; color: var(--portal-text-muted); max-width: 200px;">${pay.note}</td>
+                                            <td class="text-muted text-xs" style="max-width: 200px;">${pay.note}</td>
                                         </tr>
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
                                     <tr>
-                                        <td colspan="9" style="padding: 30px; text-align: center; color: var(--portal-text-muted);">
+                                        <td colspan="9" class="text-center py-6 text-muted">
                                             Không có phiếu thu nào được ghi nhận trong khoảng thời gian đã chọn.
                                         </td>
                                     </tr>
@@ -441,11 +430,11 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="report-pagination-container" style="display: none; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; border-top: 1px solid #e2e8f0; font-size: 13px; color: #475569;">
-                    <div class="report-pagination-info">
+                <div class="report-pagination-container pagination-bar" style="display: none;">
+                    <div class="report-pagination-info pagination-info">
                         Hiển thị <strong class="page-start">1</strong> - <strong class="page-end">10</strong> trên tổng số <strong class="page-total">0</strong> dòng
                     </div>
-                    <div class="report-pagination-buttons" style="display: flex; gap: 4px; align-items: center;"></div>
+                    <div class="report-pagination-buttons pagination-actions"></div>
                 </div>
             </div>
         </c:if>
@@ -526,10 +515,9 @@ function initTablePagination() {
                     showPage(p);
                 });
                 if (p === currentPage) {
-                    pageBtn.style.backgroundColor = '#2563eb';
-                    pageBtn.style.color = '#ffffff';
-                    pageBtn.style.borderColor = '#2563eb';
-                    pageBtn.style.fontWeight = '700';
+                    pageBtn.className = 'btn btn-primary btn-sm';
+                } else {
+                    pageBtn.className = 'btn btn-outline btn-sm';
                 }
                 btnContainer.appendChild(pageBtn);
             })(i);
@@ -546,26 +534,9 @@ function initTablePagination() {
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.textContent = text;
-        btn.style.padding = '5px 12px';
-        btn.style.fontSize = '13px';
-        btn.style.border = '1px solid #cbd5e1';
-        btn.style.borderRadius = '6px';
-        btn.style.background = '#ffffff';
-        btn.style.color = enabled ? '#1e293b' : '#94a3b8';
-        btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
+        btn.className = 'btn btn-outline btn-sm';
         btn.disabled = !enabled;
-        btn.style.transition = 'all 0.15s ease';
         if (enabled) {
-            btn.addEventListener('mouseenter', function() {
-                if (btn.style.backgroundColor !== 'rgb(37, 99, 235)') {
-                    btn.style.background = '#f1f5f9';
-                }
-            });
-            btn.addEventListener('mouseleave', function() {
-                if (btn.style.backgroundColor !== 'rgb(37, 99, 235)') {
-                    btn.style.background = '#ffffff';
-                }
-            });
             btn.addEventListener('click', onClick);
         }
         return btn;
@@ -573,6 +544,7 @@ function initTablePagination() {
 
     showPage(1);
 }
+
 function exportTableToExcel(tableId, filename) {
     var table = document.getElementById(tableId);
     if (!table) {

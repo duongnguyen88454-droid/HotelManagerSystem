@@ -1,0 +1,881 @@
+/* ========================================================================= */
+/* 1. NÚT BẤM (BUTTONS)                                                      */
+/* ========================================================================= */
+.btn, .portal-btn, .pms-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-h-md);
+  padding: 0 var(--space-4);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.btn:focus-visible, .portal-btn:focus-visible, .pms-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.btn:disabled, .portal-btn:disabled, .pms-btn:disabled,
+.btn.disabled, .portal-btn.disabled, .pms-btn.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-primary, .portal-btn-primary, .pms-btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+.btn-primary:hover, .portal-btn-primary:hover, .pms-btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  color: var(--color-text-inverse);
+  text-decoration: none;
+}
+
+.btn-secondary, .portal-btn-secondary, .pms-btn-secondary {
+  background-color: var(--color-neutral-soft);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+}
+.btn-secondary:hover, .portal-btn-secondary:hover, .pms-btn-secondary:hover {
+  background-color: var(--color-border);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+.btn-outline:hover {
+  background-color: var(--color-surface-alt);
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.btn-success, .portal-btn-success, .pms-btn-success {
+  background-color: var(--color-success);
+  color: var(--color-text-inverse);
+}
+.btn-success:hover, .portal-btn-success:hover, .pms-btn-success:hover {
+  background-color: var(--color-success-strong);
+  color: var(--color-text-inverse);
+  text-decoration: none;
+}
+
+.btn-danger, .portal-btn-danger, .pms-btn-danger {
+  background-color: var(--color-danger);
+  color: var(--color-text-inverse);
+}
+.btn-danger:hover, .portal-btn-danger:hover, .pms-btn-danger:hover {
+  background-color: var(--color-danger-strong);
+  color: var(--color-text-inverse);
+  text-decoration: none;
+}
+
+.btn-warning {
+  background-color: var(--color-warning);
+  color: var(--color-text-inverse);
+}
+.btn-warning:hover {
+  background-color: var(--color-warning-strong);
+  color: var(--color-text-inverse);
+  text-decoration: none;
+}
+
+.btn-sm {
+  min-height: var(--control-h-sm);
+  padding: 0 var(--space-3);
+  font-size: var(--fs-xs);
+}
+
+.btn-lg {
+  min-height: var(--control-h-lg);
+  padding: 0 var(--space-6);
+  font-size: var(--fs-md);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* ========================================================================= */
+/* 2. BIỂU MẪU (FORMS)                                                      */
+/* ========================================================================= */
+.form-group {
+  margin-bottom: var(--space-4);
+}
+
+.form-label {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-1);
+}
+
+.form-label .required {
+  color: var(--color-danger);
+  margin-left: 2px;
+}
+
+.form-control, .portal-input, .pms-input {
+  width: 100%;
+  min-height: var(--control-h-md);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+textarea.form-control {
+  padding: var(--space-2) var(--space-3);
+  min-height: 88px;
+  resize: vertical;
+}
+
+.form-control:focus, .portal-input:focus, .pms-input:focus {
+  border-color: var(--color-primary-hover);
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.form-control.is-invalid {
+  border-color: var(--color-danger);
+}
+
+.form-control:disabled, .form-control[readonly] {
+  background-color: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.form-control::placeholder {
+  color: var(--color-text-disabled);
+}
+
+.form-hint {
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+.form-error {
+  font-size: var(--fs-xs);
+  color: var(--color-danger);
+  margin-top: var(--space-1);
+}
+
+.form-grid {
+  display: grid;
+  gap: var(--space-4) var(--space-5);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: var(--space-6);
+}
+
+.form-section {
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.form-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* ========================================================================= */
+/* 3. THẺ (CARDS)                                                           */
+/* ========================================================================= */
+.card, .portal-card, .pms-card, .table-card, .info-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-5);
+  overflow: hidden;
+}
+
+.card-header, .portal-card-header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  background-color: var(--color-surface);
+}
+
+.card-body {
+  padding: var(--space-5);
+}
+
+.card-title, .portal-card-title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.card-subtitle, .portal-card-subtitle {
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+  margin: 2px 0 0;
+}
+
+.card-flush .card-body {
+  padding: 0;
+}
+
+.card-toolbar, .toolbar-header, .table-title-bar {
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-surface-alt);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ========================================================================= */
+/* 4. BẢNG DỮ LIỆU (TABLES)                                                 */
+/* ========================================================================= */
+.table-wrapper, .portal-table-wrapper, .table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table, .portal-table, .data-table, .invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+  text-align: left;
+}
+
+.table th, .portal-table th {
+  background-color: var(--color-surface-alt);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.table td, .portal-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  color: var(--color-text);
+}
+
+.table tbody tr:hover td, .portal-table tbody tr:hover td {
+  background-color: var(--color-surface-alt);
+}
+
+.summary-highlight-row {
+  background-color: var(--color-surface-alt);
+  font-weight: var(--fw-bold);
+  color: var(--color-text);
+  border-bottom: 2px solid var(--color-border);
+}
+.summary-highlight-row td {
+  padding: var(--space-3) var(--space-4) !important;
+}
+
+.table tr:last-child td, .portal-table tr:last-child td {
+  border-bottom: none;
+}
+
+.table-compact td, .table-compact th {
+  padding: var(--space-2) var(--space-3);
+}
+
+.table-actions {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* ========================================================================= */
+/* 5. NHÃN TRẠNG THÁI (BADGES)                                              */
+/* ========================================================================= */
+.badge, .badge-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  line-height: 1.5;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.badge-success, .badge-available, .badge-paid, .badge-checkedin, .badge-clean {
+  background-color: var(--color-success-soft);
+  color: var(--color-on-success-soft);
+  border-color: var(--color-success-border);
+}
+
+.badge-danger, .badge-occupied, .badge-unpaid, .badge-cancelled {
+  background-color: var(--color-danger-soft);
+  color: var(--color-on-danger-soft);
+  border-color: var(--color-danger-border);
+}
+
+.badge-warning, .badge-dirty, .badge-partial {
+  background-color: var(--color-warning-soft);
+  color: var(--color-on-warning-soft);
+  border-color: var(--color-warning-border);
+}
+
+.badge-info, .badge-cleaning, .badge-waiting, .badge-confirmed {
+  background-color: var(--color-info-soft);
+  color: var(--color-on-info-soft);
+  border-color: var(--color-info-border);
+}
+
+.badge-neutral, .badge-damaged {
+  background-color: var(--color-neutral-soft);
+  color: var(--color-on-neutral-soft);
+  border-color: var(--color-neutral-border);
+}
+
+.count-badge, .badge-count, .portal-nav-badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  background-color: var(--color-danger);
+  color: var(--color-text-inverse);
+}
+
+/* ========================================================================= */
+/* 6. THÔNG BÁO FLASH (ALERTS)                                              */
+/* ========================================================================= */
+.alert, .portal-alert {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  margin-bottom: var(--space-4);
+  border: 1px solid transparent;
+}
+
+.alert-success, .portal-alert-success {
+  background-color: var(--color-success-soft);
+  color: var(--color-on-success-soft);
+  border-color: var(--color-success-border);
+}
+
+.alert-danger, .portal-alert-danger {
+  background-color: var(--color-danger-soft);
+  color: var(--color-on-danger-soft);
+  border-color: var(--color-danger-border);
+}
+
+.alert-warning, .portal-alert-warning {
+  background-color: var(--color-warning-soft);
+  color: var(--color-on-warning-soft);
+  border-color: var(--color-warning-border);
+}
+
+.alert-info, .portal-alert-info {
+  background-color: var(--color-info-soft);
+  color: var(--color-on-info-soft);
+  border-color: var(--color-info-border);
+}
+
+/* ========================================================================= */
+/* 7. HỘP THOẠI (MODALS)                                                    */
+/* ========================================================================= */
+.modal-backdrop, .portal-modal-backdrop, .pms-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: var(--overlay);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  z-index: var(--z-modal);
+}
+
+.modal-backdrop.is-open {
+  display: flex;
+}
+
+.modal-card, .portal-modal-card, .pms-modal-card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-sm { max-width: 480px; }
+.modal-md { max-width: 640px; }
+.modal-lg { max-width: 880px; }
+
+.modal-head {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-head h3 {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  margin: 0;
+}
+
+.modal-body {
+  padding: var(--space-5);
+  overflow-y: auto;
+}
+
+.modal-foot {
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  background-color: var(--color-surface-alt);
+}
+
+/* ========================================================================= */
+/* 8. TIÊU ĐỀ TRANG (PAGE HEADER) & CÁC THÀNH PHẦN KHÁC                     */
+/* ========================================================================= */
+.page-header, .portal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.page-subtitle {
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.page-actions {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--space-10) var(--space-4);
+}
+
+.empty-state-title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state p {
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+}
+
+.kpi-grid, .portal-kpi-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: var(--space-5);
+}
+
+.kpi-card, .portal-kpi-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.border-top-primary { border-top: 4px solid var(--color-primary); }
+.border-top-info    { border-top: 4px solid var(--color-info); }
+.border-top-success { border-top: 4px solid var(--color-success); }
+.border-top-warning { border-top: 4px solid var(--color-warning); }
+.border-top-danger  { border-top: 4px solid var(--color-danger); }
+
+.kpi-label, .portal-kpi-label {
+  font-size: var(--fs-xs);
+  color: var(--color-text-secondary);
+  font-weight: var(--fw-medium);
+  margin-bottom: var(--space-1);
+}
+
+.kpi-value, .portal-kpi-value {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+  color: var(--color-text);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-desc, .portal-kpi-desc {
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+.tabs, .portal-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-5);
+}
+
+.tab-item, .portal-tab-item {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  text-decoration: none;
+}
+
+.tab-item.active, .portal-tab-item.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.tab-panel, .config-tab-content {
+  display: none;
+}
+
+.tab-panel.is-active, .config-tab-content.is-active, .config-tab-content.active {
+  display: block;
+}
+
+.pagination, .report-pagination-container, .portal-pagination-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-surface-alt);
+  border-top: 1px solid var(--color-border);
+}
+
+.pagination-info, .report-pagination-info {
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+}
+
+.pagination-buttons, .report-pagination-buttons {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.breadcrumb-nav {
+  margin-bottom: var(--space-3);
+}
+
+.breadcrumbs, .nav-breadcrumbs, .breadcrumb {
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  list-style: none;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  content: "/";
+  padding-right: var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.breadcrumbs a, .breadcrumb a, .breadcrumb-item a {
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover, .breadcrumb a:hover, .breadcrumb-item a:hover {
+  text-decoration: underline;
+  color: var(--color-primary-hover);
+}
+
+.breadcrumb-item.active {
+  color: var(--color-text-secondary);
+  font-weight: var(--fw-medium);
+}
+
+.pill, .portal-date-pill {
+  font-size: var(--fs-xs);
+  background-color: var(--color-neutral-soft);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  padding: 2px var(--space-3);
+  display: inline-flex;
+  align-items: center;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.detail-label {
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+}
+
+.detail-value {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
+  color: var(--color-text);
+}
+
+.grid-sidebar-content {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) 2fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .grid-sidebar-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Layout Chuẩn Chi Tiết Phòng: Trái 2/3 (Nội dung) - Phải 1/3 (Sidebar Tóm tắt) */
+.grid-content-sidebar {
+  display: grid;
+  grid-template-columns: 2fr minmax(320px, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .grid-content-sidebar {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Horizontal Room Card - Khóa Kích Thước & Tỷ Lệ Cố Định */
+.room-horizontal-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition);
+  height: 230px !important;
+  min-height: 230px !important;
+  max-height: 230px !important;
+}
+.room-horizontal-card:hover {
+  box-shadow: var(--shadow-md);
+}
+.room-card-media {
+  flex: 0 0 280px !important;
+  width: 280px !important;
+  min-width: 280px !important;
+  max-width: 280px !important;
+  height: 230px !important;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-4);
+  color: var(--color-text-inverse);
+  box-sizing: border-box;
+}
+.room-card-media img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 1;
+}
+.room-card-media .media-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%);
+  z-index: 2;
+}
+.room-card-media .media-content {
+  position: relative;
+  z-index: 3;
+}
+.room-card-body {
+  flex: 1;
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  height: 230px;
+  box-sizing: border-box;
+}
+.room-amenities-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  max-height: 64px;
+  overflow: hidden;
+}
+.room-card-pricing {
+  flex: 0 0 240px !important;
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+  height: 230px !important;
+  border-left: 1px solid var(--color-border);
+  background-color: var(--color-surface-alt);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: right;
+  box-sizing: border-box;
+}
+.cart-floating-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  padding: var(--space-3) var(--space-6);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  border-top: 2px solid var(--color-accent);
+}
+@media (max-width: 900px) {
+  .room-horizontal-card {
+    flex-direction: column;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+  .room-card-media {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 210px !important;
+    flex: none !important;
+  }
+  .room-card-body {
+    height: auto !important;
+  }
+  .room-card-pricing {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    flex: none !important;
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    text-align: left;
+  }
+}
+
+/* Room Detail Hero Banner */
+.room-detail-hero-banner {
+  height: 260px;
+  background-color: var(--color-primary);
+  position: relative;
+  overflow: hidden;
+}
+.room-detail-hero-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+.room-detail-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.85) 100%);
+  z-index: 2;
+}
+.room-detail-hero-content {
+  position: relative;
+  z-index: 3;
+  height: 100%;
+}
+

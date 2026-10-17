@@ -1,0 +1,134 @@
+/* ========================================================================= */
+/* LAYOUTS/PUBLIC.CSS - KHUNG DÀNH CHO KHÁCH & TRANG CÔNG KHAI               */
+/* ========================================================================= */
+
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+}
+
+.container, .public-container {
+  width: 100%;
+  max-width: var(--container-w);
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: var(--space-6) var(--space-5);
+  box-sizing: border-box;
+}
+
+.container--narrow {
+  max-width: var(--container-narrow-w);
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-10);
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.container--form {
+  max-width: 1040px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  padding: var(--space-3) var(--space-6);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.navbar-inner {
+  max-width: var(--container-w);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-brand {
+  font-size: 19px;
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.5px;
+}
+
+.nav-brand a {
+  color: var(--color-text-inverse);
+  text-decoration: none;
+}
+
+.nav-brand-sub {
+  font-size: var(--fs-xs);
+  color: var(--color-accent);
+  font-weight: var(--fw-regular);
+}
+
+.nav-links {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  font-size: var(--fs-sm);
+}
+
+.nav-links a {
+  color: #edf2f7;
+  text-decoration: none;
+  font-weight: var(--fw-medium);
+  transition: color var(--transition);
+}
+
+.nav-links a:hover {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.navbar-cta {
+  background-color: var(--color-accent);
+  color: var(--color-on-accent) !important;
+  padding: 6px var(--space-3);
+  border-radius: var(--radius-sm);
+  font-weight: var(--fw-semibold) !important;
+  text-decoration: none;
+  transition: opacity var(--transition);
+}
+
+.navbar-cta:hover {
+  opacity: 0.9;
+}
+
+/* Footer */
+.footer {
+  background-color: var(--color-primary);
+  color: #edf2f7;
+  padding: var(--space-6) var(--space-5);
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.footer p {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.footer-meta {
+  font-size: var(--fs-xs) !important;
+  color: #a0aec0 !important;
+  margin-top: var(--space-1) !important;
+}
+
+@media (max-width: 640px) {
+  .navbar-inner {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

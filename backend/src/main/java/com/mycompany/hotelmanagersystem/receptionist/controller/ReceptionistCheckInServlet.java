@@ -175,6 +175,7 @@ public class ReceptionistCheckInServlet extends HttpServlet {
         sb.append("\"trangThaiBuongCss\":\"").append(escapeJson(r.getTrangThaiBuongCss())).append("\",");
         sb.append("\"ngayCheckInThucTe\":\"").append(escapeJson(r.getNgayCheckInThucTe())).append("\",");
         sb.append("\"daNhanPhong\":").append(r.isDaNhanPhong()).append(",");
+        sb.append("\"trangThaiDatPhong\":\"").append(escapeJson(r.getTrangThaiDatPhong())).append("\",");
         sb.append("\"dichVu\":[");
         List<String> svcs = r.getDanhSachDichVu();
         for (int j = 0; j < svcs.size(); j++) {

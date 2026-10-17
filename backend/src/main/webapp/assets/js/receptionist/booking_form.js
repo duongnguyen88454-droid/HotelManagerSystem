@@ -48,10 +48,13 @@ function onRoomCheckboxChange() {
 }
 
 function goToStep(stepNumber) {
+    const step1 = document.getElementById('step1Container');
+    const step2 = document.getElementById('step2Container');
+
     if (stepNumber === 2) {
         const selectedCheckboxes = document.querySelectorAll('input[name="selectedRooms"]:checked');
         if (selectedCheckboxes.length === 0) {
-            alert('[Cảnh báo] Vui lòng tích chọn ít nhất một phòng trống để tiếp tục!');
+            alert('Vui lòng chọn ít nhất một phòng trống để tiếp tục!');
             return;
         }
 
@@ -59,7 +62,8 @@ function goToStep(stepNumber) {
         selectedCheckboxes.forEach(chk => {
             const card = document.getElementById('roomSvcCard_' + chk.value);
             if (card) {
-                card.style.display = 'block';
+                card.classList.remove('hidden', 'is-hidden');
+                card.style.setProperty('display', 'block', 'important');
             }
         });
 
@@ -67,13 +71,14 @@ function goToStep(stepNumber) {
         document.querySelectorAll('input[name="selectedRooms"]:not(:checked)').forEach(chk => {
             const card = document.getElementById('roomSvcCard_' + chk.value);
             if (card) {
-                card.style.display = 'none';
+                card.style.setProperty('display', 'none', 'important');
                 card.querySelectorAll('input[type="number"]').forEach(inp => inp.value = 0);
             }
         });
 
-        document.getElementById('step1Container').style.display = 'none';
-        document.getElementById('step2Container').style.display = 'block';
+        step1.style.setProperty('display', 'none', 'important');
+        step2.classList.remove('hidden', 'is-hidden');
+        step2.style.setProperty('display', 'block', 'important');
 
         document.getElementById('stepNav1').className = 'step-item completed';
         document.getElementById('stepNav2').className = 'step-item active';
@@ -81,8 +86,9 @@ function goToStep(stepNumber) {
         recalculateStep2Bill();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-        document.getElementById('step1Container').style.display = 'block';
-        document.getElementById('step2Container').style.display = 'none';
+        step1.classList.remove('hidden', 'is-hidden');
+        step1.style.setProperty('display', 'block', 'important');
+        step2.style.setProperty('display', 'none', 'important');
 
         document.getElementById('stepNav1').className = 'step-item active';
         document.getElementById('stepNav2').className = 'step-item';

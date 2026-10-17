@@ -1,6 +1,7 @@
-/* Styling in ấn */
+/* Booking Detail Styles */
+
 @media print {
-    .navbar, .footer, .no-print, button, .btn {
+    .navbar, .footer, .no-print, button, .btn, .breadcrumb-nav {
         display: none !important;
     }
     .container {
@@ -10,30 +11,42 @@
     }
     .card {
         box-shadow: none !important;
-        border: 1px solid #ccc !important;
+        border: 1px solid #cbd5e0 !important;
     }
 }
 
-/* Modal styling */
 .modal-backdrop {
     position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 9999;
+    z-index: var(--z-modal);
 }
+
 .modal-content {
-    background: white;
-    border-radius: 8px;
-    width: 100%;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    width: 90%;
     max-width: 500px;
-    padding: 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    animation: modalFadeIn 0.2s ease-out;
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-xl);
+    animation: modalSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid var(--border-color);
 }
-@keyframes modalFadeIn {
-    from { opacity: 0; transform: translateY(-15px); }
-    to { opacity: 1; transform: translateY(0); }
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-15px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }

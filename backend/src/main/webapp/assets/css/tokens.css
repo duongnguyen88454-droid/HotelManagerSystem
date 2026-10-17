@@ -1,0 +1,131 @@
+:root {
+  /* ---------- Thương hiệu ---------- */
+  --color-primary:          #1a365d;   /* Navy chủ đạo: nút chính, tiêu đề, sidebar active */
+  --color-primary-hover:    #2b6cb0;   /* Hover nút chính, link */
+  --color-primary-soft:     #eff6ff;   /* Nền nhạt: hàng được chọn, vùng nhấn mạnh */
+  --color-accent:           #c5a880;   /* Vàng kim — CHỈ khu public/landing */
+  --color-on-accent:        #1a365d;
+  --color-link:             #2b6cb0;
+
+  /* ---------- Trung tính (thang slate) ---------- */
+  --color-bg:               #f4f6fa;   /* Nền trang */
+  --color-surface:          #ffffff;   /* Nền thẻ, bảng, modal, sidebar */
+  --color-surface-alt:      #f8fafc;   /* Nền header bảng, thanh công cụ, hàng hover */
+  --color-border:           #e2e8f0;   /* Viền mặc định */
+  --color-border-strong:    #cbd5e1;   /* Viền input, đường phân cách đậm */
+  --color-text:             #0f172a;   /* Chữ chính */
+  --color-text-secondary:   #475569;   /* Chữ phụ, nhãn */
+  --color-text-muted:       #64748b;   /* Ghi chú, mô tả nhỏ (đạt AA trên nền trắng) */
+  --color-text-disabled:    #94a3b8;   /* CHỈ placeholder và trạng thái disabled */
+  --color-text-inverse:     #ffffff;
+
+  /* ---------- Ngữ nghĩa (mỗi loại 5 sắc độ) ---------- */
+  --color-success:          #15803d;
+  --color-success-strong:   #166534;
+  --color-success-soft:     #f0fdf4;
+  --color-success-border:   #bbf7d0;
+  --color-on-success-soft:  #15803d;
+
+  --color-danger:           #dc2626;
+  --color-danger-strong:    #b91c1c;
+  --color-danger-soft:      #fef2f2;
+  --color-danger-border:    #fecaca;
+  --color-on-danger-soft:   #b91c1c;
+
+  --color-warning:          #b45309;
+  --color-warning-strong:   #92400e;
+  --color-warning-soft:     #fffbeb;
+  --color-warning-border:   #fde68a;
+  --color-on-warning-soft:  #92400e;
+
+  --color-info:             #2563eb;
+  --color-info-strong:      #1d4ed8;
+  --color-info-soft:        #eff6ff;
+  --color-info-border:      #bfdbfe;
+  --color-on-info-soft:     #1d4ed8;
+
+  --color-neutral:          #64748b;
+  --color-neutral-strong:   #475569;
+  --color-neutral-soft:     #f1f5f9;
+  --color-neutral-border:   #e2e8f0;
+  --color-on-neutral-soft:  #475569;
+
+  /* ---------- Chữ ---------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --fs-xs:  12px;   /* nhãn phụ, badge, chú thích */
+  --fs-sm:  13px;   /* chữ bảng, nút, input, menu */
+  --fs-md:  14px;   /* chữ thân mặc định */
+  --fs-lg:  16px;   /* tiêu đề thẻ, chữ nhấn */
+  --fs-xl:  20px;   /* tiêu đề trang (h1 trong portal) */
+  --fs-2xl: 24px;   /* tiêu đề trang public, số KPI */
+  --fs-3xl: 32px;   /* tiêu đề hero/landing */
+
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  --lh-tight:  1.25;
+  --lh-normal: 1.5;
+
+  /* ---------- Khoảng cách (bước 4px) ---------- */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ---------- Bo góc ---------- */
+  --radius-sm:   4px;      /* badge vuông, tag nhỏ, thanh timeline */
+  --radius-md:   8px;      /* nút, input, select, alert, ô nhỏ */
+  --radius-lg:   12px;     /* thẻ, bảng, modal */
+  --radius-pill: 9999px;   /* badge viên thuốc, pill, avatar tròn */
+
+  /* ---------- Bóng đổ & lớp phủ ---------- */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.18);
+  --overlay:   rgba(15, 23, 42, 0.5);
+  --focus-ring: 0 0 0 3px rgba(43, 108, 176, 0.25);
+
+  /* ---------- Kích thước điều khiển ---------- */
+  --control-h-sm: 30px;
+  --control-h-md: 36px;
+  --control-h-lg: 44px;
+
+  /* ---------- Bố cục ---------- */
+  --sidebar-w:    260px;
+  --container-w:  1200px;
+  --container-narrow-w: 480px;
+  --container-form-w:   800px;
+
+  /* ---------- Tầng z-index ---------- */
+  --z-sticky:  20;
+  --z-sidebar: 50;
+  --z-modal:   100;
+  --z-toast:   200;
+
+  /* ---------- Chuyển động ---------- */
+  --transition: 0.15s ease;
+
+  /* ---------- Bí danh tạm hỗ trợ tương thích ngược ---------- */
+  --portal-primary: var(--color-primary);
+  --portal-primary-hover: var(--color-primary-hover);
+  --portal-bg: var(--color-bg);
+  --portal-surface: var(--color-surface);
+  --portal-surface-alt: var(--color-surface-alt);
+  --portal-border: var(--color-border);
+  --portal-border-strong: var(--color-border-strong);
+  --portal-text-primary: var(--color-text);
+  --portal-text-secondary: var(--color-text-secondary);
+  --portal-text-muted: var(--color-text-muted);
+  --portal-danger: var(--color-danger);
+  --portal-success: var(--color-success);
+  --portal-warning: var(--color-warning);
+}

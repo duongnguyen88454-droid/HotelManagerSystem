@@ -82,7 +82,7 @@
     justify-content: space-between;
     padding: 8px 0;
     font-size: 14px;
-    border-bottom: 1px dashed #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .data-row:last-child {

@@ -161,7 +161,8 @@ public class BookingCheckInQueryDAO extends BaseRepository<CheckInArrivalItemDTO
     private List<CheckInRoomDetailDTO> fetchRoomsForBooking(String maBooking) {
         String sql = "SELECT br.RoomId AS MaPhong, r.RoomName AS SoPhong, rt.RoomTypeId AS MaLoaiPhong, "
                 + "       rt.RoomTypeName AS TenLoaiPhong, "
-                + "       r.HousekeepingStatus AS TrangThaiBuong, br.ActualCheckInDate AS NgayCheckInThucTe "
+                + "       r.HousekeepingStatus AS TrangThaiBuong, br.ActualCheckInDate AS NgayCheckInThucTe, "
+                + "       br.BookingStatus AS TrangThaiDatPhong "
                 + "FROM Booking_Room br "
                 + "INNER JOIN Room r ON br.RoomId = r.RoomId "
                 + "INNER JOIN RoomType rt ON r.RoomTypeId = rt.RoomTypeId "
@@ -173,12 +174,14 @@ public class BookingCheckInQueryDAO extends BaseRepository<CheckInArrivalItemDTO
         return queryCustom(sql, rs -> {
             Timestamp ts = rs.getTimestamp("NgayCheckInThucTe");
             String actualInStr = (ts != null) ? sdf.format(ts) : null;
-            return new CheckInRoomDetailDTO(
+            CheckInRoomDetailDTO rDto = new CheckInRoomDetailDTO(
                     rs.getString("MaPhong"),
                     rs.getString("SoPhong"),
                     rs.getString("TenLoaiPhong"),
                     rs.getString("TrangThaiBuong"),
                     actualInStr);
+            rDto.setTrangThaiDatPhong(rs.getString("TrangThaiDatPhong"));
+            return rDto;
         }, maBooking);
     }
 

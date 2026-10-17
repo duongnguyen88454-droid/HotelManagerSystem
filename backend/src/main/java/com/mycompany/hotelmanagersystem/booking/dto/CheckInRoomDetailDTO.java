@@ -16,6 +16,7 @@ public class CheckInRoomDetailDTO {
     private String trangThaiBuongCss;
     private String ngayCheckInThucTe;
     private boolean daNhanPhong;
+    private String trangThaiDatPhong;
     private List<String> danhSachDichVu;
 
     public CheckInRoomDetailDTO() {
@@ -130,5 +131,13 @@ public class CheckInRoomDetailDTO {
 
     public void setDanhSachDichVu(List<String> danhSachDichVu) {
         this.danhSachDichVu = danhSachDichVu;
+    }
+
+    public String getTrangThaiDatPhong() {
+        return trangThaiDatPhong;
+    }
+
+    public void setTrangThaiDatPhong(String trangThaiDatPhong) {
+        this.trangThaiDatPhong = trangThaiDatPhong;
     }
 }

@@ -76,7 +76,7 @@ public class BookingQueryDAO extends BaseRepository<CustomerBookingHistoryDTO, S
 
         return new CustomerBookingHistoryDTO(
                 rs.getString("BookingId"),
-                rs.getString("RoomSummary"),
+                rs.getNString("RoomSummary"),
                 rs.getNString("RoomTypeName"),
                 rs.getTimestamp("CreateDate"),
                 nhan,

@@ -4,134 +4,123 @@
 
 <jsp:include page="/views/common/header.jsp">
     <jsp:param name="title" value="Chi Tiết ${room.soPhong} - ${room.tenLoaiPhong}" />
+    <jsp:param name="zone" value="public" />
 </jsp:include>
 <jsp:include page="/views/common/navbar.jsp" />
 
-<div class="container" style="max-width: 1200px; margin-top: 25px; margin-bottom: 90px;">
+<div class="public-container my-6">
 
     <!-- Breadcrumb điều hướng -->
-    <div style="margin-bottom: 20px; font-size: 13px; color: #718096;">
-        <a href="${pageContext.request.contextPath}/customer/home" style="color: #2b6cb0; text-decoration: none;">Trang Chủ</a>
-        <span style="margin: 0 8px;">/</span>
-        <a href="${pageContext.request.contextPath}/customer/search-rooms?checkIn=${paramCheckIn}&checkOut=${paramCheckOut}" style="color: #2b6cb0; text-decoration: none;">Kết Quả Tìm Phòng</a>
-        <span style="margin: 0 8px;">/</span>
-        <span style="color: #2d3748; font-weight: 600;">Chi Tiết ${room.soPhong}</span>
+    <div class="mb-4 text-xs text-muted">
+        <a href="${pageContext.request.contextPath}/customer/home" class="text-primary">Trang Chủ</a>
+        <span class="mx-2">/</span>
+        <a href="${pageContext.request.contextPath}/customer/search-rooms?checkIn=${paramCheckIn}&checkOut=${paramCheckOut}" class="text-primary">Kết Quả Tìm Phòng</a>
+        <span class="mx-2">/</span>
+        <span class="text-main font-semibold">Chi Tiết ${room.soPhong}</span>
     </div>
 
     <!-- Header Tên phòng & Hạng phòng -->
-    <div style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 24px 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); margin-bottom: 25px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div class="card p-4 mb-4">
+        <div class="flex justify-between items-center flex-wrap gap-3">
             <div>
-                <span style="background: #1a365d; color: white; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 3px; text-transform: uppercase;">
+                <span class="badge badge-primary text-xs uppercase font-bold">
                     ${room.tenLoaiPhong}
                 </span>
-                <h1 style="color: #1a365d; margin: 8px 0 6px 0; font-size: 26px; font-weight: 700;">
+                <h1 class="text-primary font-bold text-2xl mt-2 mb-1">
                     ${room.soPhong} - ${room.tenLoaiPhong}
                 </h1>
-                <div style="font-size: 13px; color: #718096; display: flex; gap: 15px; flex-wrap: wrap;">
-                    <span style="color: #276749; font-weight: 600;">✓ Trạng thái: Sẵn sàng đón khách</span>
+                <div class="text-xs text-muted flex gap-3 flex-wrap">
+                    <span class="text-success font-semibold">Trạng thái: Sẵn sàng đón khách</span>
                 </div>
             </div>
-            <div style="text-align: right;">
-                <div style="font-size: 12px; color: #718096;">Đơn giá niêm yết:</div>
-                <div style="font-size: 26px; font-weight: 700; color: #dd6b20;">
+            <div class="text-right">
+                <div class="text-xs text-muted">Đơn giá niêm yết:</div>
+                <div class="text-2xl font-bold text-warning mono">
                     <fmt:formatNumber value="${room.donGia}" type="number" maxFractionDigits="0"/> đ
                 </div>
-                <div style="font-size: 12px; color: #a0aec0;">/ phòng / đêm</div>
+                <div class="text-xs text-muted">/ phòng / đêm</div>
             </div>
         </div>
     </div>
 
-    <!-- BỐ CỤC 2 CỘT: Cột trái Thông tin chi tiết + Cột phải Tóm tắt đặt phòng -->
-    <div style="display: flex; gap: 25px; align-items: flex-start; flex-wrap: wrap;">
+    <!-- BỐ CỤC 2 CỘT: Cột trái Chi tiết 2/3 + Cột phải Tóm tắt 1/3 -->
+    <div class="grid-content-sidebar">
 
         <!-- CỘT TRÁI: THÔNG SỐ, TIỆN ÍCH VÀ DỊCH VỤ MIỄN PHÍ -->
-        <div style="flex: 1; min-width: 650px;">
-            
+        <div>
             <!-- Banner minh họa phòng sang trọng với ảnh view phòng thực tế -->
-            <div style="background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.78)), url('${not empty room.hinhAnhMinhHoa ? room.hinhAnhMinhHoa : 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80'}') center/cover no-repeat; height: 260px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; margin-bottom: 25px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); border: 1px solid rgba(255,255,255,0.1);">
-                <div style="text-align: center; padding: 20px;">
-                    <div style="font-size: 13px; font-weight: 700; color: #fbd38d; text-transform: uppercase; letter-spacing: 1px;">
+            <div class="card p-0 mb-4 room-detail-hero-banner">
+                <img src="${not empty room.hinhAnhMinhHoa ? room.hinhAnhMinhHoa : 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80'}"
+                     alt="${room.tenLoaiPhong}"
+                     class="room-detail-hero-img"
+                     onerror="this.src='https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80';" />
+                <div class="room-detail-hero-overlay"></div>
+                
+                <div class="room-detail-hero-content flex flex-col justify-center items-center text-center p-4 text-inverse">
+                    <div class="text-xs font-bold text-amber uppercase">
                         Không Gian Nghỉ Dưỡng Sang Trọng
                     </div>
-                    <div style="font-size: 28px; font-weight: 700; margin-top: 6px;">
+                    <div class="text-2xl font-bold text-inverse mt-1">
                         ${room.soPhong}
                     </div>
-                    <div style="font-size: 14px; color: #e2e8f0; margin-top: 6px;">
+                    <div class="text-sm text-muted mt-1">
                         ${room.tenLoaiPhong} &bull; Sức chứa ${room.soNguoiToiDa} khách &bull; Đầy đủ tiện nghi theo chuẩn khách sạn
                     </div>
                 </div>
             </div>
 
             <!-- Khối 1: Thông số kỹ thuật chi tiết của phòng -->
-            <div style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 25px;">
-                <h3 style="color: #1a365d; font-size: 17px; margin: 0 0 18px 0; font-weight: 700; border-bottom: 1px solid #edf2f7; padding-bottom: 10px;">
-                    Thông Số Kỹ Thuật & Cấu Hình Phòng
+            <div class="card p-4 mb-4">
+                <h3 class="card-title border-bottom pb-2 mb-3">
+                    Thông Số Kỹ Thuật &amp; Cấu Hình Phòng
                 </h3>
                 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
-                    
-                    <div style="background: #f7fafc; padding: 14px 16px; border-radius: 6px; border: 1px solid #edf2f7;">
-                        <div style="font-size: 12px; color: #718096; font-weight: 600; text-transform: uppercase;">
-                            Hạng Phòng
-                        </div>
-                        <div style="font-size: 16px; font-weight: 700; color: #2d3748; margin-top: 4px;">
-                            ${room.tenLoaiPhong}
-                        </div>
+                <div class="detail-grid">
+                    <div class="card bg-surface-subtle p-3">
+                        <div class="detail-label uppercase font-semibold">Hạng Phòng</div>
+                        <div class="detail-value font-bold text-main mt-1">${room.tenLoaiPhong}</div>
                     </div>
 
-                    <div style="background: #f7fafc; padding: 14px 16px; border-radius: 6px; border: 1px solid #edf2f7;">
-                        <div style="font-size: 12px; color: #718096; font-weight: 600; text-transform: uppercase;">
-                            Sức Chứa Tối Đa
-                        </div>
-                        <div style="font-size: 16px; font-weight: 700; color: #2d3748; margin-top: 4px;">
-                            ${room.soNguoiToiDa} khách
-                        </div>
+                    <div class="card bg-surface-subtle p-3">
+                        <div class="detail-label uppercase font-semibold">Sức Chứa Tối Đa</div>
+                        <div class="detail-value font-bold text-main mt-1">${room.soNguoiToiDa} khách</div>
                     </div>
 
-                    <div style="background: #f7fafc; padding: 14px 16px; border-radius: 6px; border: 1px solid #edf2f7;">
-                        <div style="font-size: 12px; color: #718096; font-weight: 600; text-transform: uppercase;">
-                            Cấu Hình Giường
-                        </div>
-                        <div style="font-size: 16px; font-weight: 700; color: #2d3748; margin-top: 4px;">
-                            ${room.loaiGiuong}
-                        </div>
+                    <div class="card bg-surface-subtle p-3">
+                        <div class="detail-label uppercase font-semibold">Cấu Hình Giường</div>
+                        <div class="detail-value font-bold text-main mt-1">${room.loaiGiuong}</div>
                     </div>
 
-                    <div style="background: #f7fafc; padding: 14px 16px; border-radius: 6px; border: 1px solid #edf2f7;">
-                        <div style="font-size: 12px; color: #718096; font-weight: 600; text-transform: uppercase;">
-                            Trạng Thái Phòng
-                        </div>
-                        <div style="font-size: 16px; font-weight: 700; color: #276749; margin-top: 4px;">
-                            Sẵn Sàng Đón Khách
-                        </div>
+                    <div class="card bg-surface-subtle p-3">
+                        <div class="detail-label uppercase font-semibold">Trạng Thái Phòng</div>
+                        <div class="detail-value font-bold text-success mt-1">Sẵn Sàng Đón Khách</div>
                     </div>
                 </div>
             </div>
 
             <!-- Khối 2: Các dịch vụ & Tiện ích đi kèm phòng từ CSDL 3NF -->
-            <div style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 25px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2f7; padding-bottom: 10px; margin-bottom: 18px;">
-                    <h3 style="color: #1a365d; font-size: 17px; margin: 0; font-weight: 700;">
-                        Các Dịch Vụ & Tiện Ích Đi Kèm Phòng
+            <div class="card p-4 mb-4">
+                <div class="flex justify-between items-center border-bottom pb-2 mb-3">
+                    <h3 class="card-title mb-0">
+                        Các Dịch Vụ &amp; Tiện Ích Đi Kèm Phòng
                     </h3>
-                    <span style="background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 3px;">
+                    <span class="badge badge-success text-xs font-bold">
                         Bao Gồm Trong Giá Phòng
                     </span>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+                <div class="grid-2">
                     <c:forEach var="tn" items="${room.danhSachTienNghi}">
-                        <div style="display: flex; align-items: center; gap: 10px; background: #f7fafc; padding: 12px 16px; border-radius: 6px; border: 1px solid #edf2f7;">
-                            <span style="color: #276749; font-weight: 700; font-size: 16px; line-height: 1;">✓</span>
+                        <div class="card bg-surface-subtle p-3 flex items-center gap-2">
+                            <span class="badge badge-success badge-sm">&#10003;</span>
                             <div>
-                                <strong style="color: #2d3748; font-size: 14px;">${tn}</strong>
-                                <div style="font-size: 12px; color: #718096;">Trang bị sẵn sàng phục vụ kỳ nghỉ của quý khách.</div>
+                                <strong class="text-main text-sm">${tn}</strong>
+                                <div class="text-xs text-muted">Trang bị sẵn sàng phục vụ kỳ nghỉ của quý khách.</div>
                             </div>
                         </div>
                     </c:forEach>
                     <c:if test="${empty room.danhSachTienNghi}">
-                        <div style="font-size: 13px; color: #718096; font-style: italic;">
+                        <div class="text-muted text-xs italic">
                             Phòng tiêu chuẩn trang bị đầy đủ nội thất cơ bản theo chuẩn khách sạn.
                         </div>
                     </c:if>
@@ -139,63 +128,61 @@
             </div>
 
             <!-- Khối 3: Nội quy & Chính sách nhận trả phòng -->
-            <div style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-                <h3 style="color: #1a365d; font-size: 17px; margin: 0 0 14px 0; font-weight: 700; border-bottom: 1px solid #edf2f7; padding-bottom: 10px;">
-                    Chính Sách Nhận Phòng & Lưu Ý
+            <div class="card p-4">
+                <h3 class="card-title border-bottom pb-2 mb-3">
+                    Chính Sách Nhận Phòng &amp; Lưu Ý
                 </h3>
-                <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #4a5568; line-height: 1.8;">
+                <ul class="text-secondary text-sm leading-relaxed" style="padding-left: var(--space-4);">
                     <li><strong>Giờ nhận phòng tiêu chuẩn:</strong> Từ 14:00 chiều ngày nhận phòng.</li>
                     <li><strong>Giờ trả phòng tiêu chuẩn:</strong> Trước 12:00 trưa ngày trả phòng.</li>
                     <li><strong>Hủy phòng:</strong> Miễn phí hủy phòng trước 24 giờ trước thời điểm nhận phòng.</li>
                     <li>Không hút thuốc lá trong phòng nghỉ; vui lòng xuất trình CCCD/Hộ chiếu khi làm thủ tục tại quầy lễ tân.</li>
                 </ul>
             </div>
-
         </div>
 
         <!-- CỘT PHẢI: BẢNG TỔNG KẾT VÀ NÚT ĐẶT PHÒNG (STICKY SUMMARY) -->
-        <div style="flex: 0 0 340px; width: 340px;">
-            <div style="background: white; border-radius: 8px; border: 1px solid #d2d6dc; padding: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: sticky; top: 20px;">
-                
-                <h3 style="color: #1a365d; font-size: 17px; margin: 0 0 14px 0; font-weight: 700; border-bottom: 1px solid #edf2f7; padding-bottom: 10px;">
+        <div>
+            <div class="card p-4" style="position: sticky; top: 20px;">
+                <h3 class="card-title border-bottom pb-2 mb-3">
                     Tóm Tắt Đặt Phòng Này
                 </h3>
 
-                <div style="font-size: 13px; color: #4a5568; margin-bottom: 16px; line-height: 1.8;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Phòng số:</span>
-                        <strong style="color: #1a365d;">${room.soPhong}</strong>
+                <div class="text-secondary text-sm leading-relaxed mb-4">
+                    <div class="flex justify-between py-1">
+                        <span class="text-muted">Phòng số:</span>
+                        <strong class="text-primary">${room.soPhong}</strong>
                     </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Hạng phòng:</span>
-                        <strong>${room.tenLoaiPhong}</strong>
+                    <div class="flex justify-between py-1">
+                        <span class="text-muted">Hạng phòng:</span>
+                        <strong class="text-main">${room.tenLoaiPhong}</strong>
                     </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Ngày nhận:</span>
-                        <strong>${room.ngayNhan}</strong>
+                    <div class="flex justify-between py-1">
+                        <span class="text-muted">Ngày nhận:</span>
+                        <strong class="text-main">${room.ngayNhan}</strong>
                     </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Ngày trả:</span>
-                        <strong>${room.ngayTra}</strong>
+                    <div class="flex justify-between py-1">
+                        <span class="text-muted">Ngày trả:</span>
+                        <strong class="text-main">${room.ngayTra}</strong>
                     </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Số đêm ở:</span>
-                        <strong style="color: #dd6b20;">${room.soDem} đêm</strong>
+                    <div class="flex justify-between py-1">
+                        <span class="text-muted">Số đêm ở:</span>
+                        <strong class="text-warning font-bold">${room.soDem} đêm</strong>
                     </div>
                 </div>
 
-                <div style="border-top: 1px dashed #cbd5e0; padding-top: 14px; margin-bottom: 18px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 13px; color: #718096; margin-bottom: 6px;">
+                <div class="border-top pt-3 mb-4">
+                    <div class="flex justify-between text-xs text-muted mb-1">
                         <span>Đơn giá/đêm:</span>
-                        <span><fmt:formatNumber value="${room.donGia}" type="number" maxFractionDigits="0"/> đ</span>
+                        <span class="mono"><fmt:formatNumber value="${room.donGia}" type="number" maxFractionDigits="0"/> đ</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; color: #1a365d;">
+                    <div class="flex justify-between items-baseline font-bold text-main text-base">
                         <span>Tiền phòng dự kiến:</span>
-                        <span style="color: #dd6b20; font-size: 20px;">
+                        <span class="text-warning text-xl mono font-bold">
                             <fmt:formatNumber value="${room.tongTienDuKien}" type="number" maxFractionDigits="0"/> đ
                         </span>
                     </div>
-                    <div style="font-size: 11px; color: #a0aec0; text-align: right; margin-top: 2px;">
+                    <div class="text-xs text-muted text-right mt-1">
                         (Chưa bao gồm các dịch vụ bổ sung tùy chọn)
                     </div>
                 </div>
@@ -204,13 +191,12 @@
                 <c:choose>
                     <c:when test="${isAvailable}">
                         <a href="${pageContext.request.contextPath}/customer/booking?action=prepare&maPhong=${room.maPhong}&checkIn=${paramCheckIn}&checkOut=${paramCheckOut}"
-                           style="display: block; width: 100%; box-sizing: border-box; background: #dd6b20; color: white; text-align: center; text-decoration: none; padding: 12px 16px; border-radius: 5px; font-size: 15px; font-weight: 700; transition: background 0.2s; margin-bottom: 10px;"
-                           onmouseover="this.style.background='#c05621'" onmouseout="this.style.background='#dd6b20'">
+                           class="btn btn-primary w-full mb-2">
                             Đặt Phòng Này
                         </a>
                     </c:when>
                     <c:otherwise>
-                        <div style="background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 12px; border-radius: 5px; font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 10px;">
+                        <div class="alert alert-danger text-center font-bold text-xs mb-2">
                             Phòng đã có khách đặt trong khoảng thời gian này
                         </div>
                     </c:otherwise>
@@ -218,11 +204,9 @@
 
                 <!-- Nút Quay lại danh sách tìm kiếm -->
                 <a href="${pageContext.request.contextPath}/customer/search-rooms?checkIn=${paramCheckIn}&checkOut=${paramCheckOut}"
-                   style="display: block; width: 100%; box-sizing: border-box; background: #edf2f7; color: #4a5568; text-align: center; text-decoration: none; padding: 10px 16px; border-radius: 5px; font-size: 13px; font-weight: 600; transition: background 0.2s;"
-                   onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#edf2f7'">
+                   class="btn btn-outline w-full">
                     Quay Lại Danh Sách Phòng
                 </a>
-
             </div>
         </div>
 

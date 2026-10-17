@@ -18,6 +18,7 @@ public class InvoiceRoomItemDTO implements Serializable {
     private Timestamp ngayCheckOutThucTe;
     private int soDem;
     private Double thanhTien;
+    private String trangThaiDatPhong;
 
     public InvoiceRoomItemDTO() {
     }
@@ -107,5 +108,13 @@ public class InvoiceRoomItemDTO implements Serializable {
 
     public void setThanhTien(Double thanhTien) {
         this.thanhTien = thanhTien;
+    }
+
+    public String getTrangThaiDatPhong() {
+        return trangThaiDatPhong;
+    }
+
+    public void setTrangThaiDatPhong(String trangThaiDatPhong) {
+        this.trangThaiDatPhong = trangThaiDatPhong;
     }
 }

@@ -257,7 +257,7 @@ AS
 SELECT b.BookingId,
        b.CustomerId,
        b.CreateBy AS AccountId,
-       CAST(COUNT(br.RoomId) AS VARCHAR) + N' phòng' AS RoomSummary,
+       CAST(COUNT(br.RoomId) AS NVARCHAR(10)) + N' phòng' AS RoomSummary,
        N'' AS RoomTypeName,
        b.CreateDate,
        MIN(br.ExpectedCheckInDate) AS ExpectedCheckInDate,

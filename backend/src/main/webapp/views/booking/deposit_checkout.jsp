@@ -1,246 +1,200 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" language="java" %>
-    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-        <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-            <jsp:include page="/views/common/header.jsp">
-                <jsp:param name="title" value="Thanh Toán Đặt Cọc - ${bookingDetail.maBooking}" />
-            </jsp:include>
-            <jsp:include page="/views/common/navbar.jsp" />
+<jsp:include page="/views/common/header.jsp">
+    <jsp:param name="title" value="Thanh Toán Đặt Cọc - ${bookingDetail.maBooking}" />
+    <jsp:param name="zone" value="public" />
+</jsp:include>
+<jsp:include page="/views/common/navbar.jsp" />
 
-            <div class="container" style="max-width: 1100px; margin-top: 30px; margin-bottom: 60px;">
-                <div style="font-size: 13px; color: #718096; margin-bottom: 24px;">
-                    <a href="${pageContext.request.contextPath}/customer/home"
-                        style="color: #2b6cb0; text-decoration: none;">Trang Chủ</a>
-                    &nbsp;&rsaquo;&nbsp;
-                    <a href="${pageContext.request.contextPath}/customer/history"
-                        style="color: #2b6cb0; text-decoration: none;">Lịch Sử Đặt Phòng</a>
-                    &nbsp;&rsaquo;&nbsp;
-                    <a href="${pageContext.request.contextPath}/customer/booking-detail?bookingId=${bookingDetail.maBooking}"
-                        style="color: #2b6cb0; text-decoration: none;">Đơn Đặt ${bookingDetail.maBooking}</a>
-                    &nbsp;&rsaquo;&nbsp;
-                    <span style="color: #4a5568; font-weight: 600;">Thanh Toán Tiền Cọc</span>
+<div class="container my-6">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav mb-4" aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/customer/home">Trang Chủ</a></li>
+            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/customer/history">Lịch Sử Đặt Phòng</a></li>
+            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/customer/booking-detail?bookingId=${bookingDetail.maBooking}">Đơn Đặt ${bookingDetail.maBooking}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Thanh Toán Tiền Cọc</li>
+        </ol>
+    </nav>
+
+    <!-- Thông báo lỗi (nếu có) -->
+    <c:if test="${not empty errorMessage}">
+        <div class="alert alert-danger mb-4">
+            ${errorMessage}
+        </div>
+    </c:if>
+
+    <!-- Tiêu đề trang -->
+    <div class="card p-5 mb-5 bg-primary text-white shadow-md">
+        <div class="flex justify-between items-center flex-wrap gap-3">
+            <div>
+                <h1 class="page-title text-2xl font-bold text-white m-0">
+                    Xác Nhận Đặt Cọc Giữ Chỗ Phòng
+                </h1>
+                <div class="text-sm opacity-90 mt-1">
+                    <c:choose>
+                        <c:when test="${not empty bookingDetail.maBooking && bookingDetail.maBooking != 'CHO_THANH_TOAN'}">
+                            Mã đơn đặt phòng: <strong>${bookingDetail.maBooking}</strong> &nbsp;|&nbsp;
+                        </c:when>
+                        <c:otherwise>
+                            Trạng thái: <strong>Chờ Thanh Toán Để Tạo Đơn</strong> &nbsp;|&nbsp;
+                        </c:otherwise>
+                    </c:choose>
+                    Khách hàng: <strong>${bookingDetail.hoTenKhachHang}</strong> (${bookingDetail.soDT})
                 </div>
+            </div>
+            <div class="badge badge-secondary px-4 py-2 text-right">
+                <span class="block text-xs uppercase tracking-wide opacity-80">Quy trình</span>
+                <strong class="text-sm font-bold text-primary">Thanh Toán Để Chốt Phòng</strong>
+            </div>
+        </div>
+    </div>
 
-                <!-- Thông báo lỗi (nếu có) -->
-                <c:if test="${not empty errorMessage}">
-                    <div
-                        style="background: #fff5f5; border-left: 4px solid #e53e3e; color: #c53030; padding: 14px 18px; border-radius: 6px; margin-bottom: 24px; font-size: 14px; font-weight: 600;">
-                        ${errorMessage}
-                    </div>
-                </c:if>
+    <!-- Bố cục 2 cột -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
-                <!-- Tiêu đề trang -->
-                <div
-                    style="background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%); color: white; padding: 24px 28px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                        <div>
-                            <h2 style="margin: 0 0 6px 0; font-size: 22px; font-weight: 700; color: white;">
-                                Xác Nhận Đặt Cọc Giữ Chỗ Phòng
-                            </h2>
-                            <div style="font-size: 13px; color: #e2e8f0;">
-                                <c:choose>
-                                    <c:when
-                                        test="${not empty bookingDetail.maBooking && bookingDetail.maBooking != 'CHO_THANH_TOAN'}">
-                                        Mã đơn đặt phòng: <strong>${bookingDetail.maBooking}</strong> &nbsp;|&nbsp;
-                                    </c:when>
-                                    <c:otherwise>
-                                        Trạng thái: <strong style="color: #feebc8;">Chờ Thanh Toán Để Tạo Đơn</strong>
-                                        &nbsp;|&nbsp;
-                                    </c:otherwise>
-                                </c:choose>
-                                Khách hàng: <strong>${bookingDetail.hoTenKhachHang}</strong> (${bookingDetail.soDT})
-                            </div>
+        <!-- CỘT TRÁI: THÔNG TIN ĐƠN ĐẶT VÀ CHI PHÍ CỌC -->
+        <div class="card p-5 shadow-sm">
+            <h3 class="card-title text-base font-bold text-primary pb-3 mb-4 border-b">
+                Chi Tiết Tiền Cọc Theo Phòng
+            </h3>
+
+            <div class="mb-4">
+                <c:forEach var="room" items="${bookingDetail.danhSachPhong}" varStatus="status">
+                    <div class="card p-3 mb-3 border bg-light">
+                        <div class="flex justify-between items-center mb-1">
+                            <strong class="text-secondary text-sm">
+                                Phòng ${room.soPhong} <span class="text-xs text-muted font-normal">(${room.tenLoaiPhong})</span>
+                            </strong>
+                            <span class="badge badge-secondary text-xs">
+                                ${room.soDem} đêm
+                            </span>
                         </div>
-                        <div
-                            style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); padding: 8px 16px; border-radius: 6px; font-size: 13px; text-align: right;">
-                            <span
-                                style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85;">Quy
-                                trình</span>
-                            <strong style="font-size: 15px; color: #feebc8;">Thanh Toán Để Chốt Phòng</strong>
+                        <div class="text-xs text-muted mb-2">
+                            Nhận phòng: <fmt:formatDate value="${room.ngayNhanDuKien}" pattern="dd/MM/yyyy" />
+                            &rarr; Trả phòng: <fmt:formatDate value="${room.ngayTraDuKien}" pattern="dd/MM/yyyy" />
                         </div>
-                    </div>
-                </div>
-
-                <!-- Bố cục 2 cột -->
-                <div
-                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; align-items: start;">
-
-                    <!-- CỘT TRÁI: THÔNG TIN ĐƠN ĐẶT VÀ CHI PHÍ CỌC -->
-                    <div
-                        style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);">
-                        <h3
-                            style="font-size: 16px; font-weight: 700; color: #1a365d; margin: 0 0 16px 0; border-bottom: 2px solid #edf2f7; padding-bottom: 10px;">
-                            Chi Tiết Tiền Cọc Theo Phòng
-                        </h3>
-
-                        <div style="margin-bottom: 20px;">
-                            <c:forEach var="room" items="${bookingDetail.danhSachPhong}" varStatus="status">
-                                <div
-                                    style="border: 1px solid #edf2f7; border-radius: 6px; padding: 14px; margin-bottom: 12px; background: #f7fafc;">
-                                    <div
-                                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                        <strong style="color: #2d3748; font-size: 14px;">
-                                            Phòng ${room.soPhong} <span
-                                                style="font-size: 12px; color: #718096; font-weight: 500;">(${room.tenLoaiPhong})</span>
-                                        </strong>
-                                        <span
-                                            style="font-size: 12px; color: #4a5568; background: #edf2f7; padding: 2px 8px; border-radius: 4px;">
-                                            ${room.soDem} đêm
-                                        </span>
-                                    </div>
-                                    <div style="font-size: 12px; color: #718096; margin-bottom: 8px;">
-                                        Nhận phòng:
-                                        <fmt:formatDate value="${room.ngayNhanDuKien}" pattern="dd/MM/yyyy" /> &rarr;
-                                        Trả phòng:
-                                        <fmt:formatDate value="${room.ngayTraDuKien}" pattern="dd/MM/yyyy" />
-                                    </div>
-                                    <div
-                                        style="display: flex; justify-content: space-between; font-size: 13px; border-top: 1px dashed #e2e8f0; padding-top: 8px;">
-                                        <span style="color: #718096;">Tiền phòng:</span>
-                                        <span style="color: #4a5568; font-weight: 600;">
-                                            <fmt:formatNumber value="${room.tienPhong}" type="number"
-                                                groupingUsed="true" /> đ
-                                        </span>
-                                    </div>
-                                    <div
-                                        style="display: flex; justify-content: space-between; font-size: 13px; margin-top: 4px;">
-                                        <span style="color: #2b6cb0; font-weight: 600;">Số tiền cọc cần nộp:</span>
-                                        <strong style="color: #2b6cb0;">
-                                            <fmt:formatNumber value="${room.tienCoc}" type="number"
-                                                groupingUsed="true" /> đ
-                                        </strong>
-                                    </div>
-                                </div>
-                            </c:forEach>
+                        <div class="flex justify-between text-xs pt-2 border-t">
+                            <span class="text-muted">Tiền phòng:</span>
+                            <span class="font-semibold text-secondary">
+                                <fmt:formatNumber value="${room.tienPhong}" type="number" groupingUsed="true" /> đ
+                            </span>
                         </div>
-
-                        <!-- Tổng kết tài chính -->
-                        <div
-                            style="background: #ebf8ff; border: 1px solid #bee3f8; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
-                            <div
-                                style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: #4a5568;">
-                                <span>Tổng tiền phòng:</span>
-                                <strong>
-                                    <fmt:formatNumber value="${bookingDetail.tongTienPhong}" type="number"
-                                        groupingUsed="true" /> đ
-                                </strong>
-                            </div>
-                            <div
-                                style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: #4a5568;">
-                                <span>Tổng tiền dịch vụ:</span>
-                                <strong>
-                                    <fmt:formatNumber value="${bookingDetail.tongTienDichVu}" type="number"
-                                        groupingUsed="true" /> đ
-                                </strong>
-                            </div>
-                            <div
-                                style="border-top: 1px solid #cbd5e0; padding-top: 10px; margin-top: 6px; display: flex; justify-content: space-between; align-items: baseline;">
-                                <div>
-                                    <strong style="font-size: 14px; color: #1a365d; display: block;">SỐ TIỀN CỌC CẦN
-                                        THANH TOÁN:</strong>
-                                    <span style="font-size: 11px; color: #718096;">(Thanh toán phần còn lại khi
-                                        Check-out)</span>
-                                </div>
-                                <div style="font-size: 22px; font-weight: 800; color: #c53030;">
-                                    <fmt:formatNumber value="${bookingDetail.tongTienCoc}" type="number"
-                                        groupingUsed="true" /> đ
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            style="font-size: 12px; color: #718096; line-height: 1.5; background: #fffaf0; border: 1px solid #feebc8; border-radius: 6px; padding: 12px;">
-                            <strong style="color: #dd6b20;">Lưu ý về quy định giữ chỗ:</strong> Hệ thống tự động khóa
-                            giữ phòng trong vòng <strong>10 phút</strong> kể từ khi tạo đơn. Sau khi chuyển khoản thành
-                            công, vui lòng nhấn nút xác nhận bên cạnh để hệ thống ghi nhận giao dịch nộp cọc.
+                        <div class="flex justify-between text-xs mt-1">
+                            <span class="text-primary font-semibold">Số tiền cọc cần nộp:</span>
+                            <strong class="text-primary">
+                                <fmt:formatNumber value="${room.tienCoc}" type="number" groupingUsed="true" /> đ
+                            </strong>
                         </div>
                     </div>
-
-                    <!-- CỘT PHẢI: QUÉT MÃ VIETQR VÀ NÚT XÁC NHẬN -->
-                    <div
-                        style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04); text-align: center;">
-                        <h3
-                            style="font-size: 16px; font-weight: 700; color: #1a365d; margin: 0 0 16px 0; border-bottom: 2px solid #edf2f7; padding-bottom: 10px;">
-                            Quét Mã QR Chuyển Khoản Nhanh
-                        </h3>
-
-                        <!-- VietQR Code Image -->
-                        <div
-                            style="background: #f7fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: inline-block; margin-bottom: 18px; max-width: 100%;">
-                            <img src="https://img.vietqr.io/image/MB-0333884549-compact2.png?amount=${bookingDetail.tongTienCoc}&addInfo=COC%20${bookingDetail.maBooking}&accountName=HOTEL%20MANAGEMENT%20SYSTEM"
-                                alt="Mã QR Chuyển Khoản Đặt Cọc"
-                                style="width: 280px; max-width: 100%; height: auto; display: block; border-radius: 4px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);">
-                            <div style="margin-top: 8px; font-size: 11px; color: #718096;">
-                                Mở ứng dụng Ngân hàng (App Banking) bất kỳ để quét mã
-                            </div>
-                        </div>
-
-                        <!-- Bảng chi tiết tài khoản thụ hưởng -->
-                        <div
-                            style="text-align: left; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; margin-bottom: 20px; font-size: 13px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                                <span style="color: #718096;">Ngân hàng:</span>
-                                <strong style="color: #2d3748;">MB Bank (Ngân Hàng TMCP Quân Đội)</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                                <span style="color: #718096;">Số tài khoản:</span>
-                                <strong
-                                    style="color: #1a365d; font-size: 14px; font-family: monospace;">0333884549</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                                <span style="color: #718096;">Chủ tài khoản:</span>
-                                <strong style="color: #2d3748;">HOTEL MANAGEMENT SYSTEM</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                                <span style="color: #718096;">Số tiền cọc:</span>
-                                <strong style="color: #c53030; font-size: 14px;">
-                                    <fmt:formatNumber value="${bookingDetail.tongTienCoc}" type="number"
-                                        groupingUsed="true" /> đ
-                                </strong>
-                            </div>
-                            <div
-                                style="display: flex; justify-content: space-between; border-top: 1px dashed #cbd5e0; padding-top: 6px; margin-top: 6px;">
-                                <span style="color: #718096;">Nội dung CK:</span>
-                                <strong style="color: #2b6cb0; font-size: 14px; font-family: monospace;">
-                                    <c:choose>
-                                        <c:when
-                                            test="${not empty bookingDetail.maBooking && bookingDetail.maBooking != 'CHO_THANH_TOAN'}">
-                                            COC ${bookingDetail.maBooking}
-                                        </c:when>
-                                        <c:otherwise>
-                                            COC ${bookingDetail.soDT}
-                                        </c:otherwise>
-                                    </c:choose>
-                                </strong>
-                            </div>
-                        </div>
-
-                        <!-- Nút bấm xác nhận thanh toán -->
-                        <form action="${pageContext.request.contextPath}/customer/deposit" method="POST"
-                            style="margin: 0;">
-                            <input type="hidden" name="bookingId"
-                                value="${bookingDetail.maBooking != 'CHO_THANH_TOAN' ? bookingDetail.maBooking : ''}">
-                            <input type="hidden" name="paymentMethod" value="BankTransfer">
-
-                            <button type="submit"
-                                style="width: 100%; background: #2f855a; color: white; border: none; padding: 14px 20px; border-radius: 6px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 6px rgba(47, 133, 90, 0.25); transition: background 0.2s;"
-                                onmouseover="this.style.background='#276749'"
-                                onmouseout="this.style.background='#2f855a'">
-                                Tôi Đã Hoàn Tất Chuyển Khoản & Xác Nhận Đặt Phòng
-                            </button>
-                        </form>
-
-                        <div style="margin-top: 14px;">
-                            <a href="${pageContext.request.contextPath}/customer/booking-detail?bookingId=${bookingDetail.maBooking}"
-                                style="color: #718096; font-size: 13px; text-decoration: none;">
-                                &larr; Xem lại chi tiết đơn đặt phòng
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-
+                </c:forEach>
             </div>
 
-            <jsp:include page="/views/common/footer.jsp" />
+            <!-- Tổng kết tài chính -->
+            <div class="card p-4 mb-4 border bg-light">
+                <div class="flex justify-between text-sm mb-2 text-secondary">
+                    <span>Tổng tiền phòng:</span>
+                    <strong class="font-bold">
+                        <fmt:formatNumber value="${bookingDetail.tongTienPhong}" type="number" groupingUsed="true" /> đ
+                    </strong>
+                </div>
+                <div class="flex justify-between text-sm mb-2 text-secondary">
+                    <span>Tổng tiền dịch vụ:</span>
+                    <strong class="font-bold">
+                        <fmt:formatNumber value="${bookingDetail.tongTienDichVu}" type="number" groupingUsed="true" /> đ
+                    </strong>
+                </div>
+                <div class="border-t pt-3 mt-2 flex justify-between items-baseline">
+                    <div>
+                        <strong class="text-sm text-primary block">SỐ TIỀN CỌC CẦN THANH TOÁN:</strong>
+                        <span class="text-xs text-muted">(Thanh toán phần còn lại khi Check-out)</span>
+                    </div>
+                    <div class="text-2xl font-bold text-danger">
+                        <fmt:formatNumber value="${bookingDetail.tongTienCoc}" type="number" groupingUsed="true" /> đ
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning text-xs leading-relaxed m-0">
+                <strong>Lưu ý về quy định giữ chỗ:</strong> Hệ thống tự động khóa giữ phòng trong vòng <strong>10 phút</strong> kể từ khi tạo đơn. Sau khi chuyển khoản thành công, vui lòng nhấn nút xác nhận bên cạnh để hệ thống ghi nhận giao dịch nộp cọc.
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI: QUÉT MÃ VIETQR VÀ NÚT XÁC NHẬN -->
+        <div class="card p-5 shadow-sm text-center">
+            <h3 class="card-title text-base font-bold text-primary pb-3 mb-4 border-b">
+                Quét Mã QR Chuyển Khoản Nhanh
+            </h3>
+
+            <!-- VietQR Code Image -->
+            <div class="card p-4 border bg-light inline-block mb-4 max-w-full">
+                <img src="https://img.vietqr.io/image/MB-0333884549-compact2.png?amount=${bookingDetail.tongTienCoc}&addInfo=COC%20${bookingDetail.maBooking}&accountName=HOTEL%20MANAGEMENT%20SYSTEM"
+                    alt="Mã QR Chuyển Khoản Đặt Cọc"
+                    class="mx-auto block rounded shadow-sm max-w-full qr-image">
+                <div class="mt-2 text-xs text-muted">
+                    Mở ứng dụng Ngân hàng (App Banking) bất kỳ để quét mã
+                </div>
+            </div>
+
+            <!-- Bảng chi tiết tài khoản thụ hưởng -->
+            <div class="card p-3 mb-4 border bg-light text-left text-xs">
+                <div class="flex justify-between mb-2">
+                    <span class="text-muted">Ngân hàng:</span>
+                    <strong class="text-secondary">MB Bank (Ngân Hàng TMCP Quân Đội)</strong>
+                </div>
+                <div class="flex justify-between mb-2">
+                    <span class="text-muted">Số tài khoản:</span>
+                    <strong class="text-primary text-sm font-mono font-bold">0333884549</strong>
+                </div>
+                <div class="flex justify-between mb-2">
+                    <span class="text-muted">Chủ tài khoản:</span>
+                    <strong class="text-secondary">HOTEL MANAGEMENT SYSTEM</strong>
+                </div>
+                <div class="flex justify-between mb-2">
+                    <span class="text-muted">Số tiền cọc:</span>
+                    <strong class="text-danger text-sm font-bold">
+                        <fmt:formatNumber value="${bookingDetail.tongTienCoc}" type="number" groupingUsed="true" /> đ
+                    </strong>
+                </div>
+                <div class="flex justify-between border-t pt-2 mt-1">
+                    <span class="text-muted">Nội dung CK:</span>
+                    <strong class="text-primary text-sm font-mono font-bold">
+                        <c:choose>
+                            <c:when test="${not empty bookingDetail.maBooking && bookingDetail.maBooking != 'CHO_THANH_TOAN'}">
+                                COC ${bookingDetail.maBooking}
+                            </c:when>
+                            <c:otherwise>
+                                COC ${bookingDetail.soDT}
+                            </c:otherwise>
+                        </c:choose>
+                    </strong>
+                </div>
+            </div>
+
+            <!-- Nút bấm xác nhận thanh toán -->
+            <form action="${pageContext.request.contextPath}/customer/deposit" method="POST" class="m-0">
+                <input type="hidden" name="bookingId"
+                    value="${bookingDetail.maBooking != 'CHO_THANH_TOAN' ? bookingDetail.maBooking : ''}">
+                <input type="hidden" name="paymentMethod" value="BankTransfer">
+
+                <button type="submit" class="btn btn-success w-full py-3 text-base font-bold shadow-md">
+                    Tôi Đã Hoàn Tất Chuyển Khoản &amp; Xác Nhận Đặt Phòng
+                </button>
+            </form>
+
+            <div class="mt-3">
+                <a href="${pageContext.request.contextPath}/customer/booking-detail?bookingId=${bookingDetail.maBooking}"
+                    class="text-xs text-muted hover:underline">
+                    &larr; Xem lại chi tiết đơn đặt phòng
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<jsp:include page="/views/common/footer.jsp" />

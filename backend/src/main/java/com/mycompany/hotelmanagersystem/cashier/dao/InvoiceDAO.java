@@ -66,6 +66,7 @@ public class InvoiceDAO extends BaseRepository<InvoiceDetailDTO, String> {
         String sql = "SELECT br.RoomId AS MaPhong, rd.RoomTypeName AS TenLoaiPhong, br.Price AS DonGiaPhong, "
                 + "       br.ExpectedCheckInDate AS NgayNhanDuKien, br.ExpectedCheckOutDate AS NgayTraDuKien, "
                 + "       br.ActualCheckInDate AS NgayCheckInThucTe, br.ActualCheckOutDate AS NgayCheckOutThucTe, "
+                + "       br.BookingStatus AS TrangThaiDatPhong, "
                 + "       DATEDIFF(DAY, br.ExpectedCheckInDate, "
                 + "                ISNULL(CAST(br.ActualCheckOutDate AS DATE), br.ExpectedCheckOutDate)) AS SoDem "
                 + "FROM Booking_Room br "
@@ -131,7 +132,10 @@ public class InvoiceDAO extends BaseRepository<InvoiceDetailDTO, String> {
             soDem = 1;
         }
         double donGia = rs.getDouble("DonGiaPhong");
-        return new InvoiceRoomItemDTO(
+        String bookingStatus = rs.getString("TrangThaiDatPhong");
+        double thanhTien = "Cancelled".equalsIgnoreCase(bookingStatus) ? 0.0 : (donGia * soDem);
+
+        InvoiceRoomItemDTO item = new InvoiceRoomItemDTO(
                 rs.getString("MaPhong"),
                 rs.getString("TenLoaiPhong"),
                 donGia,
@@ -140,7 +144,9 @@ public class InvoiceDAO extends BaseRepository<InvoiceDetailDTO, String> {
                 rs.getTimestamp("NgayCheckInThucTe"),
                 rs.getTimestamp("NgayCheckOutThucTe"),
                 soDem,
-                donGia * soDem);
+                thanhTien);
+        item.setTrangThaiDatPhong(bookingStatus);
+        return item;
     }
 
     private InvoiceServiceItemDTO mapRowToInvoiceService(ResultSet rs) throws SQLException {

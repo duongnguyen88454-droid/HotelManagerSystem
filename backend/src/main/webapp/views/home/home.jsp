@@ -1,218 +1,181 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" language="java" %>
-    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-        <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-            <jsp:include page="/views/common/header.jsp">
-                <jsp:param name="title" value="Cổng Khách Hàng - Trang Chủ Khách Sạn" />
-            </jsp:include>
-            <jsp:include page="/views/common/navbar.jsp" />
+<jsp:include page="/views/common/header.jsp">
+    <jsp:param name="title" value="Cổng Khách Hàng - Trang Chủ Khách Sạn" />
+    <jsp:param name="zone" value="public" />
+</jsp:include>
+<jsp:include page="/views/common/navbar.jsp" />
 
-            <div class="container" style="max-width: 1200px; margin-top: 25px; margin-bottom: 90px;">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/home/landing.css">
 
-                <!-- Banner chào mừng thương hiệu sang trọng với ảnh background Resort 5 sao -->
-                <div
-                    style="background: linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.82)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat; color: white; padding: 48px 40px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); margin-bottom: 35px; border: 1px solid rgba(255,255,255,0.15);">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
-                        <div style="max-width: 750px;">
-                            <span
-                                style="background: rgba(197, 168, 128, 0.25); color: #feebc8; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">
-                                Hệ Thống Nghỉ Dưỡng & Khách Sạn Cao Cấp
-                            </span>
-                            <h1
-                                style="color: #ffffff; margin: 12px 0 8px 0; font-size: 28px; font-weight: 700; line-height: 1.3;">
-                                Kính Chào Quý Khách, ${sessionScope.CURRENT_USER.hoTen}!
-                            </h1>
-                            <p style="color: #e2e8f0; margin: 0; font-size: 15px; line-height: 1.6;">
-                                Trải nghiệm kỳ nghỉ dưỡng đẳng cấp với không gian sang trọng, dịch vụ chuyên nghiệp và
-                                tiện nghi hiện đại bậc nhất. Vui lòng nhập tiêu chí lưu trú bên dưới để tìm kiếm và đặt
-                                phòng ưng ý.
-                            </p>
-                        </div>
-                    </div>
+<div class="container my-6">
+
+    <!-- Banner chào mừng thương hiệu sang trọng với ảnh background Resort 5 sao -->
+    <div class="customer-hero-banner">
+        <div class="flex justify-between items-center flex-wrap gap-4">
+            <div class="max-w-2xl">
+                <span class="hero-badge">
+                    Hệ Thống Nghỉ Dưỡng &amp; Khách Sạn Cao Cấp
+                </span>
+                <h1 class="page-title text-3xl font-bold text-white mt-3 mb-2 leading-tight">
+                    Kính Chào Quý Khách, ${sessionScope.CURRENT_USER.hoTen}!
+                </h1>
+                <p class="text-sm opacity-90 m-0 leading-relaxed">
+                    Trải nghiệm kỳ nghỉ dưỡng đẳng cấp với không gian sang trọng, dịch vụ chuyên nghiệp và tiện nghi hiện đại bậc nhất. Vui lòng nhập tiêu chí lưu trú bên dưới để tìm kiếm và đặt phòng ưng ý.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thanh tìm kiếm phòng trung tâm (Search Bar) -->
+    <div class="card p-5 mb-6 shadow-sm">
+        <div class="border-b pb-3 mb-4">
+            <h2 class="card-title text-lg font-bold text-primary m-0">
+                Tìm Kiếm Phòng Nghỉ Phù Hợp
+            </h2>
+            <p class="text-xs text-muted mt-1 mb-0">
+                Lựa chọn thời gian nhận - trả phòng và số lượng khách để khám phá các phòng khả dụng tốt nhất.
+            </p>
+        </div>
+
+        <form action="${pageContext.request.contextPath}/customer/search-rooms" method="GET">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+
+                <!-- Ngày nhận phòng -->
+                <div class="form-group mb-0">
+                    <label for="checkInInput" class="form-label font-semibold text-secondary text-xs">
+                        Ngày Nhận Phòng:
+                    </label>
+                    <input type="date" id="checkInInput" name="checkIn" value="${paramCheckIn}" required class="form-control">
                 </div>
 
-                <!-- Thanh tìm kiếm phòng trung tâm (Search Bar) -->
-                <div
-                    style="background: white; border-radius: 10px; border: 1px solid #d2d6dc; padding: 26px 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
-                    <div style="margin-bottom: 18px; border-bottom: 1px solid #edf2f7; padding-bottom: 12px;">
-                        <h2 style="color: #1a365d; margin: 0; font-size: 18px; font-weight: 700;">
-                            Tìm Kiếm Phòng Nghỉ Phù Hợp
-                        </h2>
-                        <p style="font-size: 13px; color: #718096; margin: 4px 0 0 0;">
-                            Lựa chọn thời gian nhận - trả phòng và số lượng khách để khám phá các phòng khả dụng tốt
-                            nhất.
-                        </p>
-                    </div>
-
-                    <form action="${pageContext.request.contextPath}/customer/search-rooms" method="GET">
-                        <div
-                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; align-items: end;">
-
-                            <!-- Ngày nhận phòng -->
-                            <div>
-                                <label for="checkInInput"
-                                    style="display: block; font-weight: 600; color: #2d3748; margin-bottom: 7px; font-size: 13px;">
-                                    Ngày Nhận Phòng:
-                                </label>
-                                <input type="date" id="checkInInput" name="checkIn" value="${paramCheckIn}" required
-                                    style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; color: #2d3748; box-sizing: border-box;">
-                            </div>
-
-                            <!-- Ngày trả phòng -->
-                            <div>
-                                <label for="checkOutInput"
-                                    style="display: block; font-weight: 600; color: #2d3748; margin-bottom: 7px; font-size: 13px;">
-                                    Ngày Trả Phòng:
-                                </label>
-                                <input type="date" id="checkOutInput" name="checkOut" value="${paramCheckOut}" required
-                                    style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; color: #2d3748; box-sizing: border-box;">
-                            </div>
-
-                            <!-- Số lượng khách -->
-                            <div>
-                                <label for="guestsSelect"
-                                    style="display: block; font-weight: 600; color: #2d3748; margin-bottom: 7px; font-size: 13px;">
-                                    Số Lượng Khách:
-                                </label>
-                                <select id="guestsSelect" name="guests"
-                                    style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; background: white; color: #2d3748; box-sizing: border-box;">
-                                    <option value="">Tất cả sức chứa</option>
-                                    <option value="1">1 người</option>
-                                    <option value="2">2 người</option>
-                                    <option value="3">3 người</option>
-                                    <option value="4">4 người</option>
-                                </select>
-                            </div>
-
-                            <!-- Hạng phòng -->
-                            <div>
-                                <label for="roomTypeSelect"
-                                    style="display: block; font-weight: 600; color: #2d3748; margin-bottom: 7px; font-size: 13px;">
-                                    Hạng Phòng Nghỉ:
-                                </label>
-                                <select id="roomTypeSelect" name="roomType"
-                                    style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; background: white; color: #2d3748; box-sizing: border-box;">
-                                    <option value="ALL">Tất cả hạng phòng</option>
-                                    <c:forEach var="rt" items="${roomTypes}">
-                                        <option value="${rt.maLoaiPhong}">${rt.tenLoaiPhong}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-
-                            <!-- Nút tìm kiếm phòng nổi bật -->
-                            <div>
-                                <button type="submit"
-                                    style="width: 100%; background: #1a365d; color: white; border: none; padding: 11px 18px; font-size: 14px; font-weight: 700; border-radius: 6px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 6px rgba(26, 54, 93, 0.2);"
-                                    onmouseover="this.style.background='#2b6cb0'; this.style.boxShadow='0 4px 12px rgba(26, 54, 93, 0.3)';"
-                                    onmouseout="this.style.background='#1a365d'; this.style.boxShadow='0 2px 6px rgba(26, 54, 93, 0.2)';">
-                                    Tìm Kiếm Phòng
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                <!-- Ngày trả phòng -->
+                <div class="form-group mb-0">
+                    <label for="checkOutInput" class="form-label font-semibold text-secondary text-xs">
+                        Ngày Trả Phòng:
+                    </label>
+                    <input type="date" id="checkOutInput" name="checkOut" value="${paramCheckOut}" required class="form-control">
                 </div>
 
-                <!-- Giới thiệu không gian nghỉ dưỡng & dịch vụ tiêu chuẩn 5 sao -->
-                <div style="margin-bottom: 40px;">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <span
-                            style="color: #c5a880; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px;">
-                            Tiêu Chuẩn Dịch Vụ
-                        </span>
-                        <h2 style="color: #1a365d; margin: 6px 0 10px 0; font-size: 24px; font-weight: 700;">
-                            Trải Nghiệm Nghỉ Dưỡng Hoàn Hảo
-                        </h2>
-                        <p style="color: #718096; max-width: 700px; margin: 0 auto; font-size: 14px; line-height: 1.6;">
-                            Chúng tôi mang đến hệ thống phòng nghỉ thanh lịch, kiến trúc giao thoa giữa nét cổ điển và
-                            hiện đại, cùng chuỗi tiện ích đẳng cấp phục vụ trọn vẹn mọi nhu cầu lưu trú của quý khách.
-                        </p>
-                    </div>
+                <!-- Số lượng khách -->
+                <div class="form-group mb-0">
+                    <label for="guestsSelect" class="form-label font-semibold text-secondary text-xs">
+                        Số Lượng Khách:
+                    </label>
+                    <select id="guestsSelect" name="guests" class="form-control">
+                        <option value="">Tất cả sức chứa</option>
+                        <option value="1">1 người</option>
+                        <option value="2">2 người</option>
+                        <option value="3">3 người</option>
+                        <option value="4">4 người</option>
+                    </select>
+                </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+                <!-- Hạng phòng -->
+                <div class="form-group mb-0">
+                    <label for="roomTypeSelect" class="form-label font-semibold text-secondary text-xs">
+                        Hạng Phòng Nghỉ:
+                    </label>
+                    <select id="roomTypeSelect" name="roomType" class="form-control">
+                        <option value="ALL">Tất cả hạng phòng</option>
+                        <c:forEach var="rt" items="${roomTypes}">
+                            <option value="${rt.maLoaiPhong}">${rt.tenLoaiPhong}</option>
+                        </c:forEach>
+                    </select>
+                </div>
 
-                        <!-- Thẻ tiện ích 1 -->
-                        <div
-                            style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-                            <div
-                                style="font-size: 12px; font-weight: 700; color: #c5a880; text-transform: uppercase; margin-bottom: 6px;">
-                                Không Gian Lưu Trú
-                            </div>
-                            <h3 style="color: #1a365d; font-size: 17px; margin: 0 0 10px 0; font-weight: 700;">
-                                Phòng Nghỉ Sang Trọng & Tiện Nghi
-                            </h3>
-                            <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin: 0;">
-                                Toàn bộ phòng nghỉ đều được trang bị giường đệm cao cấp, ban công thoáng đãng với view
-                                biển hoặc thành phố, phòng tắm đứng hoặc bồn tắm nằm cao cấp cùng hệ thống điều hòa và
-                                Wifi tốc độ cao.
-                            </p>
-                        </div>
-
-                        <!-- Thẻ tiện ích 2 -->
-                        <div
-                            style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-                            <div
-                                style="font-size: 12px; font-weight: 700; color: #c5a880; text-transform: uppercase; margin-bottom: 6px;">
-                                Ẩm Thực Thượng Hạng
-                            </div>
-                            <h3 style="color: #1a365d; font-size: 17px; margin: 0 0 10px 0; font-weight: 700;">
-                                Buffet Sáng & Thực Đơn Á - Âu
-                            </h3>
-                            <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin: 0;">
-                                Thưởng thức bữa sáng tự chọn phong phú tại nhà hàng trung tâm với nguyên liệu tươi ngon
-                                chọn lọc mỗi ngày. Hỗ trợ đặt kèm suất buffet sáng ngay trong quá trình đặt phòng thuận
-                                tiện.
-                            </p>
-                        </div>
-
-                        <!-- Thẻ tiện ích 3 -->
-                        <div
-                            style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-                            <div
-                                style="font-size: 12px; font-weight: 700; color: #c5a880; text-transform: uppercase; margin-bottom: 6px;">
-                                Dịch Vụ Chu Đáo
-                            </div>
-                            <h3 style="color: #1a365d; font-size: 17px; margin: 0 0 10px 0; font-weight: 700;">
-                                Đưa Đón Sân Bay & Giặt Ủi
-                            </h3>
-                            <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin: 0;">
-                                Đội ngũ lễ tân và hỗ trợ trực 24/7. Cung cấp dịch vụ xe đón tiễn sân bay an toàn, dịch
-                                vụ giặt ủi lấy nhanh và hỗ trợ tư vấn các chương trình tham quan địa phương chu đáo.
-                            </p>
-                        </div>
-                    </div>
+                <!-- Nút tìm kiếm phòng nổi bật -->
+                <div class="form-group mb-0">
+                    <button type="submit" class="btn btn-primary w-full py-2 font-bold shadow-sm">
+                        Tìm Kiếm Phòng
+                    </button>
                 </div>
             </div>
+        </form>
+    </div>
 
-            <!-- Thanh giỏ hàng nổi cố định ở chân trang (Bottom Sticky Bar) nếu trong giỏ đã có phòng -->
-            <c:if test="${not empty sessionScope.BOOKING_CART and sessionScope.BOOKING_CART.totalRoomCount > 0}">
-                <div
-                    style="position: fixed; bottom: 0; left: 0; right: 0; background: #1a365d; color: white; padding: 14px 24px; box-shadow: 0 -4px 16px rgba(0,0,0,0.18); z-index: 1000; border-top: 2px solid #c5a880;">
-                    <div
-                        style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                        <div>
-                            <span style="font-size: 15px; font-weight: 700; color: #fbd38d;">
-                                Đơn đặt phòng đang chọn: ${sessionScope.BOOKING_CART.totalRoomCount} phòng
-                            </span>
-                            <span style="margin: 0 8px; color: #718096;">|</span>
-                            <span style="font-size: 14px; color: #e2e8f0;">
-                                Tạm tính:
-                                <strong style="color: #ffffff; font-size: 16px;">
-                                    <fmt:formatNumber value="${sessionScope.BOOKING_CART.grandTotal}" type="number"
-                                        maxFractionDigits="0" /> đ
-                                </strong>
-                            </span>
-                        </div>
-                        <div style="display: flex; gap: 12px; align-items: center;">
-                            <a href="${pageContext.request.contextPath}/customer/cart?action=view"
-                                style="background: #dd6b20; color: white; padding: 9px 18px; border-radius: 5px; text-decoration: none; font-size: 13px; font-weight: 700; transition: background 0.2s;"
-                                onmouseover="this.style.background='#c05621'"
-                                onmouseout="this.style.background='#dd6b20'">
-                                Kiểm Tra Giỏ & Xác Nhận Đặt
-                            </a>
-                        </div>
-                    </div>
+    <!-- Giới thiệu không gian nghỉ dưỡng & dịch vụ tiêu chuẩn 5 sao -->
+    <div class="mb-6">
+        <div class="text-center mb-5">
+            <span class="section-tag">
+                Tiêu Chuẩn Dịch Vụ
+            </span>
+            <h2 class="text-2xl font-bold text-primary mt-1 mb-2">
+                Trải Nghiệm Nghỉ Dưỡng Hoàn Hảo
+            </h2>
+            <p class="text-muted text-sm max-w-xl mx-auto leading-relaxed">
+                Chúng tôi mang đến hệ thống phòng nghỉ thanh lịch, kiến trúc giao thoa giữa nét cổ điển và hiện đại, cùng chuỗi tiện ích đẳng cấp phục vụ trọn vẹn mọi nhu cầu lưu trú của quý khách.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <!-- Thẻ tiện ích 1 -->
+            <div class="customer-feature-card">
+                <div class="text-xs font-bold text-accent uppercase mb-2">
+                    Không Gian Lưu Trú
                 </div>
-            </c:if>
+                <h3 class="text-base font-bold text-primary mb-2">
+                    Phòng Nghỉ Sang Trọng &amp; Tiện Nghi
+                </h3>
+                <p class="text-secondary text-sm leading-relaxed m-0">
+                    Toàn bộ phòng nghỉ đều được trang bị giường đệm cao cấp, ban công thoáng đãng với view biển hoặc thành phố, phòng tắm đứng hoặc bồn tắm nằm cao cấp cùng hệ thống điều hòa và Wifi tốc độ cao.
+                </p>
+            </div>
 
-            <jsp:include page="/views/common/footer.jsp" />
+            <!-- Thẻ tiện ích 2 -->
+            <div class="customer-feature-card">
+                <div class="text-xs font-bold text-accent uppercase mb-2">
+                    Ẩm Thực Thượng Hạng
+                </div>
+                <h3 class="text-base font-bold text-primary mb-2">
+                    Buffet Sáng &amp; Thực Đơn Á - Âu
+                </h3>
+                <p class="text-secondary text-sm leading-relaxed m-0">
+                    Thưởng thức bữa sáng tự chọn phong phú tại nhà hàng trung tâm với nguyên liệu tươi ngon chọn lọc mỗi ngày. Hỗ trợ đặt kèm suất buffet sáng ngay trong quá trình đặt phòng thuận tiện.
+                </p>
+            </div>
+
+            <!-- Thẻ tiện ích 3 -->
+            <div class="customer-feature-card">
+                <div class="text-xs font-bold text-accent uppercase mb-2">
+                    Dịch Vụ Chu Đáo
+                </div>
+                <h3 class="text-base font-bold text-primary mb-2">
+                    Đưa Đón Sân Bay &amp; Giặt Ủi
+                </h3>
+                <p class="text-secondary text-sm leading-relaxed m-0">
+                    Đội ngũ lễ tân và hỗ trợ trực 24/7. Cung cấp dịch vụ xe đón tiễn sân bay an toàn, dịch vụ giặt ủi lấy nhanh và hỗ trợ tư vấn các chương trình tham quan địa phương chu đáo.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thanh giỏ hàng nổi cố định ở chân trang (Bottom Sticky Bar) nếu trong giỏ đã có phòng -->
+<c:if test="${not empty sessionScope.BOOKING_CART and sessionScope.BOOKING_CART.totalRoomCount > 0}">
+    <div class="sticky-cart-bar">
+        <div class="container flex justify-between items-center flex-wrap gap-4">
+            <div>
+                <span class="text-sm font-bold text-warning">
+                    Đơn đặt phòng đang chọn: ${sessionScope.BOOKING_CART.totalRoomCount} phòng
+                </span>
+                <span class="mx-2 opacity-50">|</span>
+                <span class="text-xs text-white opacity-90">
+                    Tạm tính:
+                    <strong class="text-white text-base ml-1">
+                        <fmt:formatNumber value="${sessionScope.BOOKING_CART.grandTotal}" type="number" maxFractionDigits="0" /> đ
+                    </strong>
+                </span>
+            </div>
+            <div class="flex gap-3 items-center">
+                <a href="${pageContext.request.contextPath}/customer/cart?action=view" class="btn btn-primary font-bold text-xs py-2 px-4 shadow-sm">
+                    Kiểm Tra Giỏ &amp; Xác Nhận Đặt
+                </a>
+            </div>
+        </div>
+    </div>
+</c:if>
+
+<jsp:include page="/views/common/footer.jsp" />

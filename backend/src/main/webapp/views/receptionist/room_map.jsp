@@ -1,10 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <jsp:include page="/views/common/header.jsp">
-    <jsp:param name="title" value="Bàn Làm Việc Lễ Tân - Danh Sách & Tình Trạng Phòng" />
+    <jsp:param name="title" value="Bàn Làm Việc Lễ Tân - Danh Sách &amp; Tình Trạng Phòng" />
+    <jsp:param name="zone" value="portal" />
+    <jsp:param name="pageCss" value="receptionist/room_map.css" />
 </jsp:include>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/portal_layout.css">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/receptionist/room_map.css">
 
 <div class="portal-wrapper">
     <!-- Thanh chức năng bên trái -->
@@ -15,42 +16,42 @@
     <!-- Màn hình bên phải -->
     <main class="portal-main">
         <c:if test="${param.depositPaid eq 'true'}">
-            <div class="portal-alert portal-alert-success">
+            <div class="alert alert-success">
                 Đã ghi nhận giữ chỗ và thu tiền đặt cọc thành công cho đơn đặt phòng ${param.bookingSuccess}!
             </div>
         </c:if>
 
         <!-- Thẻ tìm kiếm & danh sách phòng -->
-        <div class="portal-card" style="padding: 0; overflow: hidden;">
-            <div style="padding: 16px 20px; background: #f8fafc; border-bottom: 1px solid var(--portal-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                    <div style="display: inline-flex; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden;">
-                        <a href="${pageContext.request.contextPath}/receptionist/timeline" style="padding: 7px 14px; font-size: 13px; font-weight: 600; text-decoration: none; color: #475569; background: #ffffff;">&#9638; Lưới</a>
-                        <span style="padding: 7px 14px; font-size: 13px; font-weight: 600; background: #0284c7; color: #ffffff;">&#9776; Danh Sách</span>
+        <div class="card card-flush">
+            <div class="card-toolbar">
+                <div class="flex items-center gap-3 flex-wrap">
+                    <div class="flex" style="border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden;">
+                        <a href="${pageContext.request.contextPath}/receptionist/timeline" class="btn btn-secondary btn-sm" style="border-radius: 0;">Lưới Timeline</a>
+                        <span class="btn btn-primary btn-sm" style="border-radius: 0;">Sơ Đồ Phòng</span>
                     </div>
-                    <input type="text" id="filterKeyword" class="portal-input" placeholder="Tìm tên khách, SĐT, số phòng, mã BK..." style="width: 320px;" oninput="applyFilter()">
-                    <button type="button" class="portal-btn portal-btn-secondary" onclick="resetFilter()">Đặt Lại</button>
+                    <input type="text" id="filterKeyword" class="form-control" placeholder="Tìm tên khách, SĐT, số phòng, mã BK..." style="max-width: 320px;" oninput="applyFilter()">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="resetFilter()">Đặt Lại</button>
                 </div>
 
                 <!-- Chú thích trạng thái -->
-                <div style="display: flex; gap: 12px; font-size: 12.5px; align-items: center;">
-                    <span class="badge-pill badge-available">Trống Sẵn Sàng</span>
-                    <span class="badge-pill badge-occupied">Đang Có Khách</span>
-                    <span class="badge-pill badge-cleaning">Đang Dọn</span>
-                    <span class="badge-pill badge-damaged">Hư Hại / Bảo Trì</span>
+                <div class="flex items-center gap-2">
+                    <span class="badge badge-success">Trống Sẵn Sàng</span>
+                    <span class="badge badge-danger">Đang Có Khách</span>
+                    <span class="badge badge-info">Đang Dọn</span>
+                    <span class="badge badge-neutral">Hư Hại / Bảo Trì</span>
                 </div>
             </div>
 
             <!-- Bảng danh sách phòng -->
-            <div class="portal-table-wrapper" style="border: none; border-radius: 0;">
-                <table class="portal-table">
+            <div class="table-wrapper">
+                <table class="table">
                     <thead>
                         <tr>
                             <th style="width: 140px;">Phòng</th>
                             <th>Hạng Phòng</th>
-                            <th style="text-align: center; width: 140px;">Trạng Thái</th>
+                            <th class="text-center" style="width: 140px;">Trạng Thái</th>
                             <th>Thông Tin Lưu Trú / Đặt Trước</th>
-                            <th style="text-align: center; width: 180px;">Thao Tác</th>
+                            <th class="text-center" style="width: 180px;">Thao Tác</th>
                         </tr>
                     </thead>
                     <tbody id="timelineBody">
@@ -58,36 +59,36 @@
                         <c:forEach items="${roomList}" var="r">
                             <c:if test="${r.soTang ne prevFloor}">
                                 <c:set var="prevFloor" value="${r.soTang}" />
-                                <tr class="floor-row" data-floor="T${r.soTang}" style="background: #f1f5f9; font-weight: 700; color: #475569;">
-                                    <td colspan="5" style="padding: 10px 16px; font-size: 13px; text-transform: uppercase;">
+                                <tr class="floor-row" data-floor="T${r.soTang}" style="background: var(--color-surface-alt); font-weight: 700;">
+                                    <td colspan="5" class="text-secondary">
                                         Tầng ${r.soTang}
                                     </td>
                                 </tr>
                             </c:if>
                             <tr class="room-row" data-floor="T${r.soTang}" data-status="${r.trangThaiPhong}" data-room="${r.maPhong}">
                                 <td>
-                                    <strong style="font-size: 15px; color: var(--portal-text-primary);">Phòng ${r.soPhong}</strong>
-                                    <div style="font-size: 11.5px; color: var(--portal-text-muted);">Mã: ${r.maPhong}</div>
+                                    <strong class="text-primary text-md">${r.soPhong}</strong>
+                                    <div class="text-xs text-muted mono">Mã: ${r.maPhong}</div>
                                 </td>
                                 <td>
-                                    <span style="font-weight: 600; color: var(--portal-text-secondary);">${r.tenLoaiPhong}</span>
+                                    <span class="fw-semibold text-secondary">${r.tenLoaiPhong}</span>
                                 </td>
-                                <td style="text-align: center;">
+                                <td class="text-center">
                                     <c:choose>
                                         <c:when test="${r.trangThaiPhong eq 'Available'}">
-                                            <span class="badge-pill badge-available">Trống Sạch</span>
+                                            <span class="badge badge-success">Trống Sạch</span>
                                         </c:when>
                                         <c:when test="${r.trangThaiPhong eq 'Occupied'}">
-                                            <span class="badge-pill badge-occupied">Đang Ở</span>
+                                            <span class="badge badge-danger">Đang Ở</span>
                                         </c:when>
                                         <c:when test="${r.trangThaiPhong eq 'Cleaning' or r.trangThaiPhong eq 'Dirty'}">
-                                            <span class="badge-pill badge-cleaning">Đang Dọn</span>
+                                            <span class="badge badge-info">Đang Dọn</span>
                                         </c:when>
                                         <c:when test="${r.trangThaiPhong eq 'Damaged'}">
-                                            <span class="badge-pill badge-damaged">Hư Hại</span>
+                                            <span class="badge badge-neutral">Hư Hại</span>
                                         </c:when>
                                         <c:otherwise>
-                                            <span class="badge-pill badge-damaged">${r.trangThaiBadgeText}</span>
+                                            <span class="badge badge-neutral">${r.trangThaiBadgeText}</span>
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
@@ -95,38 +96,38 @@
                                     <c:choose>
                                         <c:when test="${not empty r.bookingBars}">
                                             <c:forEach items="${r.bookingBars}" var="bar">
-                                                <div style="font-size: 13px; margin-bottom: 4px;">
-                                                    <strong style="color: var(--portal-primary);">${bar.tenKhachHang}</strong>
-                                                    <span style="color: var(--portal-text-muted);">(${bar.maBooking})</span>: 
-                                                    <span>${bar.ngayNhanDuKien} - ${bar.ngayTraDuKien}</span>
+                                                <div class="text-sm mb-1">
+                                                    <strong class="text-primary">${bar.tenKhachHang}</strong>
+                                                    <span class="text-muted mono">(${bar.maBooking})</span>: 
+                                                    <span class="mono">${bar.ngayNhanDuKien} - ${bar.ngayTraDuKien}</span>
                                                     <c:if test="${bar.trangThaiBooking eq 'CheckedIn'}">
-                                                        <span class="badge-pill badge-occupied" style="font-size: 11px; padding: 1px 6px;">Đang ở</span>
+                                                        <span class="badge badge-danger text-xs ml-1">Đang ở</span>
                                                     </c:if>
                                                 </div>
                                             </c:forEach>
                                         </c:when>
                                         <c:otherwise>
-                                            <span style="color: var(--portal-text-muted); font-size: 13px;">Chưa có khách đặt trong tuần</span>
+                                            <span class="text-muted text-sm">Chưa có khách đặt trong tuần</span>
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
-                                <td style="text-align: center;">
+                                <td class="text-center">
                                     <c:choose>
                                         <c:when test="${not empty r.bookingBars}">
                                             <c:forEach items="${r.bookingBars}" var="bar" end="0">
-                                                <button type="button" class="portal-btn portal-btn-primary" style="padding: 6px 12px; font-size: 12px;"
+                                                <button type="button" class="btn btn-primary btn-sm"
                                                         onclick="handleBookingBarClick('${r.maPhong}', '${r.soPhong}', '${bar.maBooking}', '${bar.tenKhachHang}', '${bar.soDienThoai}', '${bar.soCccd}', '${bar.trangThaiBooking}', '${bar.ngayNhanDuKien}', '${bar.ngayTraDuKien}', '${bar.formattedNgayCheckInThucTe}', '${bar.formattedNgayCheckOutThucTe}')">
                                                     Chi Tiết Đơn
                                                 </button>
                                             </c:forEach>
                                         </c:when>
                                         <c:when test="${r.trangThaiPhong eq 'Available'}">
-                                            <a href="${pageContext.request.contextPath}/receptionist/booking" class="portal-btn portal-btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+                                            <a href="${pageContext.request.contextPath}/receptionist/booking" class="btn btn-secondary btn-sm">
                                                 Đặt Phòng
                                             </a>
                                         </c:when>
                                         <c:otherwise>
-                                            <span style="color: var(--portal-text-muted); font-size: 12px;">--</span>
+                                            <span class="text-muted text-sm">--</span>
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
@@ -134,8 +135,10 @@
                         </c:forEach>
                         <c:if test="${empty roomList}">
                             <tr>
-                                <td colspan="5" style="text-align: center; padding: 36px; color: var(--portal-text-muted);">
-                                    Chưa có dữ liệu phòng nào trong hệ thống.
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <p>Chưa có dữ liệu phòng nào trong hệ thống.</p>
+                                    </div>
                                 </td>
                             </tr>
                         </c:if>
@@ -149,74 +152,108 @@
 <!-- ========================================================================= -->
 <!-- POPUP MODAL NỔI TRUNG TÂM: THÔNG TIN BOOKING & PHÒNG                      -->
 <!-- ========================================================================= -->
-<div id="bookingModal" class="pms-modal-backdrop">
-    <div class="pms-modal-card">
-        <div class="modal-head" id="bookingModalHead" style="padding: 18px 24px; border-bottom: 1px solid var(--portal-border); display: flex; justify-content: space-between; align-items: center;">
-            <h3 id="bookingModalTitle" style="margin: 0; font-size: 16px; font-weight: 700; color: var(--portal-text-primary);">THÔNG TIN CHI TIẾT ĐẶT PHÒNG</h3>
-            <button type="button" class="portal-btn portal-btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="closeModal('bookingModal')">Đóng</button>
+<div id="bookingModal" class="modal-backdrop">
+    <div class="modal-card modal-lg">
+        <div class="modal-head" id="bookingModalHead">
+            <h3 id="bookingModalTitle">Thông Tin Chi Tiết Đặt Phòng</h3>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('bookingModal')">Đóng</button>
         </div>
-        <div class="modal-body" style="padding: 24px;">
+        <div class="modal-body">
             <input type="hidden" id="bmRoomIdVal" value="">
             <input type="hidden" id="bmRoomNoVal" value="">
             <input type="hidden" id="bmBookingIdVal" value="">
-            <div class="detail-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; font-size: 13.5px; background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid var(--portal-border);">
-                <div>Mã Booking: <strong id="bmBookingId">--</strong></div>
-                <div>Phòng bàn giao: <strong id="bmRoomId" style="color: #15803d;">--</strong></div>
-                <div>Khách đại diện: <strong id="bmGuestName">--</strong></div>
-                <div>Số điện thoại: <span id="bmPhone">--</span></div>
-                <div style="grid-column: span 2;">Số CCCD: <span id="bmCccd">--</span></div>
-                <div>Ngày nhận dự kiến: <strong id="bmInDate">--</strong></div>
-                <div>Ngày trả dự kiến: <strong id="bmOutDate">--</strong></div>
-                <div>Ngày nhận thực tế: <strong id="bmActualIn" style="color: #15803d;">___</strong></div>
-                <div>Ngày trả thực tế: <strong id="bmActualOut" style="color: #64748b;">___</strong></div>
+
+            <div class="card mb-4" style="background: var(--color-surface-alt);">
+                <div class="card-body">
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Mã Booking</span>
+                            <span class="detail-value mono" id="bmBookingId">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Phòng bàn giao</span>
+                            <span class="detail-value text-success fw-bold" id="bmRoomId">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Khách đại diện</span>
+                            <span class="detail-value fw-bold text-primary" id="bmGuestName">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Số điện thoại</span>
+                            <span class="detail-value mono" id="bmPhone">--</span>
+                        </div>
+                        <div class="detail-item" style="grid-column: span 2;">
+                            <span class="detail-label">Số CCCD</span>
+                            <span class="detail-value mono" id="bmCccd">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Ngày nhận dự kiến</span>
+                            <span class="detail-value mono" id="bmInDate">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Ngày trả dự kiến</span>
+                            <span class="detail-value mono" id="bmOutDate">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Ngày nhận thực tế</span>
+                            <span class="detail-value text-success mono" id="bmActualIn">___</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Ngày trả thực tế</span>
+                            <span class="detail-value text-muted mono" id="bmActualOut">___</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- DỊCH VỤ PHÁT SINH & THANH TOÁN (Chỉ hiển thị khi phòng Đang lưu trú) -->
+            <!-- DỊCH VỤ PHÁT SINH & THANH TOÁN -->
             <div id="occupiedArea">
-                <div style="font-weight: 700; color: var(--portal-text-primary); margin-bottom: 8px;">DANH SÁCH DỊCH VỤ PHÁT SINH TẠI PHÒNG:</div>
-                <div class="portal-table-wrapper" style="margin-bottom: 12px;">
-                    <table class="portal-table svc-table" id="usedServiceTable">
+                <div class="fw-bold mb-2">DANH SÁCH DỊCH VỤ PHÁT SINH TẠI PHÒNG:</div>
+                <div class="table-wrapper mb-3">
+                    <table class="table" id="usedServiceTable">
                         <thead>
                             <tr>
                                 <th>Tên Dịch Vụ</th>
-                                <th style="width: 60px; text-align: center;">SL</th>
-                                <th style="width: 110px; text-align: right;">Đơn Giá</th>
-                                <th style="width: 120px; text-align: right;">Thành Tiền</th>
+                                <th class="text-center" style="width: 60px;">SL</th>
+                                <th class="text-right" style="width: 120px;">Đơn Giá</th>
+                                <th class="text-right" style="width: 130px;">Thành Tiền</th>
                             </tr>
                         </thead>
                         <tbody id="usedServiceList">
                             <tr>
-                                <td colspan="4" style="text-align: center; color: var(--portal-text-muted); font-style: italic;">Chưa có dịch vụ phát sinh nào cho phòng này.</td>
+                                <td colspan="4" class="text-center text-muted" style="font-style: italic;">Chưa có dịch vụ phát sinh nào cho phòng này.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div style="text-align: right; font-size: 13.5px; margin-bottom: 16px;">
-                    Tổng tiền dịch vụ: <strong style="color: #b91c1c;" id="totalServiceCost">0 đ</strong>
+                <div class="text-right mb-4">
+                    Tổng tiền dịch vụ: <strong class="text-danger mono text-md" id="totalServiceCost">0 đ</strong>
                 </div>
 
-                <div style="padding: 16px; background: #eff6ff; border-radius: 10px; border: 1px solid #bfdbfe; font-size: 13.5px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                        <span>Tiền phòng lưu trú:</span>
-                        <strong id="dtlRoomCost">Tính theo biểu phí phòng</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                        <span>Tiền dịch vụ phát sinh:</span>
-                        <strong style="color: #b91c1c;" id="dtlServiceCostSummary">0 đ</strong>
-                    </div>
-                    <div style="border-top: 1px dashed #bfdbfe; margin: 8px 0;"></div>
-                    <div style="display: flex; justify-content: space-between; font-size: 14px;">
-                        <strong>Tổng thanh toán dự kiến khi Check-out:</strong>
-                        <strong style="color: #1e3a8a;" id="finalBalance">Quyết toán khi trả phòng</strong>
+                <div class="card mb-4" style="background: var(--color-primary-soft); border-color: var(--color-info-border);">
+                    <div class="card-body">
+                        <div class="flex justify-between mb-2">
+                            <span>Tiền phòng lưu trú:</span>
+                            <strong id="dtlRoomCost" class="mono">Tính theo biểu phí phòng</strong>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span>Tiền dịch vụ phát sinh:</span>
+                            <strong class="text-danger mono" id="dtlServiceCostSummary">0 đ</strong>
+                        </div>
+                        <hr style="margin: var(--space-2) 0; border: none; border-top: 1px solid var(--color-border);" />
+                        <div class="flex justify-between text-md">
+                            <strong>Tổng thanh toán dự kiến khi Check-out:</strong>
+                            <strong class="text-primary mono" id="finalBalance">Quyết toán khi trả phòng</strong>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="modal-foot" style="padding: 16px 24px; border-top: 1px solid var(--portal-border); background: #f8fafc; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
-            <a id="btnGoToCheckIn" href="#" class="portal-btn portal-btn-success" style="display: none; text-decoration: none;">Chuyển sang Quầy Check-in</a>
-            <button type="button" id="btnOrderService" class="portal-btn portal-btn-primary" onclick="switchToOrderServiceModal()">Thêm Dịch Vụ Phòng</button>
-            <button type="button" id="btnCheckOut" class="portal-btn portal-btn-danger" onclick="goToCheckOutCashier()">Check-out Trả Phòng</button>
-            <button type="button" class="portal-btn portal-btn-secondary" onclick="closeModal('bookingModal')">Đóng</button>
+        <div class="modal-foot">
+            <a id="btnGoToCheckIn" href="#" class="btn btn-success is-hidden">Chuyển sang Quầy Check-in</a>
+            <button type="button" id="btnOrderService" class="btn btn-primary" onclick="switchToOrderServiceModal()">Thêm Dịch Vụ Phòng</button>
+            <button type="button" id="btnCheckOut" class="btn btn-danger" onclick="goToCheckOutCashier()">Check-out Trả Phòng</button>
+            <button type="button" class="btn btn-secondary" onclick="closeModal('bookingModal')">Đóng</button>
         </div>
     </div>
 </div>
@@ -224,19 +261,19 @@
 <!-- ========================================================================= -->
 <!-- POPUP MODAL: GỌI THÊM ĐỒ ĂN / DỊCH VỤ TẠI PHÒNG                           -->
 <!-- ========================================================================= -->
-<div id="orderServiceModal" class="pms-modal-backdrop">
-    <div class="pms-modal-card">
-        <div class="modal-head" style="padding: 18px 24px; background: #1e3a8a; color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
-            <h3 id="modalOrderServiceTitle" style="margin: 0; font-size: 16px; font-weight: 700; color: #ffffff;">GỌI THÊM ĐỒ UỐNG / DỊCH VỤ TẠI PHÒNG</h3>
-            <button type="button" class="portal-btn portal-btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="closeModal('orderServiceModal')">Đóng</button>
+<div id="orderServiceModal" class="modal-backdrop">
+    <div class="modal-card modal-md">
+        <div class="modal-head">
+            <h3 id="modalOrderServiceTitle">Gọi Thêm Đồ Uống / Dịch Vụ Tại Phòng</h3>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('orderServiceModal')">Đóng</button>
         </div>
-        <div class="modal-body" style="padding: 24px;">
+        <div class="modal-body">
             <input type="hidden" id="ordRoomId" value="">
             <input type="hidden" id="ordBookingId" value="">
 
-            <div style="margin-bottom: 16px;">
-                <label style="font-weight: 700; display: block; margin-bottom: 6px; font-size: 13.5px;">1. Chọn Món / Dịch Vụ Cụ Thể:</label>
-                <select id="serviceSelect" class="portal-input" style="width: 100%; padding: 10px;" onchange="updatePriceCalculation()">
+            <div class="form-group">
+                <label class="form-label">1. Chọn Món / Dịch Vụ Cụ Thể:</label>
+                <select id="serviceSelect" class="form-control" onchange="updatePriceCalculation()">
                     <c:choose>
                         <c:when test="${not empty serviceList}">
                             <c:forEach var="svc" items="${serviceList}" varStatus="status">
@@ -250,42 +287,42 @@
                             <option value="SRV001" data-price="120000" data-unit="Suất">Buffet Sáng Cao Cấp (SRV001) - 120.000 đ/Suất</option>
                             <option value="SRV002" data-price="50000" data-unit="Bộ">Giặt Là Lấy Ngay (SRV002) - 50.000 đ/Bộ</option>
                             <option value="SRV003" data-price="250000" data-unit="Chuyến">Đưa Đón Sân Bay Chu Đáo (SRV003) - 250.000 đ/Chuyến</option>
-                            <option value="SRV004" data-price="350000" data-unit="Lượt">Gói Massage & Spa Thư Giãn (SRV004) - 350.000 đ/Lượt</option>
+                            <option value="SRV004" data-price="350000" data-unit="Lượt">Gói Massage &amp; Spa Thư Giãn (SRV004) - 350.000 đ/Lượt</option>
                             <option value="SRV006" data-price="20000" data-unit="Lon">Nước Ngọt Lon Tiện Lợi (SRV006) - 20.000 đ/Lon</option>
                         </c:otherwise>
                     </c:choose>
                 </select>
             </div>
 
-            <div style="margin-bottom: 16px;">
-                <label style="font-weight: 700; display: block; margin-bottom: 6px; font-size: 13.5px;">2. Số Lượng:</label>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <button type="button" class="portal-btn portal-btn-secondary" onclick="adjustQty(-1)">-</button>
-                    <input type="number" id="orderQty" class="portal-input" value="1" min="1" max="20" style="width: 70px; text-align: center; font-weight: 700;" onchange="updatePriceCalculation()">
-                    <button type="button" class="portal-btn portal-btn-secondary" onclick="adjustQty(1)">+</button>
-                    <span id="unitText" style="color: var(--portal-text-muted); font-weight: 600;">(Lon)</span>
+            <div class="form-group">
+                <label class="form-label">2. Số Lượng:</label>
+                <div class="flex items-center gap-2">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="adjustQty(-1)">-</button>
+                    <input type="number" id="orderQty" class="form-control text-center fw-bold" value="1" min="1" max="20" style="width: 70px;" onchange="updatePriceCalculation()">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="adjustQty(1)">+</button>
+                    <span id="unitText" class="text-muted fw-semibold">(Lon)</span>
                 </div>
             </div>
 
-            <div style="background: #f8fafc; border: 1px solid var(--portal-border); padding: 14px; border-radius: 8px; margin-bottom: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 13px; color: var(--portal-text-secondary);">Thành tiền tạm tính:</span>
-                    <strong id="subtotalText" style="font-size: 18px; color: var(--portal-primary);">30.000 đ</strong>
+            <div class="card mb-4" style="background: var(--color-surface-alt);">
+                <div class="card-body flex justify-between items-center" style="padding: var(--space-3) var(--space-4);">
+                    <span class="text-secondary text-sm">Thành tiền tạm tính:</span>
+                    <strong id="subtotalText" class="text-primary text-xl mono">30.000 đ</strong>
                 </div>
             </div>
 
-            <div style="margin-bottom: 16px;">
-                <label style="font-weight: 700; display: block; margin-bottom: 6px; font-size: 13.5px;">3. Ghi Chú Bổ Sung:</label>
-                <input type="text" id="orderNote" class="portal-input" style="width: 100%; box-sizing: border-box;" placeholder="Ví dụ: Khách gọi từ điện thoại phòng, xin thêm 1 xô đá lạnh...">
+            <div class="form-group">
+                <label class="form-label">3. Ghi Chú Bổ Sung:</label>
+                <input type="text" id="orderNote" class="form-control" placeholder="Ví dụ: Khách gọi từ điện thoại phòng, xin thêm 1 xô đá lạnh...">
             </div>
 
-            <div style="color: var(--portal-text-muted); font-size: 12.5px;">
+            <div class="text-xs text-muted">
                 Lưu ý: Tiền dịch vụ sẽ tự động ghi vào CSDL và cộng dồn vào hóa đơn thanh toán khi trả phòng.
             </div>
         </div>
-        <div class="modal-foot" style="padding: 16px 24px; border-top: 1px solid var(--portal-border); background: #f8fafc; display: flex; justify-content: flex-end; gap: 8px;">
-            <button type="button" class="portal-btn portal-btn-primary" onclick="saveServiceOrderReal()">Lưu Dịch Vụ Vào Phòng</button>
-            <button type="button" class="portal-btn portal-btn-secondary" onclick="backToRoomDetail()">Quay Lại</button>
+        <div class="modal-foot">
+            <button type="button" class="btn btn-primary" onclick="saveServiceOrderReal()">Lưu Dịch Vụ Vào Phòng</button>
+            <button type="button" class="btn btn-secondary" onclick="backToRoomDetail()">Quay Lại</button>
         </div>
     </div>
 </div>
