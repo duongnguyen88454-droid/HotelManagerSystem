@@ -4,8 +4,11 @@
 -- HỆ QUẢN TRỊ CSDL: MICROSOFT SQL SERVER 2019 / 2022
 -- ============================================================================
 USE QuanLyKhachSan;
+GO
 
-
+SET ANSI_NULLS ON;
+GO
+SET QUOTED_IDENTIFIER ON;
 GO
 -- ============================================================================
 -- PROCEDURE 1: ĐẶT PHÒNG (CHO CẢ WEBSITE VÀ LỄ TÂN TẠI QUẦY)

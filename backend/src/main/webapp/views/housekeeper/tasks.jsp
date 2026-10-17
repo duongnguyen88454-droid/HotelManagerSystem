@@ -53,7 +53,7 @@
         <!-- Banner cảnh báo nếu đang có 1 phòng dọn dở -->
         <c:if test="${not empty currentActiveTask}">
             <div class="alert alert-info">
-                Bạn đang tiến hành dọn dẹp <strong>Phòng ${currentActiveTask.soPhong}</strong>. Vui lòng bấm <strong>Hoàn Tất Dọn Phòng</strong> để hoàn tất trước khi nhận thêm phòng mới.
+                Bạn đang tiến hành dọn dẹp <strong>${currentActiveTask.soPhong}</strong>. Vui lòng bấm <strong>Hoàn Tất Dọn Phòng</strong> để hoàn tất trước khi nhận thêm phòng mới.
             </div>
         </c:if>
 
@@ -101,7 +101,7 @@
                                                 data-status="${dmg.trangThai}">
                                                 <td><strong class="text-primary">#${dmg.maBaoCao}</strong></td>
                                                 <td>
-                                                    <div class="font-bold text-main">Phòng ${dmg.soPhong}</div>
+                                                    <div class="font-bold text-main">${dmg.soPhong}</div>
                                                     <div class="text-muted text-xs">${dmg.tenLoaiPhong}</div>
                                                 </td>
                                                 <td>
@@ -210,28 +210,25 @@
                                                 data-date="${fmtEndDateOnly}">
                                                 <!-- Cột 1: Thông tin phòng -->
                                                 <td>
-                                                    <div class="font-bold text-main">Phòng ${task.soPhong}</div>
+                                                    <div class="font-bold text-main">${task.soPhong}</div>
                                                     <div class="text-secondary text-sm">${task.tenLoaiPhong}</div>
                                                     <div class="text-muted text-xs mt-1">Mã NV: #${task.maNhiemVu}</div>
                                                 </td>
 
-                                                <!-- Cột 2: Tình trạng phòng -->
+                                                <!-- Cột 2: Tình trạng nhiệm vụ -->
                                                 <td class="text-center">
                                                     <c:choose>
-                                                        <c:when test="${task.trangThaiPhong == 'Dirty'}">
-                                                            <span class="badge badge-warning badge-pill badge-cleaning">Chưa Dọn (Dirty)</span>
+                                                        <c:when test="${task.trangThaiNhiemVu == 'DaHoanThanh' || task.trangThaiNhiemVu == 'Completed'}">
+                                                            <span class="badge badge-success badge-pill badge-available">Đã Hoàn Tất</span>
                                                         </c:when>
-                                                        <c:when test="${task.trangThaiPhong == 'Cleaning'}">
+                                                        <c:when test="${task.trangThaiNhiemVu == 'DangDon' || task.trangThaiNhiemVu == 'InProgress'}">
                                                             <span class="badge badge-info badge-pill badge-partial">Đang Dọn (Cleaning)</span>
                                                         </c:when>
-                                                        <c:when test="${task.trangThaiPhong == 'Available'}">
-                                                            <span class="badge badge-success badge-pill badge-available">Đã Sạch (Available)</span>
-                                                        </c:when>
-                                                        <c:when test="${task.trangThaiPhong == 'Damaged'}">
-                                                            <span class="badge badge-danger badge-pill badge-damaged">Hư Hại (Damaged)</span>
+                                                        <c:when test="${task.trangThaiNhiemVu == 'ChoXuLy' || task.trangThaiNhiemVu == 'Pending'}">
+                                                            <span class="badge badge-warning badge-pill badge-cleaning">Chờ Dọn (Dirty)</span>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <span class="badge badge-neutral badge-pill badge-damaged">${task.trangThaiPhong}</span>
+                                                            <span class="badge badge-neutral badge-pill badge-damaged">${task.trangThaiNhiemVu}</span>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
@@ -276,39 +273,7 @@
                                                 <!-- Cột 5: Thao tác (Hành động) -->
                                                 <td class="text-center">
                                                     <c:choose>
-                                                        <c:when test="${task.trangThaiNhiemVu == 'ChoXuLy' || task.trangThaiNhiemVu == 'Pending' || task.trangThaiPhong == 'Dirty'}">
-                                                            <c:choose>
-                                                                <c:when test="${not empty currentActiveTask}">
-                                                                    <button type="button" class="btn btn-outline btn-sm" disabled style="opacity: 0.6; cursor: not-allowed;">
-                                                                        Nhận Việc &amp; Dọn
-                                                                    </button>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <form action="${pageContext.request.contextPath}/housekeeper/task-action" method="POST" class="inline">
-                                                                        <input type="hidden" name="action" value="start" />
-                                                                        <input type="hidden" name="maNhiemVu" value="${task.maNhiemVu}" />
-                                                                        <button type="submit" class="btn btn-primary btn-sm">
-                                                                            Nhận Việc &amp; Dọn
-                                                                        </button>
-                                                                    </form>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </c:when>
-                                                        <c:when test="${task.trangThaiNhiemVu == 'DangDon' || task.trangThaiNhiemVu == 'InProgress' || task.trangThaiPhong == 'Cleaning'}">
-                                                            <c:choose>
-                                                                <c:when test="${empty task.maNV || task.maNV == sessionScope.CURRENT_USER.maDinhDanh || task.maNV == sessionScope.CURRENT_USER.maTaiKhoan}">
-                                                                    <button type="button" class="btn btn-success btn-sm"
-                                                                            onclick="openInspectionModal('${task.maNhiemVu}', '${task.soPhong}', '${task.tenLoaiPhong}')">
-                                                                        Hoàn Tất Dọn Phòng
-                                                                    </button>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <span class="text-muted text-xs italic">
-                                                                        Đang được dọn bởi nhân viên khác
-                                                                    </span>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </c:when>
+                                                        <%-- 1. Nhiệm vụ đã hoàn tất hoặc trong Tab Lịch Sử Của Tôi --%>
                                                         <c:when test="${task.trangThaiNhiemVu == 'DaHoanThanh' || task.trangThaiNhiemVu == 'Completed' || currentStatus == 'MyHistory'}">
                                                             <div class="flex flex-col items-center gap-1">
                                                                 <c:choose>
@@ -339,6 +304,44 @@
                                                                 </button>
                                                             </div>
                                                         </c:when>
+
+                                                        <%-- 2. Nhiệm vụ đang dọn dẹp --%>
+                                                        <c:when test="${task.trangThaiNhiemVu == 'DangDon' || task.trangThaiNhiemVu == 'InProgress'}">
+                                                            <c:choose>
+                                                                <c:when test="${empty task.maNV || task.maNV == sessionScope.CURRENT_USER.maDinhDanh || task.maNV == sessionScope.CURRENT_USER.maTaiKhoan}">
+                                                                    <button type="button" class="btn btn-success btn-sm"
+                                                                            onclick="openInspectionModal('${task.maNhiemVu}', '${task.soPhong}', '${task.tenLoaiPhong}')">
+                                                                        Hoàn Tất Dọn Phòng
+                                                                    </button>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="text-muted text-xs italic">
+                                                                        Đang được dọn bởi nhân viên khác
+                                                                    </span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </c:when>
+
+                                                        <%-- 3. Nhiệm vụ chờ dọn dẹp --%>
+                                                        <c:when test="${task.trangThaiNhiemVu == 'ChoXuLy' || task.trangThaiNhiemVu == 'Pending'}">
+                                                            <c:choose>
+                                                                <c:when test="${not empty currentActiveTask}">
+                                                                    <button type="button" class="btn btn-outline btn-sm" disabled style="opacity: 0.6; cursor: not-allowed;" title="Vui lòng hoàn tất phòng đang dọn trước khi nhận thêm">
+                                                                        Nhận Việc &amp; Dọn
+                                                                    </button>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <form action="${pageContext.request.contextPath}/housekeeper/task-action" method="POST" class="inline">
+                                                                        <input type="hidden" name="action" value="start" />
+                                                                        <input type="hidden" name="maNhiemVu" value="${task.maNhiemVu}" />
+                                                                        <button type="submit" class="btn btn-primary btn-sm">
+                                                                            Nhận Việc &amp; Dọn
+                                                                        </button>
+                                                                    </form>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </c:when>
+
                                                         <c:otherwise>
                                                             <span class="text-muted">-</span>
                                                         </c:otherwise>
