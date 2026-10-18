@@ -181,12 +181,11 @@ public class ManagerHotelConfigServlet extends HttpServlet {
     }
 
     private void handleAddRoom(HttpServletRequest request, HttpSession session) {
-        String roomId = request.getParameter("roomId");
         String roomTypeId = request.getParameter("roomTypeId");
         String roomName = request.getParameter("roomName");
-        boolean success = roomService.addPhysicalRoom(roomId, roomTypeId, roomName);
+        boolean success = roomService.addPhysicalRoom(roomTypeId, roomName);
         setFlash(session, success, "Đã thêm phòng vật lý mới thành công!",
-                "Không thể thêm phòng (có thể trùng mã phòng hoặc dữ liệu không hợp lệ)!");
+                "Không thể thêm phòng (có thể trùng tên phòng hoặc dữ liệu không hợp lệ)!");
     }
 
     private void handleUpdateRoomStatus(HttpServletRequest request, HttpSession session) {

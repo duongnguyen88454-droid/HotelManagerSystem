@@ -2,6 +2,7 @@ package com.mycompany.hotelmanagersystem.manager.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * DTO dữ liệu báo cáo Doanh Thu Hóa Đơn cho Manager.
@@ -25,9 +26,9 @@ public class InvoiceRevenueItemDTO {
     }
 
     public InvoiceRevenueItemDTO(String invoiceId, String bookingId, String customerName,
-                                 String roomNames, LocalDateTime createDate, BigDecimal deposit,
-                                 BigDecimal roomCharge, BigDecimal serviceCharge, BigDecimal surcharge,
-                                 BigDecimal finalTotalAmount, BigDecimal paidAmount, String invoiceStatus) {
+            String roomNames, LocalDateTime createDate, BigDecimal deposit,
+            BigDecimal roomCharge, BigDecimal serviceCharge, BigDecimal surcharge,
+            BigDecimal finalTotalAmount, BigDecimal paidAmount, String invoiceStatus) {
         this.invoiceId = invoiceId;
         this.bookingId = bookingId;
         this.customerName = customerName;
@@ -80,6 +81,12 @@ public class InvoiceRevenueItemDTO {
 
     public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
+    }
+
+    public String getFormattedCreateDate() {
+        return (createDate != null)
+                ? createDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                : "";
     }
 
     public BigDecimal getDeposit() {

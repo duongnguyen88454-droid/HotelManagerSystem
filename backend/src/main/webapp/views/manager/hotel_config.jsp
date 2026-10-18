@@ -45,16 +45,16 @@
                 1. Hạng Phòng và Biểu Phí
             </button>
             <button type="button" onclick="switchTab('tab-bedtype')" id="btn-tab-bedtype" class="tab-item">
-                2. Loại Giường (BedType)
+                2. Loại Giường
             </button>
             <button type="button" onclick="switchTab('tab-amenity')" id="btn-tab-amenity" class="tab-item">
                 3. Tiện Nghi Buồng Phòng
             </button>
             <button type="button" onclick="switchTab('tab-service')" id="btn-tab-service" class="tab-item">
-                4. Dịch Vụ Bổ Sung (Service)
+                4. Dịch Vụ Bổ Sung
             </button>
             <button type="button" onclick="switchTab('tab-room')" id="btn-tab-room" class="tab-item">
-                5. Quản Lý Phòng Vật Lý (Rooms)
+                5. Quản Lý Phòng Vật Lý
             </button>
         </div>
 
@@ -166,7 +166,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: LOẠI GIƯỜNG (BEDTYPE) -->
+        <!-- TAB 2: LOẠI GIƯỜNG -->
         <div id="tab-bedtype" class="config-tab-content">
             <div class="grid-sidebar-content">
                 <!-- Form Thêm Loại Giường -->
@@ -188,7 +188,7 @@
                 <div class="card p-0">
                     <div class="card-toolbar">
                         <h3 class="card-title">
-                            Danh Sách Loại Giường Khách Sạn (Bảng BedType - 3NF)
+                            Danh Sách Loại Giường Khách Sạn
                         </h3>
                     </div>
                     <div class="table-wrapper">
@@ -262,7 +262,7 @@
                 <div class="card p-0">
                     <div class="card-toolbar">
                         <h3 class="card-title">
-                            Danh Sách Tiện Nghi Trang Bị Buồng Phòng (Bảng RoomService - 3NF)
+                            Danh Sách Tiện Nghi Trang Bị Buồng Phòng
                         </h3>
                     </div>
                     <div class="table-wrapper">
@@ -314,7 +314,7 @@
             </div>
         </div>
 
-        <!-- TAB 4: DỊCH VỤ BỔ SUNG (SERVICE) -->
+        <!-- TAB 4: DỊCH VỤ BỔ SUNG -->
         <div id="tab-service" class="config-tab-content">
             <!-- Form ẩn cập nhật từng dịch vụ tiêu dùng đặt ngoài bảng -->
             <c:forEach var="s" items="${services}">
@@ -348,7 +348,7 @@
                 <div class="card p-0">
                     <div class="card-toolbar">
                         <h3 class="card-title">
-                            Danh Mục Dịch Vụ Tiêu Dùng Phục Vụ Khách (Bảng Service - 3NF)
+                            Danh Mục Dịch Vụ Tiêu Dùng Phục Vụ Khách
                         </h3>
                     </div>
                     <div class="table-wrapper">
@@ -418,15 +418,10 @@
                         <input type="hidden" name="action" value="add_room" />
                         <div class="form-group mb-3">
                             <label class="form-label">
-                                Mã Phòng (Số phòng) <span class="text-danger">*</span>
+                                Tên / Số Phòng <span class="text-danger">*</span>
                             </label>
-                            <input type="text" name="roomId" placeholder="Ví dụ: P104, P205" required maxlength="20" class="form-control uppercase" />
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="form-label">
-                                Tên Hiển Thị Phòng <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" name="roomName" placeholder="Ví dụ: Phòng 104, Phòng 205" required maxlength="100" class="form-control" />
+                            <input type="text" name="roomName" placeholder="Ví dụ: 101 hoặc Phòng 101" required maxlength="50" class="form-control" />
+                            <span class="text-muted text-xs mt-1 block">Mã phòng sẽ do hệ thống tự động sinh (Ví dụ: RM001).</span>
                         </div>
                         <div class="form-group mb-4">
                             <label class="form-label">
@@ -435,7 +430,7 @@
                             <select name="roomTypeId" required class="form-control">
                                 <option value="">-- Chọn Hạng Phòng --</option>
                                 <c:forEach var="rt" items="${roomTypes}">
-                                    <option value="${rt.maLoaiPhong}">${rt.tenLoaiPhong} (${rt.maLoaiPhong})</option>
+                                    <option value="${rt.maLoaiPhong}">${rt.tenLoaiPhong}</option>
                                 </c:forEach>
                             </select>
                         </div>
@@ -450,7 +445,7 @@
                     <div class="card-toolbar">
                         <div>
                             <h3 class="card-title">
-                                Danh Sách Phòng Vật Lý Trong Khách Sạn (Bảng Room)
+                                Danh Sách Phòng Vật Lý Trong Khách Sạn
                             </h3>
                             <p class="text-muted text-xs mt-1">
                                 Quản lý số phòng thực tế, trạng thái vận hành, tình trạng buồng phòng và khách cư trú.
@@ -504,9 +499,9 @@
                                         </td>
                                         <td class="text-center">
                                             <select form="form-room-${rm.roomId}" name="roomStatus" class="form-control text-xs" style="width: 170px; display: inline-block;">
-                                                <option value="Available" ${rm.roomStatus == 'Available' ? 'selected="selected"' : ''}>Hoạt Động (Available)</option>
-                                                <option value="Maintenance" ${rm.roomStatus == 'Maintenance' ? 'selected="selected"' : ''}>Bảo Trì (Maintenance)</option>
-                                                <option value="OutOfService" ${rm.roomStatus == 'OutOfService' ? 'selected="selected"' : ''}>Ngưng Dùng (OutOfService)</option>
+                                                <option value="Available" ${rm.roomStatus == 'Available' ? 'selected="selected"' : ''}>Hoạt Động</option>
+                                                <option value="Maintenance" ${rm.roomStatus == 'Maintenance' ? 'selected="selected"' : ''}>Bảo Trì</option>
+                                                <option value="OutOfService" ${rm.roomStatus == 'OutOfService' ? 'selected="selected"' : ''}>Ngưng Dùng</option>
                                             </select>
                                         </td>
                                         <td class="text-center">
@@ -531,7 +526,7 @@
 <div id="addRoomTypeModal" class="modal-backdrop portal-modal-backdrop" style="display: none;">
     <div class="modal-card max-w-lg" style="width: 680px; max-width: 95%; max-height: 90vh; overflow-y: auto;">
         <div class="modal-header">
-            <h3 class="modal-title">Thêm Hạng Phòng Mới (RoomType)</h3>
+            <h3 class="modal-title">Thêm Hạng Phòng Mới</h3>
             <button type="button" onclick="closeAddRoomTypeModal()" class="modal-close">&times;</button>
         </div>
 

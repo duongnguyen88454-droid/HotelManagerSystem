@@ -1,5 +1,6 @@
 package com.mycompany.hotelmanagersystem.manager.dto;
 
+import java.time.format.DateTimeFormatter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -22,8 +23,8 @@ public class PaymentReceiptItemDTO {
     }
 
     public PaymentReceiptItemDTO(String paymentId, String invoiceId, String bookingId,
-                                 String customerName, LocalDateTime paymentDate, String paymentMethod,
-                                 String staffName, BigDecimal totalAmount, String note) {
+            String customerName, LocalDateTime paymentDate, String paymentMethod,
+            String staffName, BigDecimal totalAmount, String note) {
         this.paymentId = paymentId;
         this.invoiceId = invoiceId;
         this.bookingId = bookingId;
@@ -73,6 +74,12 @@ public class PaymentReceiptItemDTO {
 
     public void setPaymentDate(LocalDateTime paymentDate) {
         this.paymentDate = paymentDate;
+    }
+
+    public String getFormattedPaymentDate() {
+        return (paymentDate != null)
+                ? paymentDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                : "";
     }
 
     public String getPaymentMethod() {

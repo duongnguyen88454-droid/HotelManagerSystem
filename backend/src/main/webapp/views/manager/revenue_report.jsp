@@ -74,9 +74,6 @@
                     <button type="submit" class="btn btn-primary btn-sm">
                         Tải Lại
                     </button>
-                    <button type="button" class="btn btn-success btn-sm" onclick="exportTableToExcel('reportDataTable', 'BaoCao_${reportType}_${fromDate}_${toDate}');">
-                        Xuất Excel
-                    </button>
                 </div>
             </form>
         </div>
@@ -105,15 +102,15 @@
                             <tr>
                                 <th>Mã Hóa Đơn</th>
                                 <th>Khách Hàng</th>
-                                <th>Phòng</th>
-                                <th>Ngày Lập</th>
+                                <th style="min-width: 140px;">Phòng</th>
+                                <th style="min-width: 130px;">Ngày Lập</th>
                                 <th class="text-right">Đặt Trước</th>
                                 <th class="text-right">Tiền Phòng</th>
                                 <th class="text-right">Dịch Vụ</th>
                                 <th class="text-right">Phụ Thu</th>
                                 <th class="text-right">Tổng Tiền</th>
                                 <th class="text-right text-success">Thực Thu</th>
-                                <th class="text-center">Trạng Thái</th>
+                                <th class="text-center" style="min-width: 130px;">Trạng Thái</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -151,8 +148,8 @@
                                                 <strong class="text-primary">${inv.invoiceId}</strong>
                                             </td>
                                             <td class="font-semibold">${inv.customerName}</td>
-                                            <td class="text-secondary text-sm">${inv.roomNames}</td>
-                                            <td class="text-muted text-xs">${inv.createDate}</td>
+                                            <td class="text-secondary text-sm" style="min-width: 140px; white-space: normal; word-break: keep-all;">${inv.roomNames}</td>
+                                            <td class="text-muted text-xs mono nowrap">${inv.formattedCreateDate}</td>
                                             <td class="text-right mono">
                                                 <fmt:formatNumber value="${inv.deposit}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
@@ -171,16 +168,16 @@
                                             <td class="text-right font-bold text-success mono">
                                                 <fmt:formatNumber value="${inv.paidAmount}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center" style="min-width: 130px;">
                                                 <c:choose>
                                                     <c:when test="${inv.invoiceStatus eq 'Paid'}">
-                                                        <span class="badge badge-success badge-pill badge-available">Đã Quyết Toán</span>
+                                                        <span class="badge badge-success badge-pill badge-available nowrap">Đã Quyết Toán</span>
                                                     </c:when>
                                                     <c:when test="${inv.invoiceStatus eq 'PartiallyPaid'}">
-                                                        <span class="badge badge-warning badge-pill badge-cleaning">Một Phần</span>
+                                                        <span class="badge badge-warning badge-pill badge-cleaning nowrap">Một Phần</span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="badge badge-danger badge-pill badge-occupied">Chưa Thanh Toán</span>
+                                                        <span class="badge badge-danger badge-pill badge-occupied nowrap">Chưa Thanh Toán</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
@@ -224,7 +221,7 @@
                         <thead>
                             <tr>
                                 <th>Mã Phòng</th>
-                                <th>Tên Phòng (Số Phòng)</th>
+                                <th>Tên Phòng</th>
                                 <th>Hạng Phòng</th>
                                 <th class="text-right">Đơn Giá Niêm Yết</th>
                                 <th class="text-center">Số Lượt Đặt</th>
@@ -407,7 +404,7 @@
                                             <td class="font-semibold text-main">${pay.invoiceId}</td>
                                             <td class="text-secondary text-sm">${pay.bookingId}</td>
                                             <td class="font-semibold">${pay.customerName}</td>
-                                            <td class="text-muted text-xs">${pay.paymentDate}</td>
+                                            <td class="text-muted text-xs mono nowrap">${pay.formattedPaymentDate}</td>
                                             <td>
                                                 <span class="badge badge-success badge-pill badge-available">${pay.paymentMethod}</span>
                                             </td>
@@ -441,7 +438,7 @@
     </main>
 </div>
 
-<!-- JAVASCRIPT PHÂN TRANG 10 DÒNG/TRANG & XUẤT EXCEL THUẦN -->
+<!-- JAVASCRIPT PHÂN TRANG 10 DÒNG/TRANG -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     initTablePagination();
@@ -543,32 +540,6 @@ function initTablePagination() {
     }
 
     showPage(1);
-}
-
-function exportTableToExcel(tableId, filename) {
-    var table = document.getElementById(tableId);
-    if (!table) {
-        alert("Không tìm thấy bảng dữ liệu để xuất!");
-        return;
-    }
-
-    var html = table.outerHTML;
-    var template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">'
-                 + '<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>'
-                 + '<x:Name>BaoCao</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>'
-                 + '<body>' + html + '</body></html>';
-
-    var blob = new Blob(["\ufeff", template], {
-        type: "application/vnd.ms-excel;charset=utf-8"
-    });
-
-    var downloadUrl = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = downloadUrl;
-    a.download = (filename || "BaoCaoDoanhThu") + ".xls";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
 }
 </script>
 

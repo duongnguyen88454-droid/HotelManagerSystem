@@ -143,7 +143,7 @@
                     <div>
                         <h4 class="card-title mb-2">Cấu Hình Khách Sạn &amp; Biểu Phí</h4>
                         <p class="text-muted text-sm leading-relaxed mb-4">
-                            Điều chỉnh giá phòng, phụ phí nhận sớm/trả muộn, % cọc, danh mục loại giường (BedType), tiện nghi và dịch vụ tiêu dùng.
+                            Điều chỉnh giá phòng, phụ phí nhận sớm/trả muộn, % cọc, danh mục loại giường, tiện nghi và dịch vụ tiêu dùng.
                         </p>
                     </div>
                     <a href="${pageContext.request.contextPath}/manager/hotel-config" class="btn btn-outline">

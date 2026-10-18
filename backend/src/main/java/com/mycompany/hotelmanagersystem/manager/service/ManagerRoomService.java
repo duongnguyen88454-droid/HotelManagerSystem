@@ -36,19 +36,22 @@ public class ManagerRoomService {
 
     /**
      * Thêm một phòng vật lý mới vào hệ thống.
+     * Mã phòng do CSDL tự động sinh (RM001, RM002...).
      *
-     * @param roomId mã định danh phòng (ví dụ P104)
      * @param roomTypeId mã hạng phòng
-     * @param roomName tên hiển thị phòng (ví dụ Phòng 104)
+     * @param roomName tên hiển thị phòng (ví dụ 101 hoặc Phòng 101)
      * @return true nếu thêm thành công
      */
-    public boolean addPhysicalRoom(String roomId, String roomTypeId, String roomName) {
-        if (roomId == null || roomId.trim().isEmpty()
-                || roomTypeId == null || roomTypeId.trim().isEmpty()
+    public boolean addPhysicalRoom(String roomTypeId, String roomName) {
+        if (roomTypeId == null || roomTypeId.trim().isEmpty()
                 || roomName == null || roomName.trim().isEmpty()) {
             return false;
         }
-        return roomDAO.createRoom(roomId.trim().toUpperCase(), roomTypeId.trim(), roomName.trim());
+        String cleanName = roomName.trim();
+        String formattedName = (cleanName.toLowerCase().startsWith("phòng") || cleanName.toLowerCase().startsWith("phong"))
+                ? cleanName
+                : "Phòng " + cleanName;
+        return roomDAO.createRoom(roomTypeId.trim(), formattedName);
     }
 
     /**

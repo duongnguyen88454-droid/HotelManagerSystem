@@ -5,9 +5,11 @@ import com.mycompany.hotelmanagersystem.common.base.RowMapper;
 import com.mycompany.hotelmanagersystem.common.config.DBContext;
 import com.mycompany.hotelmanagersystem.manager.dto.PhysicalRoomDTO;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 /**
@@ -66,20 +68,23 @@ public class ManagerRoomDAO extends BaseRepository<PhysicalRoomDTO, String> {
     }
 
     /**
-     * Tạo mới một phòng vật lý trong khách sạn.
+     * Tạo mới một phòng vật lý trong khách sạn qua Stored Procedure dbo.sp_ThemPhong.
+     * CSDL tự động gọi fn_SinhMaRoom() để sinh mã phòng RM... tự tăng.
      *
-     * @param roomId mã phòng (ví dụ P104)
      * @param roomTypeId mã hạng phòng
-     * @param roomName tên hiển thị phòng (ví dụ Phòng 104)
+     * @param roomName tên hiển thị phòng (ví dụ Phòng 101)
      * @return true nếu tạo thành công
      */
-    public boolean createRoom(String roomId, String roomTypeId, String roomName) {
+    public boolean createRoom(String roomTypeId, String roomName) {
+        String callSql = "{call dbo.sp_ThemPhong(?, ?, ?)}";
         try (Connection conn = DBContext.getConnection(getRole());
-             PreparedStatement ps = conn.prepareStatement(INSERT_ROOM_SQL)) {
-            ps.setString(1, roomId);
-            ps.setString(2, roomTypeId);
-            ps.setString(3, roomName);
-            return ps.executeUpdate() > 0;
+             CallableStatement cs = conn.prepareCall(callSql)) {
+            cs.setString(1, roomTypeId);
+            cs.setString(2, roomName);
+            cs.registerOutParameter(3, Types.VARCHAR);
+            cs.execute();
+            String newRoomId = cs.getString(3);
+            return newRoomId != null && !newRoomId.trim().isEmpty();
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;

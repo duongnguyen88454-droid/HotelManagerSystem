@@ -7,8 +7,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Quản lý kết nối cơ sở dữ liệu (JDBC Connection) phân quyền thuần túy theo Role (RBAC).
- * Bắt buộc mọi kết nối phải chỉ định vai trò nghiệp vụ (Manager, Receptionist, Housekeeper, Customer).
+ * Quản lý kết nối cơ sở dữ liệu (JDBC Connection) phân quyền thuần túy theo
+ * Role (RBAC).
+ * Bắt buộc mọi kết nối phải chỉ định vai trò nghiệp vụ (Manager, Receptionist,
+ * Housekeeper, Customer).
  */
 public class DBContext {
 
@@ -17,19 +19,10 @@ public class DBContext {
         String port = EnvConfig.get("DB_PORT", "1433");
         String database = EnvConfig.get("DB_NAME", "QuanLyKhachSan");
         return String.format(
-                "jdbc:sqlserver://%s:%s;databaseName=%s;encrypt=false;trustServerCertificate=true;characterEncoding=UTF-8",
+                "jdbc:sqlserver://%s:%s;databaseName=%s;encrypt=false;trustServerCertificate=true;characterEncoding=UTF-8;sendStringParametersAsUnicode=true",
                 server, port, database);
     }
 
-    /**
-     * Mở kết nối CSDL phân quyền thuần túy theo vai trò nghiệp vụ (RBAC).
-     * BẮT BUỘC phải chỉ định vai trò hợp lệ, không cho phép dùng tài khoản mặc định.
-     *
-     * @param role Tên vai trò (Manager, Receptionist, Housekeeper, Customer)
-     * @return Connection gắn liền với quyền hạn của vai trò đó trong SQL Server
-     * @throws ClassNotFoundException nếu thiếu driver JDBC
-     * @throws SQLException nếu kết nối thất bại
-     */
     public static Connection getConnection(String role) throws ClassNotFoundException, SQLException {
         if (role == null || role.trim().isEmpty()) {
             throw new IllegalArgumentException(
@@ -73,35 +66,5 @@ public class DBContext {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public static boolean testConnection(String role) {
-        Connection conn = null;
-        try {
-            conn = getConnection(role);
-            return conn != null && !conn.isClosed();
-        } catch (Exception e) {
-            System.err.println("Lỗi kết nối [" + role + "]: " + e.getMessage());
-            return false;
-        } finally {
-            closeConnection(conn, null, null);
-        }
-    }
-
-    public static void main(String[] args) {
-        String dbName = EnvConfig.get("DB_NAME", "QuanLyKhachSan");
-        System.out.println("===============================================================");
-        System.out.println("   KIỂM TRA HỆ THỐNG PHÂN QUYỀN CSDL THUẦN TÚY (PURE RBAC)     ");
-        System.out.println("   Cơ sở dữ liệu đích: " + dbName);
-        System.out.println("===============================================================");
-
-        String[] roles = {"Manager", "Receptionist", "Housekeeper", "Customer"};
-
-        for (String r : roles) {
-            boolean ok = testConnection(r);
-            String status = ok ? "[THÀNH CÔNG]" : "[THẤT BẠI]";
-            System.out.printf("Vai trò: %-15s -> %s%n", r, status);
-        }
-        System.out.println("===============================================================");
     }
 }
