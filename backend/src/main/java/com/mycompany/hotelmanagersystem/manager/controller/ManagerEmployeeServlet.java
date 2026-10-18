@@ -86,7 +86,7 @@ public class ManagerEmployeeServlet extends HttpServlet {
         );
         boolean success = employeeService.createEmployee(dto);
         setFlashMessage(session, success, "Thêm nhân viên mới thành công!",
-                "Không thể thêm nhân viên mới (Số ĐT, Email hoặc Tên đăng nhập có thể đã tồn tại)!");
+                "Không thể thêm nhân viên mới (Email hoặc Tên đăng nhập có thể đã tồn tại)!");
     }
 
     private void handleUpdateAccount(HttpServletRequest request, HttpSession session) {

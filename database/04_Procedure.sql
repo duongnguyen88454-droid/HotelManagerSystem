@@ -583,10 +583,6 @@ AS
 BEGIN
     SET NOCOUNT ON;
     BEGIN TRY
-        IF EXISTS (SELECT 1
-                   FROM   Employee
-                   WHERE  Phone = @Phone)
-            THROW 50055, N'Số điện thoại nhân viên đã tồn tại trên hệ thống!', 1;
         SET @NewEmployeeId = dbo.fn_SinhMaEmployee();
         INSERT  INTO Employee (
             EmployeeId,
