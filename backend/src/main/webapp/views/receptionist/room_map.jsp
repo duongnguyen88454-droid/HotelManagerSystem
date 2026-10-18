@@ -115,16 +115,32 @@
                                     <c:choose>
                                         <c:when test="${not empty r.bookingBars}">
                                             <c:forEach items="${r.bookingBars}" var="bar" end="0">
-                                                <button type="button" class="btn btn-primary btn-sm"
-                                                        onclick="handleBookingBarClick('${r.maPhong}', '${r.soPhong}', '${bar.maBooking}', '${bar.tenKhachHang}', '${bar.soDienThoai}', '${bar.soCccd}', '${bar.trangThaiBooking}', '${bar.ngayNhanDuKien}', '${bar.ngayTraDuKien}', '${bar.formattedNgayCheckInThucTe}', '${bar.formattedNgayCheckOutThucTe}')">
-                                                    Chi Tiết Đơn
-                                                </button>
+                                                <div class="flex items-center justify-center gap-1">
+                                                    <button type="button" class="btn btn-primary btn-sm"
+                                                            onclick="handleBookingBarClick('${r.maPhong}', '${r.soPhong}', '${bar.maBooking}', '${bar.tenKhachHang}', '${bar.soDienThoai}', '${bar.soCccd}', '${bar.trangThaiBooking}', '${bar.ngayNhanDuKien}', '${bar.ngayTraDuKien}', '${bar.formattedNgayCheckInThucTe}', '${bar.formattedNgayCheckOutThucTe}')">
+                                                        Chi Tiết Đơn
+                                                    </button>
+                                                    <c:if test="${bar.trangThaiBooking eq 'CheckedIn' or r.trangThaiPhong eq 'Occupied'}">
+                                                        <button type="button" class="btn btn-success btn-sm"
+                                                                onclick="openServiceOrderForRoom('${r.maPhong}', '${r.soPhong}')"
+                                                                title="Gọi thêm đồ ăn, đồ uống hoặc dịch vụ cho phòng ${r.soPhong}">
+                                                            + Dịch Vụ
+                                                        </button>
+                                                    </c:if>
+                                                </div>
                                             </c:forEach>
                                         </c:when>
                                         <c:when test="${r.trangThaiPhong eq 'Available'}">
                                             <a href="${pageContext.request.contextPath}/receptionist/booking" class="btn btn-secondary btn-sm">
                                                 Đặt Phòng
                                             </a>
+                                        </c:when>
+                                        <c:when test="${r.trangThaiPhong eq 'Occupied'}">
+                                            <button type="button" class="btn btn-success btn-sm"
+                                                    onclick="openServiceOrderForRoom('${r.maPhong}', '${r.soPhong}')"
+                                                    title="Gọi thêm đồ ăn, đồ uống hoặc dịch vụ cho phòng ${r.soPhong}">
+                                                + Dịch Vụ
+                                            </button>
                                         </c:when>
                                         <c:otherwise>
                                             <span class="text-muted text-sm">--</span>
