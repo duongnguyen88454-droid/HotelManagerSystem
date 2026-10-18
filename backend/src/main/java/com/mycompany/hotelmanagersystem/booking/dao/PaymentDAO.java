@@ -41,7 +41,7 @@ public class PaymentDAO extends BaseRepository<Object, String> {
      * @param paymentMethod phương thức thanh toán (BankTransfer, Momo, VNPay)
      * @param note ghi chú thanh toán
      * @return mã PaymentId được sinh ra
-     * @throws SQLException nếu xảy ra lỗi CSDL hoặc quá hạn 10 phút
+     * @throws SQLException nếu xảy ra lỗi CSDL
      * @throws ClassNotFoundException nếu không tìm thấy driver
      */
     public String confirmDepositPaymentSP(String bookingId, String paymentMethod, String note)

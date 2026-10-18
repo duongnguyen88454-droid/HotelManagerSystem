@@ -177,9 +177,6 @@ CREATE OR ALTER TRIGGER trg_Booking_TuDongTaoHoaDon
     AFTER INSERT
     AS BEGIN
            SET NOCOUNT ON;
-           DECLARE @MaxInvId AS INT;
-           SELECT @MaxInvId = ISNULL(MAX(TRY_CAST (SUBSTRING(InvoiceId, PATINDEX('%[0-9]%', InvoiceId), 10) AS INT)), 0)
-           FROM   Invoice WITH (NOLOCK);
            INSERT INTO Invoice (
                InvoiceId,
                BookingId,
@@ -191,7 +188,7 @@ CREATE OR ALTER TRIGGER trg_Booking_TuDongTaoHoaDon
                InvoiceStatus,
                FinalTotalAmount
            )
-           SELECT 'INV' + RIGHT('000' + CAST (@MaxInvId + ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS VARCHAR (10)), 3),
+           SELECT dbo.fn_SinhMaInvoice(),
                   i.BookingId,
                   GETDATE(),
                   0,

@@ -135,20 +135,16 @@ GRANT SELECT ON v_DamageReports TO role_Receptionist;
 GRANT SELECT ON v_CustomerBookingHistory TO role_Receptionist;
 
 -- Quyền thực thi các thủ tục Check-in/Check-out/Thu tiền/Dịch vụ/Hủy phòng
-GRANT EXECUTE ON dbo.sp_DatPhong TO role_Receptionist;
 GRANT EXECUTE ON dbo.sp_CheckInNhanPhong TO role_Receptionist;
 GRANT EXECUTE ON dbo.sp_CheckOutTraPhong TO role_Receptionist;
 GRANT EXECUTE ON dbo.sp_GoiThemDichVu TO role_Receptionist;
 GRANT EXECUTE ON dbo.sp_GhiNhanThanhToan TO role_Receptionist;
 GRANT EXECUTE ON dbo.sp_XacNhanThanhToanCoc TO role_Receptionist;
 GRANT EXECUTE ON dbo.sp_HuyPhong TO role_Receptionist;
-GRANT EXECUTE ON dbo.sp_BaoCaoSuCoHuHai TO role_Receptionist;
-GRANT EXECUTE ON dbo.sp_DonDepDonHetHanGiuCho TO role_Receptionist;
 GRANT EXECUTE ON dbo.fn_KiemTraPhongTrongTrongKhoang TO role_Receptionist;
 GRANT EXECUTE ON dbo.fn_SinhMaBooking TO role_Receptionist;
 GRANT EXECUTE ON dbo.fn_SinhMaCustomer TO role_Receptionist;
 GRANT EXECUTE ON dbo.fn_SinhMaPayment TO role_Receptionist;
-GRANT EXECUTE ON dbo.fn_SinhMaDamageReport TO role_Receptionist;
 
 -- CHÍNH SÁCH DENY: Chặn xem báo cáo tài chính tổng hợp & chặn sửa giá, nhân sự
 DENY SELECT ON v_InvoiceRevenueReport TO role_Receptionist;
@@ -172,10 +168,8 @@ GRANT SELECT, INSERT, UPDATE ON DamageReport_DamageType TO role_Housekeeper;
 GRANT SELECT ON v_HousekeeperTasks TO role_Housekeeper;
 GRANT SELECT ON v_DamageReports TO role_Housekeeper;
 
--- Quyền thực thi thủ tục cập nhật tiến độ dọn dẹp & báo hỏng thiết bị
+-- Quyền thực thi thủ tục cập nhật tiến độ dọn dẹp
 GRANT EXECUTE ON dbo.sp_CapNhatTienDoDonPhong TO role_Housekeeper;
-GRANT EXECUTE ON dbo.sp_BaoCaoSuCoHuHai TO role_Housekeeper;
-GRANT EXECUTE ON dbo.fn_SinhMaDamageReport TO role_Housekeeper;
 
 -- CHÍNH SÁCH DENY: Cấm tuyệt đối xem thông tin tài chính, hóa đơn, khách hàng, nhân sự
 DENY SELECT, INSERT, UPDATE, DELETE ON Invoice TO role_Housekeeper;
@@ -212,10 +206,8 @@ GRANT SELECT, INSERT ON Booking_Room TO role_Customer;
 GRANT SELECT, INSERT ON Booking_Room_Service TO role_Customer;
 GRANT SELECT, INSERT, UPDATE ON Invoice TO role_Customer;
 GRANT SELECT, INSERT ON Payment TO role_Customer;
-GRANT EXECUTE ON dbo.sp_DatPhong TO role_Customer;
 GRANT EXECUTE ON dbo.sp_XacNhanThanhToanCoc TO role_Customer;
 GRANT EXECUTE ON dbo.sp_HuyPhong TO role_Customer;
-GRANT EXECUTE ON dbo.sp_DonDepDonHetHanGiuCho TO role_Customer;
 GRANT EXECUTE ON dbo.fn_KiemTraPhongTrongTrongKhoang TO role_Customer;
 GRANT EXECUTE ON dbo.fn_SinhMaBooking TO role_Customer;
 GRANT EXECUTE ON dbo.fn_SinhMaCustomer TO role_Customer;

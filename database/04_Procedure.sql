@@ -4,93 +4,14 @@
 -- HỆ QUẢN TRỊ CSDL: MICROSOFT SQL SERVER 2019 / 2022
 -- ============================================================================
 USE QuanLyKhachSan;
-GO
 
+
+GO
 SET ANSI_NULLS ON;
+
+
 GO
 SET QUOTED_IDENTIFIER ON;
-GO
--- ============================================================================
--- PROCEDURE 1: ĐẶT PHÒNG (CHO CẢ WEBSITE VÀ LỄ TÂN TẠI QUẦY)
--- ============================================================================
-CREATE OR ALTER PROCEDURE dbo.sp_DatPhong
-@CustomerId VARCHAR (10), @CreateBy VARCHAR (10), -- AccountId của khách hàng hoặc nhân viên tạo đơn
-@RoomId VARCHAR (10), @ExpectedCheckInDate DATE, @ExpectedCheckOutDate DATE, @Deposit DECIMAL (12, 2)=NULL, -- NULL nếu là khách vãng lai nhận phòng ngay
-@NewBookingId VARCHAR (10) OUTPUT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    BEGIN TRY
-        -- 1. Kiểm tra tính hợp lệ của ngày lưu trú
-        IF @ExpectedCheckInDate >= @ExpectedCheckOutDate
-           OR @ExpectedCheckInDate < CAST (GETDATE() AS DATE)
-            BEGIN
-                RAISERROR (N'Lỗi nghiệp vụ: Ngày nhận và ngày trả phòng dự kiến không hợp lệ!', 16, 1);
-                RETURN -1;
-            END
-        -- 2. Kiểm tra khách hàng và tài khoản tồn tại
-        IF NOT EXISTS (SELECT 1
-                       FROM   Customer
-                       WHERE  CustomerId = @CustomerId)
-            BEGIN
-                RAISERROR (N'Lỗi nghiệp vụ: Không tìm thấy hồ sơ khách hàng đại diện!', 16, 1);
-                RETURN -2;
-            END
-        IF NOT EXISTS (SELECT 1
-                       FROM   Account
-                       WHERE  AccountId = @CreateBy)
-            BEGIN
-                RAISERROR (N'Lỗi nghiệp vụ: Tài khoản người tạo đơn không tồn tại!', 16, 1);
-                RETURN -3;
-            END
-        -- 3. Kiểm tra phòng có trống và sẵn sàng không
-        IF dbo.fn_KiemTraPhongTrongTrongKhoang(@RoomId, @ExpectedCheckInDate, @ExpectedCheckOutDate, NULL) = 0
-            BEGIN
-                RAISERROR (N'Lỗi nghiệp vụ: Phòng đã chọn hiện không khả dụng trong khoảng thời gian này!', 16, 1);
-                RETURN -4;
-            END
-        -- 4. Lấy đơn giá niêm yết của phòng theo Hạng phòng
-        DECLARE @BasePrice AS DECIMAL (12, 2);
-        SELECT @BasePrice = rt.BasePrice
-        FROM   Room AS r
-               INNER JOIN
-               RoomType AS rt
-               ON r.RoomTypeId = rt.RoomTypeId
-        WHERE  r.RoomId = @RoomId;
-        -- 5. Sinh mã Booking mới
-        SET @NewBookingId = dbo.fn_SinhMaBooking();
-        -- 6. Giao dịch chèn dữ liệu (Trigger sẽ tự sinh Invoice và tính tiền phòng)
-        BEGIN TRANSACTION;
-        INSERT  INTO Booking (
-            BookingId,
-            CustomerId,
-            CreateBy,
-            CreateDate
-        )
-        VALUES               (@NewBookingId, @CustomerId, @CreateBy, GETDATE());
-        INSERT  INTO Booking_Room (
-            BookingId,
-            RoomId,
-            BookingStatus,
-            ExpectedCheckInDate,
-            ExpectedCheckOutDate,
-            ActualCheckInDate,
-            ActualCheckOutDate,
-            Deposit,
-            Price
-        )
-        VALUES                    (@NewBookingId, @RoomId, 'Confirmed', @ExpectedCheckInDate, @ExpectedCheckOutDate, NULL, NULL, @Deposit, @BasePrice);
-        COMMIT TRANSACTION;
-        RETURN 0;
-    END TRY
-    BEGIN CATCH
-        IF @@TRANCOUNT > 0
-            ROLLBACK;
-        DECLARE @ErrMsg AS NVARCHAR (4000) = ERROR_MESSAGE();
-        RAISERROR (@ErrMsg, 16, 1);
-        RETURN -99;
-    END CATCH
-END
 
 
 GO
@@ -485,62 +406,6 @@ END
 
 GO
 -- ============================================================================
--- PROCEDURE 8: GHI NHẬN BIÊN BẢN BÁO CÁO HƯ HỎNG THIẾT BỊ TRONG PHÒNG
--- ============================================================================
-CREATE OR ALTER PROCEDURE dbo.sp_BaoCaoSuCoHuHai
-@RoomId VARCHAR (10), @CreateBy VARCHAR (10), @DamageTypeId VARCHAR (10), @Note NVARCHAR (300)=NULL, @NewDamageReportId VARCHAR (10) OUTPUT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    BEGIN TRY
-        IF NOT EXISTS (SELECT 1
-                       FROM   Room
-                       WHERE  RoomId = @RoomId)
-            BEGIN
-                RAISERROR (N'Lỗi nghiệp vụ: Phòng báo cáo sự cố không tồn tại!', 16, 1);
-                RETURN -1;
-            END
-        IF NOT EXISTS (SELECT 1
-                       FROM   DamageType
-                       WHERE  DamageTypeId = @DamageTypeId)
-            BEGIN
-                RAISERROR (N'Lỗi nghiệp vụ: Loại hư hỏng thiết bị không hợp lệ!', 16, 1);
-                RETURN -2;
-            END
-        SET @NewDamageReportId = dbo.fn_SinhMaDamageReport();
-        BEGIN TRANSACTION;
-        -- 1. Tạo biên bản báo cáo (Trạng thái Confirmed kích hoạt Trigger 10 đưa Room sang Maintenance)
-        INSERT  INTO DamageReport (
-            DamageReportId,
-            RoomId,
-            CreateBy,
-            DetectedAt,
-            ConfirmedAt,
-            DamageReportStatus
-        )
-        VALUES                    (@NewDamageReportId, @RoomId, @CreateBy, GETDATE(), GETDATE(), 'Confirmed');
-        -- 2. Ghi chi tiết loại hư hại
-        INSERT  INTO DamageReport_DamageType (
-            DamageReportId,
-            DamageTypeId,
-            Note
-        )
-        VALUES                               (@NewDamageReportId, @DamageTypeId, @Note);
-        COMMIT TRANSACTION;
-        RETURN 0;
-    END TRY
-    BEGIN CATCH
-        IF @@TRANCOUNT > 0
-            ROLLBACK;
-        DECLARE @ErrMsg AS NVARCHAR (4000) = ERROR_MESSAGE();
-        RAISERROR (@ErrMsg, 16, 1);
-        RETURN -99;
-    END CATCH
-END
-
-
-GO
--- ============================================================================
 -- PROCEDURE 9: TẠO TÀI KHOẢN ĐĂNG NHẬP MỚI (ÁP DỤNG fn_SinhMaAccount)
 -- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_ThemTaiKhoan
@@ -644,39 +509,7 @@ END
 
 GO
 -- ============================================================================
--- PROCEDURE 14: TẠO DỊCH VỤ PHÁT SINH MỚI (ÁP DỤNG fn_SinhMaService)
--- ============================================================================
-CREATE OR ALTER PROCEDURE dbo.sp_ThemDichVu
-@ServiceName NVARCHAR (100), @BasePrice DECIMAL (12, 2), @NewServiceId VARCHAR (10) OUTPUT, @IsActive BIT=1
-AS
-BEGIN
-    SET NOCOUNT ON;
-    BEGIN TRY
-        IF EXISTS (SELECT 1
-                   FROM   Service
-                   WHERE  ServiceName = @ServiceName)
-            THROW 50058, N'Tên dịch vụ này đã tồn tại trên danh mục!', 1;
-        SET @NewServiceId = dbo.fn_SinhMaService();
-        INSERT  INTO Service (
-            ServiceId,
-            ServiceName,
-            BasePrice,
-            IsActive
-        )
-        VALUES               (@NewServiceId, @ServiceName, @BasePrice, @IsActive);
-        RETURN 0;
-    END TRY
-    BEGIN CATCH
-        DECLARE @ErrMsg AS NVARCHAR (4000) = ERROR_MESSAGE();
-        RAISERROR (@ErrMsg, 16, 1);
-        RETURN -1;
-    END CATCH
-END
-
-
-GO
--- ============================================================================
--- PROCEDURE 15: XÁC NHẬN THANH TOÁN TIỀN CỌC TRONG THỜI HẠN 10 PHÚT
+-- PROCEDURE 15: XÁC NHẬN THANH TOÁN TIỀN CỌC GIỮ CHỖ
 -- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_XacNhanThanhToanCoc
 @BookingId VARCHAR (10), @PaymentMethod VARCHAR (20)='BankTransfer', @Note NVARCHAR (300)=NULL, @NewPaymentId VARCHAR (10) OUTPUT
@@ -685,9 +518,8 @@ BEGIN
     SET NOCOUNT ON;
     BEGIN TRY
         BEGIN TRANSACTION;
-        DECLARE @CreateDate AS DATETIME, @InvoiceId AS VARCHAR (10), @DepositTotal AS DECIMAL (12, 2);
-        SELECT @CreateDate = b.CreateDate,
-               @InvoiceId = inv.InvoiceId
+        DECLARE @InvoiceId AS VARCHAR (10), @DepositTotal AS DECIMAL (12, 2);
+        SELECT @InvoiceId = inv.InvoiceId
         FROM   Booking AS b
                INNER JOIN
                Invoice AS inv
@@ -698,13 +530,6 @@ BEGIN
                 RAISERROR (N'Lỗi: Đơn đặt phòng hoặc hóa đơn không tồn tại!', 16, 1);
                 ROLLBACK;
                 RETURN -1;
-            END
-        -- Kiểm tra thời hạn 10 phút giữ chỗ
-        IF DATEDIFF(MINUTE, @CreateDate, GETDATE()) >= 10
-            BEGIN
-                RAISERROR (N'Đã hết thời gian giữ chỗ (10 phút)! Đơn đặt phòng không còn hiệu lực để thanh toán cọc.', 16, 1);
-                ROLLBACK;
-                RETURN -2;
             END
         -- Tính tổng tiền cọc của đơn
         SELECT @DepositTotal = ISNULL(SUM(Deposit), 0)
@@ -738,66 +563,6 @@ BEGIN
             ROLLBACK;
         DECLARE @ErrMsg AS NVARCHAR (4000) = ERROR_MESSAGE();
         RAISERROR (@ErrMsg, 16, 1);
-        RETURN -99;
-    END CATCH
-END
-
-
-GO
--- ============================================================================
--- PROCEDURE 16: TỰ ĐỘNG DỌN DẸP ĐƠN HẾT HẠN GIỮ CHỖ (CÓ GRACE PERIOD 12 PHÚT)
--- ============================================================================
-CREATE OR ALTER PROCEDURE dbo.sp_DonDepDonHetHanGiuCho
-AS
-BEGIN
-    SET NOCOUNT ON;
-    BEGIN TRY
-        BEGIN TRANSACTION;
-        DECLARE @ExpiredBookings TABLE (
-            BookingId VARCHAR (10) PRIMARY KEY);
-        -- Quét các đơn Unpaid đã quá 12 phút (2 phút ân hạn chống Race Condition sát nút)
-        INSERT INTO @ExpiredBookings (
-            BookingId
-        )
-        SELECT b.BookingId
-        FROM   Booking AS b
-               INNER JOIN
-               Invoice AS inv
-               ON b.BookingId = inv.BookingId
-        WHERE  inv.InvoiceStatus = 'Unpaid'
-               AND NOT EXISTS (SELECT 1
-                               FROM   Payment AS p
-                               WHERE  p.InvoiceId = inv.InvoiceId)
-               AND DATEDIFF(MINUTE, b.CreateDate, GETDATE()) >= 12;
-        -- Xóa an toàn từ bảng con lên bảng cha theo Foreign Key:
-        DELETE brs
-        FROM   Booking_Room_Service AS brs
-               INNER JOIN
-               @ExpiredBookings AS eb
-               ON brs.BookingId = eb.BookingId;
-        DELETE br
-        FROM   Booking_Room AS br
-               INNER JOIN
-               @ExpiredBookings AS eb
-               ON br.BookingId = eb.BookingId;
-        DELETE inv
-        FROM   Invoice AS inv
-               INNER JOIN
-               @ExpiredBookings AS eb
-               ON inv.BookingId = eb.BookingId;
-        DELETE b
-        FROM   Booking AS b
-               INNER JOIN
-               @ExpiredBookings AS eb
-               ON b.BookingId = eb.BookingId;
-        COMMIT TRANSACTION;
-        RETURN 0;
-    END TRY
-    BEGIN CATCH
-        IF @@TRANCOUNT > 0
-            ROLLBACK;
-        DECLARE @ErrMsg2 AS NVARCHAR (4000) = ERROR_MESSAGE();
-        RAISERROR (@ErrMsg2, 16, 1);
         RETURN -99;
     END CATCH
 END

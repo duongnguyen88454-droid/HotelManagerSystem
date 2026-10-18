@@ -119,7 +119,7 @@
             </div>
 
             <div class="alert alert-warning text-xs leading-relaxed m-0">
-                <strong>Lưu ý về quy định giữ chỗ:</strong> Hệ thống tự động khóa giữ phòng trong vòng <strong>10 phút</strong> kể từ khi tạo đơn. Sau khi chuyển khoản thành công, vui lòng nhấn nút xác nhận bên cạnh để hệ thống ghi nhận giao dịch nộp cọc.
+                <strong>Lưu ý về quy định nộp cọc:</strong> Sau khi quét mã chuyển khoản thành công, vui lòng nhấn nút xác nhận bên cạnh để hệ thống tự động ghi nhận giao dịch và kích hoạt đơn đặt phòng.
             </div>
         </div>
 
