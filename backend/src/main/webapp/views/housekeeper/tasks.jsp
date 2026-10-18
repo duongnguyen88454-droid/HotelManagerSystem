@@ -71,18 +71,18 @@
                                         <div class="card p-0">
                                             <div class="card-toolbar">
                                                 <h3 class="card-title">Lịch Sử Biên Bản Sự Cố Hư Hại Thiết Bị</h3>
-                                                <div class="filter-group">
-                                                    <input type="text" id="damageSearchInput" class="form-control"
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <input type="text" id="damageSearchInput" class="form-control" style="width: 240px;"
                                                         placeholder="Tìm số phòng, mã BB, loại hư hại..."
                                                         oninput="applyDamageFilters()">
-                                                    <select id="damageStatusFilter" class="form-control"
+                                                    <select id="damageStatusFilter" class="form-control" style="width: 180px;"
                                                         onchange="applyDamageFilters()">
                                                         <option value="">-- Tất Cả Trạng Thái --</option>
                                                         <option value="Pending">Chờ Bảo Trì</option>
                                                         <option value="Confirmed">Đang Khắc Phục</option>
                                                         <option value="Resolved">Đã Sửa Xong</option>
                                                     </select>
-                                                    <button type="button" class="btn btn-outline"
+                                                    <button type="button" class="btn btn-outline btn-sm font-semibold"
                                                         onclick="resetDamageFilters()">Đặt Lại</button>
                                                 </div>
                                             </div>
@@ -204,27 +204,25 @@
                                                                 </c:choose>
                                                             </h3>
 
-                                                            <!-- Bộ lọc nâng cao chỉ hiển thị riêng cho tab Lịch Sử Của Tôi -->
+                                                            <!-- Bộ lọc nâng cao hiển thị thẳng hàng ngang -->
                                                             <c:if test="${currentStatus == 'MyHistory'}">
-                                                                <div class="filter-group">
+                                                                <div class="flex items-center gap-2 flex-wrap">
                                                                     <input type="text" id="historySearchInput"
-                                                                        class="form-control"
-                                                                        placeholder="Tìm số phòng, loại phòng, mã NV..."
+                                                                        class="form-control" style="width: 210px;"
+                                                                        placeholder="Tìm số phòng, loại phòng..."
                                                                         oninput="applyHistoryFilters()">
                                                                     <select id="historyResultFilter"
-                                                                        class="form-control"
+                                                                        class="form-control" style="width: 170px;"
                                                                         onchange="applyHistoryFilters()">
                                                                         <option value="">-- Tất Cả Kết Quả --</option>
-                                                                        <option value="KhongThietHai">Hoàn Tất Sạch Sẽ
-                                                                        </option>
-                                                                        <option value="CoThietHai">Có Báo Cáo Hư Hại
-                                                                        </option>
+                                                                        <option value="KhongThietHai">Hoàn Tất Sạch Sẽ</option>
+                                                                        <option value="CoThietHai">Có Báo Cáo Hư Hại</option>
                                                                     </select>
                                                                     <input type="date" id="historyDateFilter"
-                                                                        class="form-control"
+                                                                        class="form-control" style="width: 145px;"
                                                                         onchange="applyHistoryFilters()"
                                                                         title="Lọc theo ngày hoàn thành">
-                                                                    <button type="button" class="btn btn-outline"
+                                                                    <button type="button" class="btn btn-outline btn-sm font-semibold"
                                                                         onclick="resetHistoryFilters()">Đặt Lại</button>
                                                                 </div>
                                                             </c:if>

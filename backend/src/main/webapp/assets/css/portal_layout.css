@@ -105,12 +105,31 @@ body {
 }
 
 .nav-group-title {
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 12.5px;
+    font-weight: 800;
     text-transform: uppercase;
-    color: var(--portal-text-muted);
-    letter-spacing: 0.6px;
-    padding: 12px 10px 4px;
+    color: var(--portal-primary);
+    letter-spacing: 0.8px;
+    padding: 14px 10px 6px;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--portal-border-light);
+}
+
+.nav-group-title:not(:first-child) {
+    margin-top: 16px;
+}
+
+.nav-group-title::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 13px;
+    background-color: var(--portal-primary);
+    border-radius: 2px;
 }
 
 .portal-nav-item {

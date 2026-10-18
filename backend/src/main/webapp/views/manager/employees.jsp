@@ -125,8 +125,8 @@
                                                     <td class="text-center">
                                                         <div class="flex items-center justify-center gap-1">
                                                             <button type="button" class="btn btn-outline btn-sm"
-                                                                onclick="openEditAccountModal('${emp.employeeId}', '${emp.fullName}', '${emp.userName}', '${emp.role}', '${emp.accountStatus}')">
-                                                                Đổi Tài Khoản
+                                                                onclick="openEditAccountModal('${emp.employeeId}', '${emp.fullName}', '${emp.phone}', '${emp.email}', '${emp.userName}', '${emp.role}', '${emp.accountStatus}')">
+                                                                Sửa Thông Tin
                                                             </button>
                                                             <c:choose>
                                                                 <c:when test="${emp.employeeStatus == 'Working'}">
@@ -217,8 +217,8 @@
                             <div class="form-group mb-3">
                                 <label class="form-label">Vị Trí / Vai Trò <span class="text-danger">*</span></label>
                                 <select name="role" required class="form-control">
-                                    <option value="Receptionist">Lễ Tân (Receptionist)</option>
-                                    <option value="Housekeeper">Buồng Phòng (Housekeeper)</option>
+                                    <option value="Receptionist">Lễ Tân</option>
+                                    <option value="Housekeeper">Buồng Phòng</option>
                                 </select>
                             </div>
 
@@ -246,11 +246,11 @@
                 </div>
             </div>
 
-            <!-- Modal 2: Cập Nhật Tài Khoản Nhân Viên -->
+            <!-- Modal 2: Cập Nhật Hồ Sơ & Tài Khoản Nhân Viên -->
             <div id="editAccountModal" class="modal-backdrop portal-modal-backdrop" style="display: none;">
                 <div class="modal-card max-w-lg">
                     <div class="modal-header">
-                        <h3 class="modal-title">Thay Đổi Tài Khoản Nhân Viên</h3>
+                        <h3 class="modal-title">Cập Nhật Hồ Sơ &amp; Tài Khoản Nhân Viên</h3>
                         <button type="button" onclick="closeModal('editAccountModal')"
                             class="modal-close">&times;</button>
                     </div>
@@ -260,9 +260,24 @@
                             <input type="hidden" id="editEmployeeId" name="employeeId" value="" />
 
                             <div class="card bg-surface-subtle p-3 mb-3">
-                                <div class="text-muted text-xs">Nhân viên được điều chỉnh:</div>
-                                <div class="font-bold text-main text-base" id="editEmployeeName">--</div>
-                                <div class="text-secondary text-xs mt-1" id="editEmployeeIdLabel">Mã NV: --</div>
+                                <div class="text-muted text-xs">Mã nhân sự:</div>
+                                <div class="font-bold text-main text-base" id="editEmployeeIdLabel">Mã NV: --</div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">Họ Và Tên <span class="text-danger">*</span></label>
+                                <input type="text" id="editFullName" name="fullName" required class="form-control" />
+                            </div>
+
+                            <div class="grid-2 mb-3">
+                                <div class="form-group">
+                                    <label class="form-label">Số Điện Thoại <span class="text-danger">*</span></label>
+                                    <input type="text" id="editPhone" name="phone" required class="form-control" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" id="editEmail" name="email" required class="form-control" />
+                                </div>
                             </div>
 
                             <div class="form-group mb-3">
@@ -281,17 +296,17 @@
 
                             <div class="grid-2 mb-3">
                                 <div class="form-group">
-                                    <label class="form-label">Vai Trò / Phân Quyền</label>
+                                    <label class="form-label">Vị Trí / Vai Trò</label>
                                     <select id="editRole" name="role" required class="form-control">
-                                        <option value="Receptionist">Lễ Tân (Receptionist)</option>
-                                        <option value="Housekeeper">Buồng Phòng (Housekeeper)</option>
+                                        <option value="Receptionist">Lễ Tân</option>
+                                        <option value="Housekeeper">Buồng Phòng</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Trạng Thái Tài Khoản</label>
                                     <select id="editAccountStatus" name="accountStatus" required class="form-control">
-                                        <option value="Active">Đang Mở (Active)</option>
-                                        <option value="Locked">Đã Khóa (Locked)</option>
+                                        <option value="Active">Đang Mở</option>
+                                        <option value="Locked">Đã Khóa</option>
                                     </select>
                                 </div>
                             </div>
@@ -310,10 +325,12 @@
                 function openCreateEmployeeModal() {
                     document.getElementById('createEmployeeModal').style.display = 'flex';
                 }
-                function openEditAccountModal(empId, fullName, userName, role, accStatus) {
+                function openEditAccountModal(empId, fullName, phone, email, userName, role, accStatus) {
                     document.getElementById('editEmployeeId').value = empId;
-                    document.getElementById('editEmployeeName').innerText = fullName;
                     document.getElementById('editEmployeeIdLabel').innerText = 'Mã NV: ' + empId;
+                    document.getElementById('editFullName').value = fullName;
+                    document.getElementById('editPhone').value = phone;
+                    document.getElementById('editEmail').value = email;
                     document.getElementById('editUserName').value = userName;
                     document.getElementById('editRole').value = role;
                     document.getElementById('editAccountStatus').value = accStatus;

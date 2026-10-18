@@ -55,7 +55,8 @@ public class ManagerEmployeeService {
     }
 
     public boolean updateEmployeeAccount(UpdateEmployeeAccountDTO dto) {
-        if (dto == null || isBlank(dto.getEmployeeId()) || isBlank(dto.getUserName())) {
+        if (dto == null || isBlank(dto.getEmployeeId()) || isBlank(dto.getFullName())
+                || isBlank(dto.getPhone()) || isBlank(dto.getEmail()) || isBlank(dto.getUserName())) {
             return false;
         }
         String role = dto.getRole();

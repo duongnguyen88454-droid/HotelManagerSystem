@@ -45,20 +45,22 @@
             <!-- ========================================================================= -->
             <div id="step1Container">
                 
-                <!-- KHUNG CHỌN TIÊU CHÍ LỌC PHÒNG KHẢ DỤNG -->
-                <div class="pms-card p-4">
+                <!-- KHUNG CHỌN TIÊU CHÍ LỌC PHÒNG KHẢ DỤNG (NỔI BẬT TƯƠNG PHẢN VỚI BACKGROUND) -->
+                <div class="card p-4 mb-4" style="background-color: #f8fafc; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-radius: 10px;">
                     <div class="flex items-center gap-4 flex-wrap">
                         <div class="flex items-center gap-2">
-                            <label class="form-label font-bold text-secondary text-xs mb-0">Ngày nhận:</label>
-                            <input type="date" id="dateCheckIn" name="checkIn" value="${checkIn}" class="pms-input w-36 py-1 px-2" onchange="onDateFilterChange()">
+                            <label class="form-label font-bold text-secondary text-xs mb-0 nowrap">Ngày nhận:</label>
+                            <input type="date" id="dateCheckIn" name="checkIn" value="${checkIn}" 
+                                class="form-control" style="background-color: #ffffff; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05); width: 145px; height: 38px; border-radius: 6px;" onchange="onDateFilterChange()">
                         </div>
                         <div class="flex items-center gap-2">
-                            <label class="form-label font-bold text-secondary text-xs mb-0">Ngày trả:</label>
-                            <input type="date" id="dateCheckOut" name="checkOut" value="${checkOut}" class="pms-input w-36 py-1 px-2" onchange="onDateFilterChange()">
+                            <label class="form-label font-bold text-secondary text-xs mb-0 nowrap">Ngày trả:</label>
+                            <input type="date" id="dateCheckOut" name="checkOut" value="${checkOut}" 
+                                class="form-control" style="background-color: #ffffff; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05); width: 145px; height: 38px; border-radius: 6px;" onchange="onDateFilterChange()">
                         </div>
                         <div class="flex items-center gap-2">
-                            <label class="form-label font-bold text-secondary text-xs mb-0">Số khách:</label>
-                            <select id="filterGuests" class="pms-input w-28 py-1 px-2" onchange="onDateFilterChange()">
+                            <label class="form-label font-bold text-secondary text-xs mb-0 nowrap">Số khách:</label>
+                            <select id="filterGuests" class="form-control" style="background-color: #ffffff; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05); width: 120px; height: 38px; border-radius: 6px;" onchange="onDateFilterChange()">
                                 <option value="">Tất cả</option>
                                 <option value="1" ${paramGuests=='1' ? 'selected' : ''}>1 người</option>
                                 <option value="2" ${paramGuests=='2' ? 'selected' : ''}>2 người</option>
@@ -67,8 +69,8 @@
                             </select>
                         </div>
                         <div class="flex items-center gap-2">
-                            <label class="form-label font-bold text-secondary text-xs mb-0">Hạng phòng:</label>
-                            <select id="filterRoomType" class="pms-input w-40 py-1 px-2" onchange="onDateFilterChange()">
+                            <label class="form-label font-bold text-secondary text-xs mb-0 nowrap">Hạng phòng:</label>
+                            <select id="filterRoomType" class="form-control" style="background-color: #ffffff; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05); min-width: 160px; height: 38px; border-radius: 6px;" onchange="onDateFilterChange()">
                                 <option value="ALL">Tất cả</option>
                                 <c:forEach var="rt" items="${roomTypes}">
                                     <option value="${rt.maLoaiPhong}" ${paramRoomType==rt.maLoaiPhong ? 'selected' : ''}>
@@ -77,7 +79,7 @@
                                 </c:forEach>
                             </select>
                         </div>
-                        <span id="nightsCounter" class="nights-pill">1 đêm</span>
+                        <span id="nightsCounter" class="pill pill-primary font-bold" style="height: 38px; display: inline-flex; align-items: center; padding: 0 14px;">1 đêm</span>
                     </div>
                 </div>
 

@@ -108,7 +108,7 @@ public class ManagerEmployeeDAO extends BaseRepository<EmployeeItemDTO, String> 
             try (CallableStatement csAcc = conn.prepareCall(callAccountSql)) {
                 csAcc.setString(1, dto.getEmail().trim());
                 csAcc.setString(2, dto.getRole().trim());
-                csAcc.setString(3, dto.getUserName().trim());
+                csAcc.setNString(3, dto.getUserName().trim());
                 csAcc.setString(4, dto.getPassword().trim());
                 csAcc.registerOutParameter(5, Types.VARCHAR);
                 csAcc.execute();
@@ -116,7 +116,7 @@ public class ManagerEmployeeDAO extends BaseRepository<EmployeeItemDTO, String> 
             }
             try (CallableStatement csEmp = conn.prepareCall(callEmployeeSql)) {
                 csEmp.setString(1, newAccountId);
-                csEmp.setString(2, dto.getFullName().trim());
+                csEmp.setNString(2, dto.getFullName().trim());
                 csEmp.setString(3, dto.getPhone().trim());
                 csEmp.setString(4, dto.getEmail().trim());
                 csEmp.registerOutParameter(5, Types.VARCHAR);
@@ -133,18 +133,30 @@ public class ManagerEmployeeDAO extends BaseRepository<EmployeeItemDTO, String> 
     public boolean updateEmployeeAccount(UpdateEmployeeAccountDTO dto) {
         String findAccSql = "SELECT AccountId FROM Employee WHERE EmployeeId = ?";
         String checkUserSql = "SELECT 1 FROM Account WHERE UserName = ? AND AccountId <> ?";
-        String updateWithPassSql = "UPDATE Account SET UserName = ?, Password = ?, Role = ?, AccountStatus = ? WHERE AccountId = ?";
-        String updateNoPassSql = "UPDATE Account SET UserName = ?, Role = ?, AccountStatus = ? WHERE AccountId = ?";
+        String updateEmpSql = "UPDATE Employee SET FullName = ?, Phone = ?, Email = ? WHERE EmployeeId = ?";
+        String updateWithPassSql = "UPDATE Account SET UserName = ?, Email = ?, Password = ?, Role = ?, AccountStatus = ? WHERE AccountId = ?";
+        String updateNoPassSql = "UPDATE Account SET UserName = ?, Email = ?, Role = ?, AccountStatus = ? WHERE AccountId = ?";
 
         try (Connection conn = DBContext.getConnection(getRole())) {
+            conn.setAutoCommit(false);
             String accountId = findAccountIdByEmpId(conn, findAccSql, dto.getEmployeeId());
-            if (accountId == null) {
+            if (accountId == null || isUserNameTaken(conn, checkUserSql, dto.getUserName(), accountId)) {
                 return false;
             }
-            if (isUserNameTaken(conn, checkUserSql, dto.getUserName(), accountId)) {
+            try (PreparedStatement psEmp = conn.prepareStatement(updateEmpSql)) {
+                psEmp.setNString(1, dto.getFullName().trim());
+                psEmp.setString(2, dto.getPhone().trim());
+                psEmp.setString(3, dto.getEmail().trim());
+                psEmp.setString(4, dto.getEmployeeId().trim());
+                psEmp.executeUpdate();
+            }
+            boolean accUpdated = executeUpdateAccount(conn, updateWithPassSql, updateNoPassSql, dto, accountId);
+            if (!accUpdated) {
+                conn.rollback();
                 return false;
             }
-            return executeUpdateAccount(conn, updateWithPassSql, updateNoPassSql, dto, accountId);
+            conn.commit();
+            return true;
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;
@@ -162,7 +174,7 @@ public class ManagerEmployeeDAO extends BaseRepository<EmployeeItemDTO, String> 
 
     private boolean isUserNameTaken(Connection conn, String sql, String userName, String accountId) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, userName);
+            ps.setNString(1, userName.trim());
             ps.setString(2, accountId);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
@@ -175,16 +187,17 @@ public class ManagerEmployeeDAO extends BaseRepository<EmployeeItemDTO, String> 
         boolean hasNewPass = (dto.getNewPassword() != null && !dto.getNewPassword().trim().isEmpty());
         String sql = hasNewPass ? sqlWithPass : sqlNoPass;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, dto.getUserName().trim());
+            ps.setNString(1, dto.getUserName().trim());
+            ps.setString(2, dto.getEmail().trim());
             if (hasNewPass) {
-                ps.setString(2, dto.getNewPassword().trim());
+                ps.setString(3, dto.getNewPassword().trim());
+                ps.setString(4, dto.getRole());
+                ps.setString(5, dto.getAccountStatus());
+                ps.setString(6, accountId);
+            } else {
                 ps.setString(3, dto.getRole());
                 ps.setString(4, dto.getAccountStatus());
                 ps.setString(5, accountId);
-            } else {
-                ps.setString(2, dto.getRole());
-                ps.setString(3, dto.getAccountStatus());
-                ps.setString(4, accountId);
             }
             return ps.executeUpdate() > 0;
         }

@@ -544,7 +544,7 @@ GO
 -- PROCEDURE 9: TẠO TÀI KHOẢN ĐĂNG NHẬP MỚI (ÁP DỤNG fn_SinhMaAccount)
 -- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_ThemTaiKhoan
-@Email VARCHAR (100), @Role VARCHAR (20), @UserName VARCHAR (50), @Password VARCHAR (255), @NewAccountId VARCHAR (10) OUTPUT
+@Email VARCHAR (100), @Role VARCHAR (20), @UserName NVARCHAR (50), @Password VARCHAR (255), @NewAccountId VARCHAR (10) OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;

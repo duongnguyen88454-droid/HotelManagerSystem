@@ -92,14 +92,17 @@ public class ManagerEmployeeServlet extends HttpServlet {
     private void handleUpdateAccount(HttpServletRequest request, HttpSession session) {
         UpdateEmployeeAccountDTO dto = new UpdateEmployeeAccountDTO(
                 request.getParameter("employeeId"),
+                request.getParameter("fullName"),
+                request.getParameter("phone"),
+                request.getParameter("email"),
                 request.getParameter("userName"),
                 request.getParameter("newPassword"),
                 request.getParameter("role"),
                 request.getParameter("accountStatus")
         );
         boolean success = employeeService.updateEmployeeAccount(dto);
-        setFlashMessage(session, success, "Đã cập nhật thông tin tài khoản nhân viên thành công!",
-                "Không thể cập nhật tài khoản (Tên đăng nhập có thể đã tồn tại hoặc dữ liệu không hợp lệ)!");
+        setFlashMessage(session, success, "Đã cập nhật hồ sơ và tài khoản nhân viên thành công!",
+                "Không thể cập nhật thông tin nhân viên (Tên đăng nhập có thể đã tồn tại hoặc dữ liệu không hợp lệ)!");
     }
 
     private void setFlashMessage(HttpSession session, boolean success, String successMsg, String errorMsg) {
