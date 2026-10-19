@@ -2,6 +2,14 @@ USE QuanLyKhachSan;
 
 
 GO
+SET ANSI_NULLS ON;
+
+
+GO
+SET QUOTED_IDENTIFIER ON;
+
+
+GO
 -- ============================================================================
 -- HỆ THỐNG QUẢN LÝ KHÁCH SẠN (HOTEL MANAGEMENT SYSTEM)
 -- SCRIPT 03: HỆ THỐNG VIEW CHUẨN HÓA TIẾNG ANH (100% ENGLISH PASCALCASE)
@@ -246,32 +254,38 @@ FROM   CancellationHistory AS ch
        LEFT OUTER JOIN
        Account AS acc
        ON ch.CancelledBy = acc.AccountId;
-GO
 
+
+GO
 -- ============================================================================
 -- VIEW 8: CUSTOMER BOOKING HISTORY
 -- Phục vụ: BookingQueryDAO.java (Màn hình Lịch sử Đặt phòng của Khách hàng)
 -- ============================================================================
 CREATE OR ALTER VIEW v_CustomerBookingHistory
 AS
-SELECT b.BookingId,
-       b.CustomerId,
-       b.CreateBy AS AccountId,
-       CAST(COUNT(br.RoomId) AS NVARCHAR(10)) + N' phòng' AS RoomSummary,
-       N'' AS RoomTypeName,
-       b.CreateDate,
-       MIN(br.ExpectedCheckInDate) AS ExpectedCheckInDate,
-       MAX(br.ExpectedCheckOutDate) AS ExpectedCheckOutDate,
-       ISNULL(inv.FinalTotalAmount, 0) AS EstimatedTotal,
-       ISNULL(MIN(br.BookingStatus), 'Confirmed') AS BookingStatus,
-       inv.InvoiceId,
-       inv.InvoiceStatus
-FROM Booking b
-LEFT JOIN Booking_Room br ON b.BookingId = br.BookingId
-LEFT JOIN Invoice inv ON b.BookingId = inv.BookingId
+SELECT   b.BookingId,
+         b.CustomerId,
+         b.CreateBy AS AccountId,
+         CAST (COUNT(br.RoomId) AS NVARCHAR (10)) + N' phòng' AS RoomSummary,
+         N'' AS RoomTypeName,
+         b.CreateDate,
+         MIN(br.ExpectedCheckInDate) AS ExpectedCheckInDate,
+         MAX(br.ExpectedCheckOutDate) AS ExpectedCheckOutDate,
+         ISNULL(inv.FinalTotalAmount, 0) AS EstimatedTotal,
+         ISNULL(MIN(br.BookingStatus), 'Confirmed') AS BookingStatus,
+         inv.InvoiceId,
+         inv.InvoiceStatus
+FROM     Booking AS b
+         LEFT OUTER JOIN
+         Booking_Room AS br
+         ON b.BookingId = br.BookingId
+         LEFT OUTER JOIN
+         Invoice AS inv
+         ON b.BookingId = inv.BookingId
 GROUP BY b.BookingId, b.CustomerId, b.CreateBy, b.CreateDate, inv.FinalTotalAmount, inv.InvoiceId, inv.InvoiceStatus;
-GO
 
+
+GO
 -- ============================================================================
 -- VIEW 9: INVOICE REVENUE REPORT
 -- Phục vụ: RevenueReportDAO.java (Báo cáo Doanh thu Hóa đơn cho Quản lý)
@@ -281,21 +295,34 @@ AS
 SELECT inv.InvoiceId,
        inv.BookingId,
        c.FullName AS CustomerName,
-       ISNULL((SELECT STRING_AGG(r2.RoomName, ', ') FROM Booking_Room br2 
-               INNER JOIN Room r2 ON br2.RoomId = r2.RoomId WHERE br2.BookingId = inv.BookingId), N'Chưa xếp') AS RoomNames,
+       ISNULL((SELECT STRING_AGG(r2.RoomName, ', ')
+               FROM   Booking_Room AS br2
+                      INNER JOIN
+                      Room AS r2
+                      ON br2.RoomId = r2.RoomId
+               WHERE  br2.BookingId = inv.BookingId), N'Chưa xếp') AS RoomNames,
        inv.CreateDate,
-       ISNULL((SELECT SUM(br3.Deposit) FROM Booking_Room br3 WHERE br3.BookingId = inv.BookingId), 0) AS DepositAmount,
+       ISNULL((SELECT SUM(br3.Deposit)
+               FROM   Booking_Room AS br3
+               WHERE  br3.BookingId = inv.BookingId), 0) AS DepositAmount,
        inv.TotalRoomCharge,
        inv.TotalServiceCharge,
        (inv.EarlyCheckInFee + inv.LateCheckOutFee) AS Surcharge,
        inv.FinalTotalAmount,
-       ISNULL((SELECT SUM(p.TotalAmount) FROM Payment p WHERE p.InvoiceId = inv.InvoiceId), 0) AS PaidAmount,
+       ISNULL((SELECT SUM(p.TotalAmount)
+               FROM   Payment AS p
+               WHERE  p.InvoiceId = inv.InvoiceId), 0) AS PaidAmount,
        inv.InvoiceStatus
-FROM Invoice inv
-INNER JOIN Booking b ON inv.BookingId = b.BookingId
-INNER JOIN Customer c ON b.CustomerId = c.CustomerId;
-GO
+FROM   Invoice AS inv
+       INNER JOIN
+       Booking AS b
+       ON inv.BookingId = b.BookingId
+       INNER JOIN
+       Customer AS c
+       ON b.CustomerId = c.CustomerId;
 
+
+GO
 -- ============================================================================
 -- VIEW 10: PAYMENT RECEIPT REPORT
 -- Phục vụ: RevenueReportDAO.java (Báo cáo Phiếu thu Tiền mặt & Chuyển khoản)
@@ -312,14 +339,25 @@ SELECT p.PaymentId,
        emp.EmployeeId,
        p.TotalAmount,
        p.Note
-FROM Payment p
-INNER JOIN Invoice inv ON p.InvoiceId = inv.InvoiceId
-INNER JOIN Booking b ON inv.BookingId = b.BookingId
-INNER JOIN Customer c ON b.CustomerId = c.CustomerId
-LEFT JOIN Account acc ON p.ProcessBy = acc.AccountId
-LEFT JOIN Employee emp ON acc.AccountId = emp.AccountId;
-GO
+FROM   Payment AS p
+       INNER JOIN
+       Invoice AS inv
+       ON p.InvoiceId = inv.InvoiceId
+       INNER JOIN
+       Booking AS b
+       ON inv.BookingId = b.BookingId
+       INNER JOIN
+       Customer AS c
+       ON b.CustomerId = c.CustomerId
+       LEFT OUTER JOIN
+       Account AS acc
+       ON p.ProcessBy = acc.AccountId
+       LEFT OUTER JOIN
+       Employee AS emp
+       ON acc.AccountId = emp.AccountId;
 
+
+GO
 -- ============================================================================
 -- VIEW 11: DAMAGE REPORTS (ALL INCIDENTS FOR HOUSEKEEPING & MAINTENANCE)
 -- Phục vụ: DamageReportDAO.java (Lịch sử sự cố hư hại Buồng Phòng & Nghiệm thu)
@@ -342,10 +380,9 @@ FROM   DamageReport AS dr
        INNER JOIN
        RoomType AS rt
        ON r.RoomTypeId = rt.RoomTypeId
-       LEFT JOIN
+       LEFT OUTER JOIN
        DamageReport_DamageType AS drdt
        ON dr.DamageReportId = drdt.DamageReportId
-       LEFT JOIN
+       LEFT OUTER JOIN
        DamageType AS dt
        ON drdt.DamageTypeId = dt.DamageTypeId;
-GO

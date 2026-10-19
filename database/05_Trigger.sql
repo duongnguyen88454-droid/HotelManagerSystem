@@ -1,6 +1,9 @@
 USE QuanLyKhachSan;
+GO
 
-
+SET ANSI_NULLS ON;
+GO
+SET QUOTED_IDENTIFIER ON;
 GO
 CREATE OR ALTER TRIGGER trg_BookingRoom_KiemTraXungDot
        ON Booking_Room

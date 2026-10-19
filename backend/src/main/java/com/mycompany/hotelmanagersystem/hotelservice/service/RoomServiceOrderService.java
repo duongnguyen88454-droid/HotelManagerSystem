@@ -11,7 +11,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Service điều phối nghiệp vụ gọi thêm dịch vụ tại phòng cho khách đang lưu trú (FN-3.4 & FN-3.5).
+ * Service điều phối nghiệp vụ gọi thêm dịch vụ tại phòng cho khách đang lưu trú
+ * (FN-3.4 & FN-3.5).
  * Tuân thủ QT 3.2: Không chứa Servlet API, không chứa JDBC.
  */
 public class RoomServiceOrderService {
@@ -67,13 +68,26 @@ public class RoomServiceOrderService {
         String id = maDichVu.trim().toUpperCase();
         if (id.startsWith("DV")) {
             switch (id) {
-                case "DV01": case "DV1": return "SRV001";
-                case "DV02": case "DV2": return "SRV002";
-                case "DV03": case "DV3": return "SRV003";
-                case "DV04": case "DV4": return "SRV004";
-                case "DV05": case "DV5": return "SRV005";
-                case "DV06": case "DV6": return "SRV006";
-                default: break;
+                case "DV01":
+                case "DV1":
+                    return "SRV001";
+                case "DV02":
+                case "DV2":
+                    return "SRV002";
+                case "DV03":
+                case "DV3":
+                    return "SRV003";
+                case "DV04":
+                case "DV4":
+                    return "SRV004";
+                case "DV05":
+                case "DV5":
+                    return "SRV005";
+                case "DV06":
+                case "DV6":
+                    return "SRV006";
+                default:
+                    break;
             }
         }
         return id;

@@ -103,8 +103,6 @@ public class BookingDAO extends BaseRepository<Object, String> {
         return createMultiRoomBookingWithServices(maKH, null, cart, ghiChu);
     }
 
-    // --- CÁC HÀM HELPER NỘI BỘ TRONG TRANSACTION ---
-
     private void validateRoomAvailability(Connection conn, String maPhong, Date checkIn, Date checkOut)
             throws SQLException {
         String checkSql = "SELECT dbo.fn_KiemTraPhongTrongTrongKhoang(?, ?, ?, NULL)";

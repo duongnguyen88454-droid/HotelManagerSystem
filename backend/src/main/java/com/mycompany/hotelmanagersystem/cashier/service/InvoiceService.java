@@ -78,9 +78,37 @@ public class InvoiceService {
         if (selectedRooms == null || selectedRooms.isEmpty()) {
             return remaining;
         }
+
+        if (isAllActiveRoomsSelected(invoice.getRooms(), selectedRooms)) {
+            return remaining;
+        }
+
         double totalSelected = sumRooms(invoice.getRooms(), selectedRooms)
-                + sumServices(invoice.getServices(), selectedRooms);
+                + sumServices(invoice.getServices(), selectedRooms)
+                + sumSurcharges(invoice);
         return Math.min(totalSelected, remaining);
+    }
+
+    private boolean isAllActiveRoomsSelected(List<InvoiceRoomItemDTO> rooms, List<String> selectedRooms) {
+        if (rooms == null || rooms.isEmpty() || selectedRooms == null) {
+            return false;
+        }
+        for (InvoiceRoomItemDTO r : rooms) {
+            if (!"Cancelled".equalsIgnoreCase(r.getTrangThaiDatPhong())
+                    && r.getNgayCheckOutThucTe() == null
+                    && r.getNgayCheckInThucTe() != null) {
+                if (!selectedRooms.contains(r.getMaPhong())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private double sumSurcharges(InvoiceDetailDTO invoice) {
+        double early = invoice.getEarlyCheckInFee() != null ? invoice.getEarlyCheckInFee() : 0.0;
+        double late = invoice.getLateCheckOutFee() != null ? invoice.getLateCheckOutFee() : 0.0;
+        return early + late;
     }
 
     private double sumRooms(List<InvoiceRoomItemDTO> rooms, List<String> filter) {

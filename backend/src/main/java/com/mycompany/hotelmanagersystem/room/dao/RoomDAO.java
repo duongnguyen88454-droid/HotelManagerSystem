@@ -55,7 +55,8 @@ public class RoomDAO extends BaseRepository<AvailableRoomDTO, String> {
     }
 
     /**
-     * Tra cứu danh sách các phòng trống khả dụng theo khoảng ngày, số khách và loại phòng
+     * Tra cứu danh sách các phòng trống khả dụng theo khoảng ngày, số khách và loại
+     * phòng
      */
     public List<AvailableRoomDTO> searchAvailableRooms(LocalDate checkIn, LocalDate checkOut, Integer guests,
             String roomTypeId) {
@@ -67,7 +68,8 @@ public class RoomDAO extends BaseRepository<AvailableRoomDTO, String> {
                 + "  AND dbo.fn_KiemTraPhongTrongTrongKhoang(RoomId, ?, ?, NULL) = 1 "
                 + "ORDER BY BasePrice ASC, RoomName ASC";
 
-        boolean hasRoomType = (roomTypeId != null && !roomTypeId.trim().isEmpty() && !"ALL".equalsIgnoreCase(roomTypeId));
+        boolean hasRoomType = (roomTypeId != null && !roomTypeId.trim().isEmpty()
+                && !"ALL".equalsIgnoreCase(roomTypeId));
         Object typeParam = hasRoomType ? roomTypeId.trim() : null;
         Object guestParam = (guests != null && guests > 0) ? guests : null;
         Date dIn = checkIn != null ? Date.valueOf(checkIn) : null;
@@ -95,9 +97,6 @@ public class RoomDAO extends BaseRepository<AvailableRoomDTO, String> {
         return result != null && result == 1;
     }
 
-    /**
-     * FN-3.1: Lấy toàn bộ danh sách phòng thực tế theo tầng để hiển thị trên PMS Gantt Timeline
-     */
     public List<RoomTimelineDTO> getAllRoomsForTimeline() {
         String sql = "SELECT * FROM v_RoomDetails ORDER BY RoomName ASC";
         return queryCustom(sql, this::mapRoomTimeline);

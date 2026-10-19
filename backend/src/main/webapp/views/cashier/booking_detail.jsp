@@ -106,6 +106,19 @@
             </div>
         </div>
 
+        <!-- Khối hiển thị thông tin phụ thu nhận sớm / trả trễ nếu có -->
+        <c:if test="${(invoice.earlyCheckInFee != null && invoice.earlyCheckInFee > 0) || (invoice.lateCheckOutFee != null && invoice.lateCheckOutFee > 0)}">
+            <div class="alert alert-warning mb-6">
+                <strong>Phụ phí phát sinh trong đơn:</strong>
+                <c:if test="${invoice.earlyCheckInFee != null && invoice.earlyCheckInFee > 0}">
+                    Nhận phòng sớm (&lt;13h): <strong>+ <fmt:formatNumber value="${invoice.earlyCheckInFee}" pattern="#,##0" /> đ</strong>
+                </c:if>
+                <c:if test="${invoice.lateCheckOutFee != null && invoice.lateCheckOutFee > 0}">
+                    &nbsp;|&nbsp; Trả phòng trễ (&gt;12h): <strong>+ <fmt:formatNumber value="${invoice.lateCheckOutFee}" pattern="#,##0" /> đ</strong>
+                </c:if>
+            </div>
+        </c:if>
+
         <c:set var="hasUncheckedRooms" value="false" />
         <c:forEach var="r" items="${invoice.rooms}">
             <c:if test="${r.trangThaiDatPhong != 'Cancelled' && r.ngayCheckOutThucTe == null && r.ngayCheckInThucTe != null}">

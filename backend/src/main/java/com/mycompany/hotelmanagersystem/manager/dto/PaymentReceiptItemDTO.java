@@ -78,7 +78,7 @@ public class PaymentReceiptItemDTO {
 
     public String getFormattedPaymentDate() {
         return (paymentDate != null)
-                ? paymentDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                ? paymentDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
                 : "";
     }
 

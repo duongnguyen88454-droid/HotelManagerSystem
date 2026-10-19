@@ -105,7 +105,7 @@
                                    class="form-control mono fw-bold text-lg" disabled />
                             <input type="hidden" id="soTien" name="soTien" value="<fmt:formatNumber value='${paymentAmount}' pattern='0' />" />
                             <div class="form-hint">
-                                Số tiền đã được hệ thống tự động tính toán chính xác dựa trên danh sách phòng và dịch vụ bạn đã chọn.
+                                Số tiền đã được hệ thống tự động tính toán chính xác dựa trên danh sách phòng, dịch vụ và các khoản phụ phí phát sinh.
                             </div>
                         </div>
 
