@@ -354,3 +354,21 @@ BEGIN
     RETURN 'PAY' + RIGHT('000' + CAST(@MaxID + 1 AS VARCHAR(10)), 3);
 END;
 GO
+
+-- ----------------------------------------------------------------------------
+-- Function 25: Sinh mã nhiệm vụ dọn phòng RoomCleaningTask (TSK001, TSK002...)
+-- Hỗ trợ tham số @Offset để sinh mã hàng loạt khi check-out nhiều phòng cùng lúc
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER FUNCTION dbo.fn_SinhMaRoomCleaningTask
+(
+    @Offset INT = 1
+)
+RETURNS VARCHAR(10)
+AS
+BEGIN
+    DECLARE @MaxID INT;
+    SELECT @MaxID = ISNULL(MAX(TRY_CAST(SUBSTRING(RoomCleaningTaskId, PATINDEX('%[0-9]%', RoomCleaningTaskId), 10) AS INT)), 0)
+    FROM RoomCleaningTask WITH (NOLOCK);
+    RETURN 'TSK' + RIGHT('000' + CAST(@MaxID + ISNULL(@Offset, 1) AS VARCHAR(10)), 3);
+END;
+GO
