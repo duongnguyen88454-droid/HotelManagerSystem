@@ -10,10 +10,6 @@ SET QUOTED_IDENTIFIER ON;
 
 
 GO
--- ============================================================================
--- HỆ THỐNG QUẢN LÝ KHÁCH SẠN (HOTEL MANAGEMENT SYSTEM)
--- SCRIPT 03: HỆ THỐNG VIEW CHUẨN HÓA TIẾNG ANH (100% ENGLISH PASCALCASE)
--- ============================================================================
 -- Dọn dẹp các view cũ tiếng Việt (nếu có)
 DROP VIEW IF EXISTS v_DanhSachPhongHuHaiCanBaoTri;
 
@@ -31,10 +27,6 @@ DROP VIEW IF EXISTS v_DanhSachYeuCauHoanTien;
 
 
 GO
--- ============================================================================
--- VIEW 1: MAINTENANCE PENDING ROOMS (DAMAGED ROOMS NEEDING REPAIR)
--- Phục vụ: MaintenanceDAO.java (Màn hình điều phối bảo trì của Quản lý)
--- ============================================================================
 CREATE OR ALTER VIEW v_MaintenancePendingRooms
 AS
 SELECT dr.DamageReportId AS ReportId,
@@ -69,10 +61,6 @@ WHERE  dr.DamageReportStatus IN ('Pending', 'Confirmed');
 
 
 GO
--- ============================================================================
--- VIEW 2: ROOM OCCUPANCY RATE REPORT (PMS OCCUPANCY METRICS)
--- Phục vụ: ManagerDashboardDAO.java (Dashboard Quản lý)
--- ============================================================================
 CREATE OR ALTER VIEW v_RoomOccupancyRate
 AS
 SELECT COUNT(*) AS TotalRooms,
@@ -87,10 +75,6 @@ FROM   Room;
 
 
 GO
--- ============================================================================
--- VIEW 3: DETAILED ROOM INFORMATION WITH 3NF BED TYPES & AMENITIES
--- Phục vụ: RoomDAO.java (searchAvailableRooms, getRoomDetailById, getAllRoomsForTimeline)
--- ============================================================================
 CREATE OR ALTER VIEW v_RoomDetails
 AS
 SELECT r.RoomId,
@@ -126,10 +110,6 @@ FROM   Room AS r
 
 
 GO
--- ============================================================================
--- VIEW 4: ACTIVE RECEIVABLE BOOKINGS (CASHIER RECEIVABLES & DEBT)
--- Phục vụ: ActiveBookingDAO.java (Dashboard Thu Ngân / Check-out)
--- ============================================================================
 CREATE OR ALTER VIEW v_ReceivableBookings
 AS
 SELECT   b.BookingId,
@@ -170,10 +150,6 @@ GROUP BY b.BookingId, c.FullName, c.PhoneNumber, c.CCCD, inv.FinalTotalAmount, i
 
 
 GO
--- ============================================================================
--- VIEW 5: HOUSEKEEPER ROOM CLEANING TASKS
--- Phục vụ: HousekeeperTaskDAO.java (Màn hình Buồng Phòng Housekeeper)
--- ============================================================================
 CREATE OR ALTER VIEW v_HousekeeperTasks
 AS
 SELECT rct.RoomCleaningTaskId AS TaskId,
@@ -204,10 +180,6 @@ FROM   RoomCleaningTask AS rct
 
 
 GO
--- ============================================================================
--- VIEW 6: FRONT DESK ARRIVAL BOOKINGS AWAITING CHECK-IN
--- Phục vụ: BookingCheckInQueryDAO.java (Màn hình Quầy Lễ Tân Check-in)
--- ============================================================================
 CREATE OR ALTER VIEW v_ArrivalCheckInBookings
 AS
 SELECT   b.BookingId,
@@ -230,10 +202,6 @@ GROUP BY b.BookingId, c.FullName, c.PhoneNumber, c.CCCD;
 
 
 GO
--- ============================================================================
--- VIEW 7: CANCELLATION AND REFUND REQUESTS
--- Phục vụ: ManagerRefundDAO.java (Màn hình Phê duyệt hoàn cọc)
--- ============================================================================
 CREATE OR ALTER VIEW v_RefundRequests
 AS
 SELECT ch.CancellationId,
@@ -257,10 +225,6 @@ FROM   CancellationHistory AS ch
 
 
 GO
--- ============================================================================
--- VIEW 8: CUSTOMER BOOKING HISTORY
--- Phục vụ: BookingQueryDAO.java (Màn hình Lịch sử Đặt phòng của Khách hàng)
--- ============================================================================
 CREATE OR ALTER VIEW v_CustomerBookingHistory
 AS
 SELECT   b.BookingId,
@@ -286,10 +250,6 @@ GROUP BY b.BookingId, b.CustomerId, b.CreateBy, b.CreateDate, inv.FinalTotalAmou
 
 
 GO
--- ============================================================================
--- VIEW 9: INVOICE REVENUE REPORT
--- Phục vụ: RevenueReportDAO.java (Báo cáo Doanh thu Hóa đơn cho Quản lý)
--- ============================================================================
 CREATE OR ALTER VIEW v_InvoiceRevenueReport
 AS
 SELECT inv.InvoiceId,
@@ -323,10 +283,6 @@ FROM   Invoice AS inv
 
 
 GO
--- ============================================================================
--- VIEW 10: PAYMENT RECEIPT REPORT
--- Phục vụ: RevenueReportDAO.java (Báo cáo Phiếu thu Tiền mặt & Chuyển khoản)
--- ============================================================================
 CREATE OR ALTER VIEW v_PaymentReceiptReport
 AS
 SELECT p.PaymentId,
@@ -358,10 +314,6 @@ FROM   Payment AS p
 
 
 GO
--- ============================================================================
--- VIEW 11: DAMAGE REPORTS (ALL INCIDENTS FOR HOUSEKEEPING & MAINTENANCE)
--- Phục vụ: DamageReportDAO.java (Lịch sử sự cố hư hại Buồng Phòng & Nghiệm thu)
--- ============================================================================
 CREATE OR ALTER VIEW v_DamageReports
 AS
 SELECT dr.DamageReportId,

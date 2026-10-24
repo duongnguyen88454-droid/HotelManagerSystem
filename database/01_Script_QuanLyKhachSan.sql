@@ -1,8 +1,3 @@
--- ============================================================================
--- HỆ THỐNG QUẢN LÝ KHÁCH SẠN (HOTEL MANAGEMENT SYSTEM)
--- SCRIPT 01: TẠO CƠ SỞ DỮ LIỆU & BẢNG (CHUẨN HÓA 3NF)
--- HỆ QUẢN TRỊ CSDL: MICROSOFT SQL SERVER 2019 / 2022
--- ============================================================================
 USE master;
 
 
@@ -27,9 +22,6 @@ USE QuanLyKhachSan;
 
 
 GO
--- ============================================================================
--- PHẦN 1: NHÓM TÀI KHOẢN, NHÂN VIÊN & KHÁCH HÀNG
--- ============================================================================
 -- BẢNG 1: ACCOUNT (Tài khoản đăng nhập hệ thống)
 CREATE TABLE Account (
     AccountId     VARCHAR (10)  NOT NULL,
@@ -80,9 +72,6 @@ CREATE TABLE Customer (
 
 
 GO
--- ============================================================================
--- PHẦN 2: NHÓM DANH MỤC PHÒNG & TIỆN NGHI
--- ============================================================================
 -- BẢNG 4: ROOMTYPE (Hạng phòng)
 CREATE TABLE RoomType (
     RoomTypeId      VARCHAR (10)    NOT NULL,
@@ -181,9 +170,6 @@ CREATE TABLE Service (
 
 
 GO
--- ============================================================================
--- PHẦN 3: NHÓM ĐẶT PHÒNG, DỊCH VỤ PHÒNG & HỦY PHÒNG
--- ============================================================================
 -- BẢNG 11: BOOKING (Đơn đặt phòng)
 CREATE TABLE Booking (
     BookingId  VARCHAR (10) NOT NULL,
@@ -260,9 +246,6 @@ CREATE TABLE CancellationHistory (
 
 
 GO
--- ============================================================================
--- PHẦN 4: NHÓM HÓA ĐƠN & THANH TOÁN
--- ============================================================================
 -- BẢNG 15: INVOICE (Hóa đơn thanh toán)
 CREATE TABLE Invoice (
     InvoiceId          VARCHAR (10)    NOT NULL,
@@ -305,9 +288,6 @@ CREATE TABLE Payment (
 
 
 GO
--- ============================================================================
--- PHẦN 5: NHÓM BUỒNG PHÒNG & BÁO CÁO HƯ HỎNG
--- ============================================================================
 -- BẢNG 17: ROOMCLEANINGTASK (Nhiệm vụ dọn phòng)
 CREATE TABLE RoomCleaningTask (
     RoomCleaningTaskId     VARCHAR (10)   NOT NULL,

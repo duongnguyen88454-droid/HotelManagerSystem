@@ -1,9 +1,14 @@
 USE QuanLyKhachSan;
-GO
 
+
+GO
 SET ANSI_NULLS ON;
+
+
 GO
 SET QUOTED_IDENTIFIER ON;
+
+
 GO
 CREATE OR ALTER TRIGGER trg_BookingRoom_KiemTraXungDot
        ON Booking_Room
@@ -50,10 +55,6 @@ CREATE OR ALTER TRIGGER trg_BookingRoom_KiemTraXungDot
 
 
 GO
--- ============================================================================
--- TRIGGER 2: ĐỒNG BỘ TRẠNG THÁI PHÒNG KHI KHÁCH LÀM THỦ TỤC CHECK-IN
--- BẢNG: Booking_Room | SỰ KIỆN: AFTER UPDATE
--- ============================================================================
 CREATE OR ALTER TRIGGER trg_BookingRoom_DongBoCheckIn
        ON Booking_Room
        AFTER UPDATE
@@ -80,10 +81,6 @@ CREATE OR ALTER TRIGGER trg_BookingRoom_DongBoCheckIn
 
 
 GO
--- ============================================================================
--- TRIGGER 3: ĐỒNG BỘ TRẠNG THÁI PHÒNG VÀ TỰ ĐỘNG TẠO VIỆC DỌN DẸP KHI CHECK-OUT
--- BẢNG: Booking_Room | SỰ KIỆN: AFTER UPDATE
--- ============================================================================
 CREATE OR ALTER TRIGGER trg_BookingRoom_DongBoCheckOut
        ON Booking_Room
        AFTER UPDATE
@@ -138,10 +135,6 @@ CREATE OR ALTER TRIGGER trg_BookingRoom_DongBoCheckOut
 
 
 GO
--- ============================================================================
--- TRIGGER 4: TỰ ĐỘNG TẠO HÓA ĐƠN KHI TẠO ĐƠN ĐẶT PHÒNG (BOOKING)
--- BẢNG: Booking | SỰ KIỆN: AFTER INSERT
--- ============================================================================
 CREATE OR ALTER TRIGGER trg_Booking_TuDongTaoHoaDon
        ON Booking
        AFTER INSERT
@@ -175,13 +168,6 @@ CREATE OR ALTER TRIGGER trg_Booking_TuDongTaoHoaDon
 
 
 GO
--- ============================================================================
--- TRIGGER 5: TỰ ĐỘNG TÍNH TIỀN PHÒNG, PHỤ THU CHECK-IN/OUT VÀ CẬP NHẬT HÓA ĐƠN
--- BẢNG: Booking_Room | SỰ KIỆN: AFTER INSERT, UPDATE, DELETE
--- QUY TẮC PHỤ THU ĐÃ CHỐT:
---   • Check-in: Chuẩn 14h. Miễn phí từ 13h - 14h. Nhận trước 13h -> tính EarlyCheckInFee.
---   • Check-out: Chuẩn 12h. Miễn phí đến 12h (kể cả 11h-12h). Trả sau 12h -> tính LateCheckOutFee.
--- ============================================================================
 CREATE OR ALTER TRIGGER trg_BookingRoom_CapNhatHoaDon
        ON Booking_Room
        AFTER INSERT, UPDATE, DELETE
@@ -248,10 +234,6 @@ CREATE OR ALTER TRIGGER trg_BookingRoom_CapNhatHoaDon
 
 
 GO
--- ============================================================================
--- TRIGGER 6: TỰ ĐỘNG CẬP NHẬT TIỀN DỊCH VỤ PHÁT SINH VÀO HÓA ĐƠN
--- BẢNG: Booking_Room_Service | SỰ KIỆN: AFTER INSERT, UPDATE, DELETE
--- ============================================================================
 CREATE OR ALTER TRIGGER trg_BookingRoomService_CapNhatTienDichVu
        ON Booking_Room_Service
        AFTER INSERT, UPDATE, DELETE
@@ -297,10 +279,6 @@ CREATE OR ALTER TRIGGER trg_BookingRoomService_CapNhatTienDichVu
 
 
 GO
--- ============================================================================
--- TRIGGER 7: ĐỒNG BỘ TRẠNG THÁI HÓA ĐƠN KHI THANH TOÁN (PAYMENT)
--- BẢNG: Payment | SỰ KIỆN: AFTER INSERT, UPDATE, DELETE
--- ============================================================================
 CREATE OR ALTER TRIGGER trg_Payment_DongBoTrangThaiHoaDon
        ON Payment
        AFTER INSERT, UPDATE, DELETE
@@ -330,10 +308,6 @@ CREATE OR ALTER TRIGGER trg_Payment_DongBoTrangThaiHoaDon
 
 
 GO
--- ============================================================================
--- TRIGGER 8: ĐỒNG BỘ HỦY PHÒNG VÀ CHẶN HỦY SAU CHECK-IN
--- BẢNG: CancellationHistory | SỰ KIỆN: AFTER INSERT
--- ============================================================================
 CREATE OR ALTER TRIGGER trg_Cancellation_DongBoHuyPhong
        ON CancellationHistory
        AFTER INSERT
@@ -372,10 +346,6 @@ CREATE OR ALTER TRIGGER trg_Cancellation_DongBoHuyPhong
 
 
 GO
--- ============================================================================
--- TRIGGER 9: TỰ ĐỘNG CHUYỂN PHÒNG SANG 'CLEAN' KHI HOÀN TẤT DỌN DẸP
--- BẢNG: RoomCleaningTask | SỰ KIỆN: AFTER UPDATE
--- ============================================================================
 CREATE OR ALTER TRIGGER trg_RoomCleaningTask_HoanTatDonPhong
        ON RoomCleaningTask
        AFTER UPDATE
@@ -399,10 +369,6 @@ CREATE OR ALTER TRIGGER trg_RoomCleaningTask_HoanTatDonPhong
 
 
 GO
--- ============================================================================
--- TRIGGER 10: TỰ ĐỘNG ĐỔI TRẠNG THÁI PHÒNG KHI PHÁT HIỆN / XỬ LÝ HƯ HỎNG
--- BẢNG: DamageReport | SỰ KIỆN: AFTER INSERT, UPDATE
--- ============================================================================
 CREATE OR ALTER TRIGGER trg_DamageReport_CapNhatTrangThaiPhong
        ON DamageReport
        AFTER INSERT, UPDATE
@@ -434,10 +400,6 @@ CREATE OR ALTER TRIGGER trg_DamageReport_CapNhatTrangThaiPhong
 
 
 GO
--- ============================================================================
--- TRIGGER 11: TỰ ĐỘNG KHÓA TÀI KHOẢN KHI NHÂN VIÊN NGHỈ VIỆC
--- BẢNG: Employee | SỰ KIỆN: AFTER UPDATE
--- ============================================================================
 CREATE OR ALTER TRIGGER trg_Employee_KhoaTaiKhoanNghiViec
        ON Employee
        AFTER UPDATE

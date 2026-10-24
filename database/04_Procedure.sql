@@ -1,8 +1,3 @@
--- ============================================================================
--- HỆ THỐNG QUẢN LÝ KHÁCH SẠN (HOTEL MANAGEMENT SYSTEM)
--- SCRIPT 04: HỆ THỐNG STORED PROCEDURE (THỦ TỤC NGHIỆP VỤ - CHUẨN 3NF)
--- HỆ QUẢN TRỊ CSDL: MICROSOFT SQL SERVER 2019 / 2022
--- ============================================================================
 USE QuanLyKhachSan;
 
 
@@ -15,9 +10,6 @@ SET QUOTED_IDENTIFIER ON;
 
 
 GO
--- ============================================================================
--- PROCEDURE 2: THỦ TỤC CHECK-IN NHẬN PHÒNG TẠI QUẦY LỄ TÂN
--- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_CheckInNhanPhong
 @BookingId VARCHAR (10), @RoomId VARCHAR (10)=NULL -- NULL = Check-in toàn bộ phòng trong đơn; Truyền mã = Check-in riêng phòng đó
 AS
@@ -71,9 +63,6 @@ END
 
 
 GO
--- ============================================================================
--- PROCEDURE 3: GỌI THÊM DỊCH VỤ PHÁT SINH CHO PHÒNG
--- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_GoiThemDichVu
 @BookingId VARCHAR (10), @RoomId VARCHAR (10), @ServiceId VARCHAR (10), @Quantity INT=1
 AS
@@ -145,9 +134,6 @@ END
 
 
 GO
--- ============================================================================
--- PROCEDURE 4: THỦ TỤC CHECK-OUT TRẢ PHÒNG TẠI QUẦY LỄ TÂN
--- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_CheckOutTraPhong
 @BookingId VARCHAR (10), @RoomId VARCHAR (10)=NULL -- NULL = Check-out toàn bộ phòng; Hoặc truyền mã để trả từng phòng
 AS
@@ -202,9 +188,6 @@ END
 
 
 GO
--- ============================================================================
--- PROCEDURE 5: GHI NHẬN THANH TOÁN TIỀN (TIỀN CỌC / QUYẾT TOÁN HÓA ĐƠN)
--- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_GhiNhanThanhToan
 @InvoiceId VARCHAR (10), @ProcessBy VARCHAR (10)=NULL, -- NULL nếu khách tự thanh toán online
 @TotalAmount DECIMAL (12, 2), @PaymentMethod VARCHAR (20)='Cash', @Note NVARCHAR (300)=NULL, @NewPaymentId VARCHAR (10) OUTPUT
@@ -259,9 +242,6 @@ END
 
 
 GO
--- ============================================================================
--- PROCEDURE 6: THỦ TỤC HỦY PHÒNG ĐÃ ĐẶT
--- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_HuyPhong
 @BookingId VARCHAR (10), @RoomId VARCHAR (10), @CancelledBy VARCHAR (10), @CancellationFee DECIMAL (12, 2)=0, @Reason NVARCHAR (300)=NULL, @NewCancellationId VARCHAR (10) OUTPUT
 AS
@@ -314,9 +294,6 @@ END
 
 
 GO
--- ============================================================================
--- PROCEDURE 7: QUY TRÌNH BUỒNG PHÒNG TIẾP NHẬN & HOÀN TẤT DỌN DẸP
--- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_CapNhatTienDoDonPhong
 @RoomCleaningTaskId VARCHAR (10), @ReceivedBy VARCHAR (10), -- AccountId của nhân viên dọn phòng
 @Action VARCHAR (20), -- 'AcceptTask' (Nhận việc) hoặc 'CompleteTask' (Hoàn tất)
@@ -405,9 +382,6 @@ END
 
 
 GO
--- ============================================================================
--- PROCEDURE 9: TẠO TÀI KHOẢN ĐĂNG NHẬP MỚI (ÁP DỤNG fn_SinhMaAccount)
--- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_ThemTaiKhoan
 @Email VARCHAR (100), @Role VARCHAR (20), @UserName NVARCHAR (50), @Password VARCHAR (255), @NewAccountId VARCHAR (10) OUTPUT
 AS
@@ -439,9 +413,6 @@ END
 
 
 GO
--- ============================================================================
--- PROCEDURE 12: TẠO HỒ SƠ NHÂN VIÊN MỚI (ÁP DỤNG fn_SinhMaEmployee)
--- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_ThemNhanVien
 @AccountId VARCHAR (10)=NULL, @FullName NVARCHAR (100), @Phone VARCHAR (15), @Email VARCHAR (100), @HireDate DATE=NULL, @NewEmployeeId VARCHAR (10) OUTPUT
 AS
@@ -470,9 +441,6 @@ END
 
 
 GO
--- ============================================================================
--- PROCEDURE 13: TẠO PHÒNG VẬT LÝ MỚI (ÁP DỤNG fn_SinhMaRoom)
--- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_ThemPhong
 @RoomTypeId VARCHAR (10), @RoomName NVARCHAR (50), @NewRoomId VARCHAR (10) OUTPUT
 AS
@@ -508,9 +476,6 @@ END
 
 
 GO
--- ============================================================================
--- PROCEDURE 15: XÁC NHẬN THANH TOÁN TIỀN CỌC GIỮ CHỖ
--- ============================================================================
 CREATE OR ALTER PROCEDURE dbo.sp_XacNhanThanhToanCoc
 @BookingId VARCHAR (10), @PaymentMethod VARCHAR (20)='BankTransfer', @Note NVARCHAR (300)=NULL, @NewPaymentId VARCHAR (10) OUTPUT
 AS
